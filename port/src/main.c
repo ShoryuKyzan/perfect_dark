@@ -18,6 +18,8 @@
 #include "system.h"
 #include "utils.h"
 
+#include "openvr_capi.h"
+
 u32 g_OsMemSize = 0;
 s32 g_OsMemSizeMb = 16;
 u8 g_Is4Mb = 0;
@@ -92,8 +94,27 @@ static void cleanup(void)
 	// TODO: actually shut down all subsystems
 }
 
+static bool tempInitVR() // XXX
+{
+	intptr_t *m_pHMD;
+	// Loading the SteamVR Runtime
+	EVRInitError eError = EVRInitError_VRInitError_None;
+	m_pHMD = (intptr_t *)VR_InitInternal(&eError, EVRApplicationType_VRApplication_Scene);
+
+	if (eError != EVRInitError_VRInitError_None)
+	{
+		m_pHMD = NULL;
+		char buf[1024];
+		sprintf_s(buf, sizeof(buf), "Unable to init VR runtime: %s", VR_GetVRInitErrorAsEnglishDescription(eError));
+		sysLogPrintf(LOG_ERROR, buf);
+		return false;
+	}
+	return true;
+}
+
 int main(int argc, const char **argv)
 {
+	tempInitVR();
 	sysInitArgs(argc, argv);
 
 	if (!sysArgCheck("--no-crash-handler")) {
