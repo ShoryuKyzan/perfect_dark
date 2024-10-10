@@ -241,6 +241,7 @@ static int game_framebuffer;
 static int game_framebuffer_msaa_resolved;
 
 // VR
+bool vrEnabled = false;
 vr::IVRSystem *m_pHMD;
 static int eye_l_fb;
 static int eye_r_fb;
@@ -2919,6 +2920,8 @@ static bool gfx_init_vr()
 
     sysLogPrintf(LOG_NOTE, "vr set framebuffer params"); // XXX
 
+    vrEnabled = true;
+
     return true;
 }
 
@@ -3063,17 +3066,15 @@ uint32_t num_dls = 0;
 extern "C" void gfx_run(Gfx *commands)
 {
     ++num_dls;
-    // vr rendering.. multiple passes
 
     bool frame_started = false;
     int fb_id = 0;
-    for (int pass = 0; pass < 3; pass++)
+    int num_passes = vrEnabled ? 3 : 1;
+    for (int pass = 0; pass < num_passes; pass++)
     {
         gfx_sp_reset();
 
-        // puts("New frame");
-
-        if (pass == 1)
+        if (pass == 0)
         {
             if (!gfx_wapi->start_frame())
             {
@@ -3095,9 +3096,9 @@ extern "C" void gfx_run(Gfx *commands)
 
         // set correct frame buffer
         fb_id =
-            pass == 1   ? game_renders_to_framebuffer ? game_framebuffer : 0
-            : pass == 2 ? eye_l_fb
-            : pass == 3 ? eye_r_fb
+            pass == 0   ? game_renders_to_framebuffer ? game_framebuffer : 0
+            : pass == 1 ? eye_l_fb
+            : pass == 2 ? eye_r_fb
                         : 0;
         gfx_rapi->start_draw_to_framebuffer(fb_id,
                                             (float)gfx_current_dimensions.height / SCREEN_HEIGHT);
@@ -3110,7 +3111,7 @@ extern "C" void gfx_run(Gfx *commands)
         gfxFramebuffer = 0;
 
         // 2d only, resolve msaa
-        if (game_renders_to_framebuffer && pass == 1)
+        if (game_renders_to_framebuffer && pass == 0)
         {
             gfx_rapi->start_draw_to_framebuffer(0, 1);
             gfx_rapi->clear_framebuffer(true, true);
@@ -3141,12 +3142,12 @@ extern "C" void gfx_run(Gfx *commands)
             gfxFramebuffer = fb_id;
         }
 
-        if (pass == 2)
+        if (pass == 1)
         {
             vr::Texture_t leftEyeTexture = {(void *)(uintptr_t)gfxFramebuffer, vr::TextureType_OpenGL, vr::ColorSpace_Gamma};
             vr::VRCompositor()->Submit(vr::Eye_Left, &leftEyeTexture);
         }
-        else if (pass == 3)
+        else if (pass == 2)
         {
             vr::Texture_t rightEyeTexture = {(void *)(uintptr_t)gfxFramebuffer, vr::TextureType_OpenGL, vr::ColorSpace_Gamma};
             vr::VRCompositor()->Submit(vr::Eye_Right, &rightEyeTexture);
