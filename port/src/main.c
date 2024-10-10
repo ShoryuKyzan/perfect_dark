@@ -60,9 +60,12 @@ void *bootAllocateStack(s32 threadid, s32 size)
 void bootCreateSched(void)
 {
 	osCreateMesgQueue(&g_MainMesgQueue, g_MainMesgBuf, ARRAYCOUNT(g_MainMesgBuf));
-	if (osTvType == OS_TV_MPAL) {
+	if (osTvType == OS_TV_MPAL)
+	{
 		osCreateScheduler(&g_Sched, NULL, OS_VI_MPAL_LAN1, 1);
-	} else {
+	}
+	else
+	{
 		osCreateScheduler(&g_Sched, NULL, OS_VI_NTSC_LAN1, 1);
 	}
 }
@@ -71,15 +74,19 @@ static void gameInit(void)
 {
 	osMemSize = g_OsMemSizeMb * 1024 * 1024;
 
-	for (s32 i = 0; i < MAX_PLAYERS; ++i) {
+	for (s32 i = 0; i < MAX_PLAYERS; ++i)
+	{
 		struct extplayerconfig *cfg = g_PlayerExtCfg + i;
 		cfg->fovzoommult = cfg->fovzoom ? cfg->fovy / 60.0f : 1.0f;
 	}
 
-	if (g_HudCenter == HUDCENTER_NORMAL) {
+	if (g_HudCenter == HUDCENTER_NORMAL)
+	{
 		g_HudAlignModeL = G_ASPECT_CENTER_EXT;
 		g_HudAlignModeR = G_ASPECT_CENTER_EXT;
-	} else if (g_HudCenter == HUDCENTER_WIDE) {
+	}
+	else if (g_HudCenter == HUDCENTER_WIDE)
+	{
 		g_HudAlignModeL = G_ASPECT_LEFT_EXT | G_ASPECT_WIDE_EXT;
 		g_HudAlignModeR = G_ASPECT_RIGHT_EXT | G_ASPECT_WIDE_EXT;
 	}
@@ -94,30 +101,12 @@ static void cleanup(void)
 	// TODO: actually shut down all subsystems
 }
 
-static bool tempInitVR() // XXX
-{
-	intptr_t *m_pHMD;
-	// Loading the SteamVR Runtime
-	EVRInitError eError = EVRInitError_VRInitError_None;
-	m_pHMD = (intptr_t *)VR_InitInternal(&eError, EVRApplicationType_VRApplication_Scene);
-
-	if (eError != EVRInitError_VRInitError_None)
-	{
-		m_pHMD = NULL;
-		char buf[1024];
-		sprintf_s(buf, sizeof(buf), "Unable to init VR runtime: %s", VR_GetVRInitErrorAsEnglishDescription(eError));
-		sysLogPrintf(LOG_ERROR, buf);
-		return false;
-	}
-	return true;
-}
-
 int main(int argc, const char **argv)
 {
-	tempInitVR();
 	sysInitArgs(argc, argv);
 
-	if (!sysArgCheck("--no-crash-handler")) {
+	if (!sysArgCheck("--no-crash-handler"))
+	{
 		crashInit();
 	}
 
@@ -133,7 +122,8 @@ int main(int argc, const char **argv)
 
 	gameInit();
 
-	if (fsGetModDir()) {
+	if (fsGetModDir())
+	{
 		modConfigLoad(MOD_CONFIG_FNAME);
 	}
 
@@ -145,7 +135,8 @@ int main(int argc, const char **argv)
 
 	g_MempHeapSize = g_OsMemSize;
 	g_MempHeap = sysMemZeroAlloc(g_MempHeapSize);
-	if (!g_MempHeap) {
+	if (!g_MempHeap)
+	{
 		sysFatalError("Could not alloc %u bytes for memp heap.", g_MempHeapSize);
 	}
 
@@ -156,20 +147,25 @@ int main(int argc, const char **argv)
 
 	g_StageNum = sysArgGetInt("--boot-stage", STAGE_TITLE);
 
-	if (g_StageNum == STAGE_TITLE && (sysArgCheck("--skip-intro") || g_SkipIntro)) {
+	if (g_StageNum == STAGE_TITLE && (sysArgCheck("--skip-intro") || g_SkipIntro))
+	{
 		// shorthand for --boot-stage 0x26
 		g_StageNum = STAGE_CITRAINING;
-	} else if (g_StageNum < 0x01 || g_StageNum > 0x5d) {
+	}
+	else if (g_StageNum < 0x01 || g_StageNum > 0x5d)
+	{
 		// stage num out of range
 		g_StageNum = STAGE_TITLE;
 	}
 
-	if (g_StageNum != STAGE_TITLE) {
+	if (g_StageNum != STAGE_TITLE)
+	{
 		sysLogPrintf(LOG_NOTE, "boot stage set to 0x%02x", g_StageNum);
 	}
 
 	g_FileAutoSelect = sysArgGetInt("--profile", -1);
-	if (g_FileAutoSelect >= 0) {
+	if (g_FileAutoSelect >= 0)
+	{
 		sysLogPrintf(LOG_NOTE, "player profile set to %d", g_FileAutoSelect);
 	}
 
@@ -189,7 +185,8 @@ PD_CONSTRUCTOR static void gameConfigInit(void)
 	configRegisterInt("Game.SkipIntro", &g_SkipIntro, 0, 1);
 	configRegisterInt("Game.DisableMpDeathMusic", &g_MusicDisableMpDeath, 0, 1);
 	configRegisterInt("Game.GEMuzzleFlashes", &g_BgunGeMuzzleFlashes, 0, 1);
-	for (s32 j = 0; j < MAX_PLAYERS; ++j) {
+	for (s32 j = 0; j < MAX_PLAYERS; ++j)
+	{
 		const s32 i = j + 1;
 		configRegisterFloat(strFmt("Game.Player%d.FovY", i), &g_PlayerExtCfg[j].fovy, 5.f, 175.f);
 		configRegisterInt(strFmt("Game.Player%d.FovAffectsZoom", i), &g_PlayerExtCfg[j].fovzoom, 0, 1);
