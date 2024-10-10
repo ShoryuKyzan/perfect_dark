@@ -31,6 +31,8 @@
 #include "gfx_rendering_api.h"
 #include "gfx_screen_config.h"
 
+#include "openvr.h"
+
 uintptr_t gfxFramebuffer;
 
 #define ALIGN(x, a) (((x) + (a - 1)) & ~(a - 1))
@@ -237,6 +239,13 @@ bool gfx_detail_textures_enabled = true;
 static bool game_renders_to_framebuffer;
 static int game_framebuffer;
 static int game_framebuffer_msaa_resolved;
+
+// VR
+vr::IVRSystem *m_pHMD;
+static int eye_l_fb;
+static int eye_r_fb;
+uint32_t vrRenderWidth;
+uint32_t vrRenderHeight;
 
 uint32_t gfx_msaa_level = 1;
 
@@ -2874,6 +2883,45 @@ extern "C" void gfx_get_dimensions(uint32_t *width, uint32_t *height, int32_t *p
     gfx_wapi->get_dimensions(width, height, posX, posY);
 }
 
+static bool gfx_init_vr()
+{
+
+    // Loading the SteamVR Runtime
+    vr::EVRInitError eError = vr::VRInitError_None;
+    m_pHMD = vr::VR_Init(&eError, vr::VRApplication_Scene);
+    char buf[1024];
+
+    if (eError != vr::VRInitError_None)
+    {
+        m_pHMD = NULL;
+        sprintf_s(buf, sizeof(buf), "Unable to init VR runtime: %s", vr::VR_GetVRInitErrorAsEnglishDescription(eError));
+        sysLogPrintf(LOG_ERROR, buf);
+        return false;
+    }
+
+    sysLogPrintf(LOG_NOTE, "vr init success"); // XXX
+
+    // vr init
+    m_pHMD->GetRecommendedRenderTargetSize(&vrRenderWidth, &vrRenderHeight);
+
+    sprintf_s(buf, sizeof(buf), "vr got recommended sizes w %d h %d", vrRenderWidth, vrRenderHeight); // XXX
+    sysLogPrintf(LOG_NOTE, buf);                                                                      // XXX
+
+    // VR framebuffers
+    eye_l_fb = gfx_rapi->create_framebuffer();
+    eye_r_fb = gfx_rapi->create_framebuffer();
+
+    sysLogPrintf(LOG_NOTE, "vr created framebuffers"); // XXX
+
+    // set sizes
+    gfx_rapi->update_framebuffer_parameters(eye_l_fb, vrRenderWidth, vrRenderHeight, 1, true, true, true, true);
+    gfx_rapi->update_framebuffer_parameters(eye_r_fb, vrRenderWidth, vrRenderHeight, 1, true, true, true, true);
+
+    sysLogPrintf(LOG_NOTE, "vr set framebuffer params"); // XXX
+
+    return true;
+}
+
 extern "C" void gfx_init(const GfxInitSettings *settings)
 {
     gfx_wapi = settings->wapi;
@@ -2886,6 +2934,8 @@ extern "C" void gfx_init(const GfxInitSettings *settings)
     gfx_current_game_window_viewport.height = gfx_current_dimensions.height = settings->window_settings.height;
     game_framebuffer = gfx_rapi->create_framebuffer();
     game_framebuffer_msaa_resolved = gfx_rapi->create_framebuffer();
+
+    gfx_init_vr();
 
     if (gfx_msaa_level > 1 && !gfx_framebuffers_enabled)
     {
@@ -3013,59 +3063,97 @@ uint32_t num_dls = 0;
 extern "C" void gfx_run(Gfx *commands)
 {
     ++num_dls;
-    gfx_sp_reset();
+    // vr rendering.. multiple passes
 
-    // puts("New frame");
-
-    if (!gfx_wapi->start_frame())
+    bool frame_started = false;
+    int fb_id = 0;
+    for (int pass = 0; pass < 3; pass++)
     {
-        dropped_frame = true;
-        return;
-    }
-    dropped_frame = false;
+        gfx_sp_reset();
 
-    gfx_rapi->update_framebuffer_parameters(0, gfx_current_window_dimensions.width,
-                                            gfx_current_window_dimensions.height, 1, false, true, true,
-                                            !game_renders_to_framebuffer);
-    gfx_rapi->start_frame();
-    gfx_rapi->start_draw_to_framebuffer(game_renders_to_framebuffer ? game_framebuffer : 0,
-                                        (float)gfx_current_dimensions.height / SCREEN_HEIGHT);
-    gfx_rapi->clear_framebuffer(true, false);
-    rdp.viewport_or_scissor_changed = true;
-    rendering_state.viewport = {};
-    rendering_state.scissor = {};
-    gfx_run_dl(commands);
-    gfx_flush();
-    gfxFramebuffer = 0;
+        // puts("New frame");
 
-    if (game_renders_to_framebuffer)
-    {
-        gfx_rapi->start_draw_to_framebuffer(0, 1);
-        gfx_rapi->clear_framebuffer(true, true);
-
-        if (gfx_msaa_level > 1)
+        if (pass == 1)
         {
-            bool different_size = gfx_current_dimensions.width != gfx_current_game_window_viewport.width ||
-                                  gfx_current_dimensions.height != gfx_current_game_window_viewport.height;
-
-            if (different_size)
+            if (!gfx_wapi->start_frame())
             {
-                gfx_rapi->resolve_msaa_color_buffer(game_framebuffer_msaa_resolved, game_framebuffer);
-                gfxFramebuffer = (uintptr_t)gfx_rapi->get_framebuffer_texture_id(game_framebuffer_msaa_resolved);
+                dropped_frame = true;
+                return;
+            }
+            dropped_frame = false;
+
+            gfx_rapi->update_framebuffer_parameters(0, gfx_current_window_dimensions.width,
+                                                    gfx_current_window_dimensions.height, 1, false, true, true,
+                                                    !game_renders_to_framebuffer);
+        }
+
+        if (!frame_started)
+        {
+            gfx_rapi->start_frame();
+            frame_started = true;
+        }
+
+        // set correct frame buffer
+        fb_id =
+            pass == 1   ? game_renders_to_framebuffer ? game_framebuffer : 0
+            : pass == 2 ? eye_l_fb
+            : pass == 3 ? eye_r_fb
+                        : 0;
+        gfx_rapi->start_draw_to_framebuffer(fb_id,
+                                            (float)gfx_current_dimensions.height / SCREEN_HEIGHT);
+        gfx_rapi->clear_framebuffer(true, false);
+        rdp.viewport_or_scissor_changed = true;
+        rendering_state.viewport = {};
+        rendering_state.scissor = {};
+        gfx_run_dl(commands);
+        gfx_flush();
+        gfxFramebuffer = 0;
+
+        // 2d only, resolve msaa
+        if (game_renders_to_framebuffer && pass == 1)
+        {
+            gfx_rapi->start_draw_to_framebuffer(0, 1);
+            gfx_rapi->clear_framebuffer(true, true);
+
+            if (gfx_msaa_level > 1)
+            {
+                bool different_size = gfx_current_dimensions.width != gfx_current_game_window_viewport.width ||
+                                      gfx_current_dimensions.height != gfx_current_game_window_viewport.height;
+
+                if (different_size)
+                {
+                    gfx_rapi->resolve_msaa_color_buffer(game_framebuffer_msaa_resolved, game_framebuffer);
+                    gfxFramebuffer = (uintptr_t)gfx_rapi->get_framebuffer_texture_id(game_framebuffer_msaa_resolved);
+                }
+                else
+                {
+                    // TODO if vr needs MSAA, we need to do this step from vrfb -> msaafb (final fb). also eye fbs need to be initted with msaa_level. After that get the clrbuf for those final vr framebuffers.
+                    gfx_rapi->resolve_msaa_color_buffer(0, game_framebuffer);
+                }
             }
             else
             {
-                gfx_rapi->resolve_msaa_color_buffer(0, game_framebuffer);
+                gfxFramebuffer = (uintptr_t)gfx_rapi->get_framebuffer_texture_id(game_framebuffer);
             }
         }
         else
         {
-            gfxFramebuffer = (uintptr_t)gfx_rapi->get_framebuffer_texture_id(game_framebuffer);
+            gfxFramebuffer = fb_id;
         }
-    }
 
-    gfx_rapi->end_frame();
-    gfx_wapi->swap_buffers_begin();
+        if (pass == 2)
+        {
+            vr::Texture_t leftEyeTexture = {(void *)(uintptr_t)gfxFramebuffer, vr::TextureType_OpenGL, vr::ColorSpace_Gamma};
+            vr::VRCompositor()->Submit(vr::Eye_Left, &leftEyeTexture);
+        }
+        else if (pass == 3)
+        {
+            vr::Texture_t rightEyeTexture = {(void *)(uintptr_t)gfxFramebuffer, vr::TextureType_OpenGL, vr::ColorSpace_Gamma};
+            vr::VRCompositor()->Submit(vr::Eye_Right, &rightEyeTexture);
+        }
+        gfx_rapi->end_frame();
+        gfx_wapi->swap_buffers_begin();
+    }
 }
 
 extern "C" void gfx_end_frame(void)
