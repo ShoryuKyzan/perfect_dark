@@ -61,17 +61,17 @@ s32 videoInit(void)
 			.fullscreen = vidFullscreen,
 			.fullscreen_is_exclusive = vidFullscreenExclusive,
 			.maximized = vidMaximize,
-			.allow_hidpi = vidAllowHiDpi
-		}
-	};
+			.allow_hidpi = vidAllowHiDpi}};
 
 	gfx_init(&set);
 
-	if (!wmAPI->set_swap_interval(vidVsync)) {
+	if (!wmAPI->set_swap_interval(vidVsync))
+	{
 		vidVsync = 0;
 	}
 
-	if (vidVsync == 0 && vidFramerateLimit == 0) {
+	if (vidVsync == 0 && vidFramerateLimit == 0)
+	{
 		// cap FPS if there's no vsync to prevent the game from exploding
 		vidFramerateLimit = VIDEO_MAX_FPS;
 	}
@@ -83,9 +83,14 @@ s32 videoInit(void)
 	return 0;
 }
 
+void videoCleanup()
+{
+	gfx_destroy();
+}
 void videoStartFrame(void)
 {
-	if (initDone) {
+	if (initDone)
+	{
 		startTime = wmAPI->get_time();
 		gfx_start_frame();
 	}
@@ -93,7 +98,8 @@ void videoStartFrame(void)
 
 void videoSubmitCommands(Gfx *cmds)
 {
-	if (initDone) {
+	if (initDone)
+	{
 		gfx_run(cmds);
 		++dlcount;
 	}
@@ -101,7 +107,8 @@ void videoSubmitCommands(Gfx *cmds)
 
 void videoEndFrame(void)
 {
-	if (!initDone) {
+	if (!initDone)
+	{
 		return;
 	}
 
@@ -112,7 +119,8 @@ void videoEndFrame(void)
 	++frames;
 	++framesPerSec;
 
-	if (endTime >= fpsTime) {
+	if (endTime >= fpsTime)
+	{
 		char tmp[128];
 		snprintf(tmp, sizeof(tmp), "fps %3u frt %lf frm %u", framesPerSec, endTime - startTime, frames);
 		wmAPI->set_window_title(tmp);
@@ -130,7 +138,8 @@ void videoClearScreen(void)
 
 void *videoGetWindowHandle(void)
 {
-	if (initDone) {
+	if (initDone)
+	{
 		return wmAPI->get_window_handle();
 	}
 	return NULL;
@@ -201,7 +210,8 @@ void videoSetWindowOffset(s32 x, s32 y)
 
 void videoSetFullscreen(s32 fs)
 {
-	if (fs != vidFullscreen) {
+	if (fs != vidFullscreen)
+	{
 		vidFullscreen = !!fs;
 		wmAPI->set_fullscreen(vidFullscreen);
 	}
@@ -209,7 +219,8 @@ void videoSetFullscreen(s32 fs)
 
 void videoSetMaximizeWindow(s32 fs)
 {
-	if (fs != vidMaximize) {
+	if (fs != vidMaximize)
+	{
 		vidMaximize = !!fs;
 		wmAPI->set_maximize(vidMaximize);
 	}
@@ -217,8 +228,10 @@ void videoSetMaximizeWindow(s32 fs)
 
 void videoSetTextureFilter(u32 filter)
 {
-	if (filter > FILTER_THREE_POINT) filter = FILTER_THREE_POINT;
-	if (texFilter == filter) return;
+	if (filter > FILTER_THREE_POINT)
+		filter = FILTER_THREE_POINT;
+	if (texFilter == filter)
+		return;
 	texFilter = filter;
 	gfx_set_texture_filter((enum FilteringMode)filter);
 }

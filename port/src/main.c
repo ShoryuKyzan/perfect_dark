@@ -18,8 +18,6 @@
 #include "system.h"
 #include "utils.h"
 
-#include "openvr_capi.h"
-
 u32 g_OsMemSize = 0;
 s32 g_OsMemSizeMb = 16;
 u8 g_Is4Mb = 0;
@@ -98,6 +96,7 @@ static void cleanup(void)
 	inputSaveBinds();
 	configSave(CONFIG_PATH);
 	crashShutdown();
+	videoCleanup();
 	// TODO: actually shut down all subsystems
 }
 

@@ -12,6 +12,7 @@
 #endif
 
 s32 videoInit(void);
+void videoCleanup();
 void videoStartFrame(void);
 void videoSubmitCommands(Gfx *cmds);
 void videoClearScreen(void);

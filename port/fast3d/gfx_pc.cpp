@@ -247,6 +247,7 @@ static int eye_l_fb;
 static int eye_r_fb;
 uint32_t vrRenderWidth;
 uint32_t vrRenderHeight;
+vr::TrackedDevicePose_t vrTrackedDevicePoses[vr::k_unMaxTrackedDeviceCount];
 
 uint32_t gfx_msaa_level = 1;
 
@@ -2902,6 +2903,13 @@ static bool gfx_init_vr()
 
     sysLogPrintf(LOG_NOTE, "vr init success"); // XXX
 
+    if (!vr::VRCompositor())
+    {
+        sysLogPrintf(LOG_ERROR, "vr compositor failed to init");
+        return false;
+    }
+    sysLogPrintf(LOG_NOTE, "vr compositor init success"); // XXX
+
     // vr init
     m_pHMD->GetRecommendedRenderTargetSize(&vrRenderWidth, &vrRenderHeight);
 
@@ -2923,6 +2931,17 @@ static bool gfx_init_vr()
     vrEnabled = true;
 
     return true;
+}
+
+static void gfx_vr_shutdown()
+{
+    if (m_pHMD && vrEnabled)
+    {
+        vr::VR_Shutdown();
+        m_pHMD = NULL;
+        vrEnabled = false;
+        sysLogPrintf(LOG_NOTE, "vr shutdown"); // XXX
+    }
 }
 
 extern "C" void gfx_init(const GfxInitSettings *settings)
@@ -2969,6 +2988,8 @@ extern "C" void gfx_destroy(void)
 
     // Texture cache and loaded textures store references to Resources which need to be unreferenced.
     gfx_texture_cache_clear();
+
+    gfx_vr_shutdown();
 }
 
 extern "C" struct GfxRenderingAPI *gfx_get_current_rendering_api(void)
@@ -3070,19 +3091,18 @@ extern "C" void gfx_run(Gfx *commands)
     bool frame_started = false;
     int fb_id = 0;
     int num_passes = vrEnabled ? 3 : 1;
+    gfx_sp_reset();
+    if (!gfx_wapi->start_frame())
+    {
+        dropped_frame = true;
+        return;
+    }
+    dropped_frame = false;
     for (int pass = 0; pass < num_passes; pass++)
     {
-        gfx_sp_reset();
-
+        sysLogPrintf(LOG_NOTE, "frame pass %d", pass); // XXX
         if (pass == 0)
         {
-            if (!gfx_wapi->start_frame())
-            {
-                dropped_frame = true;
-                return;
-            }
-            dropped_frame = false;
-
             gfx_rapi->update_framebuffer_parameters(0, gfx_current_window_dimensions.width,
                                                     gfx_current_window_dimensions.height, 1, false, true, true,
                                                     !game_renders_to_framebuffer);
@@ -3137,23 +3157,52 @@ extern "C" void gfx_run(Gfx *commands)
                 gfxFramebuffer = (uintptr_t)gfx_rapi->get_framebuffer_texture_id(game_framebuffer);
             }
         }
-        else
+        else if (pass > 0)
         {
-            gfxFramebuffer = fb_id;
+            gfxFramebuffer = (uintptr_t)gfx_rapi->get_framebuffer_texture_id(fb_id);
         }
 
         if (pass == 1)
         {
             vr::Texture_t leftEyeTexture = {(void *)(uintptr_t)gfxFramebuffer, vr::TextureType_OpenGL, vr::ColorSpace_Gamma};
-            vr::VRCompositor()->Submit(vr::Eye_Left, &leftEyeTexture);
+            vr::EVRCompositorError error = vr::VRCompositor()->Submit(vr::Eye_Left, &leftEyeTexture);
+
+            if (error != vr::VRCompositorError_None)
+            {
+                // Handle error
+                switch (error)
+                {
+                case vr::VRCompositorError_RequestFailed:
+                    sysLogPrintf(LOG_ERROR, "Submit failed: RequestFailed");
+                    break;
+                case vr::VRCompositorError_InvalidTexture:
+                    sysLogPrintf(LOG_ERROR, "Submit failed: InvalidTexture");
+                    break;
+                case vr::VRCompositorError_IsNotSceneApplication:
+                    sysLogPrintf(LOG_ERROR, "Submit failed: IsNotSceneApplication");
+                    break;
+                // Add other error cases as needed
+                default:
+                    sysLogPrintf(LOG_ERROR, "Submit failed with error:", (int)error);
+                    break;
+                }
+            }
+            else
+            {
+                sysLogPrintf(LOG_NOTE, "vr left eye texture submitted");
+            }
         }
         else if (pass == 2)
         {
             vr::Texture_t rightEyeTexture = {(void *)(uintptr_t)gfxFramebuffer, vr::TextureType_OpenGL, vr::ColorSpace_Gamma};
             vr::VRCompositor()->Submit(vr::Eye_Right, &rightEyeTexture);
         }
-        gfx_rapi->end_frame();
-        gfx_wapi->swap_buffers_begin();
+    }
+    gfx_rapi->end_frame();
+    gfx_wapi->swap_buffers_begin();
+    if (vrEnabled)
+    {
+        vr::VRCompositor()->WaitGetPoses(vrTrackedDevicePoses, vr::k_unMaxTrackedDeviceCount, NULL, 0);
     }
 }
 
