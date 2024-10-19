@@ -40,7 +40,8 @@ typedef s16 RoomNum;
 // Matrices are stored as Mtxfs then converted to an Mtx when passed to the GPU.
 // Mtxs use a union and a long long int to force alignments. Mtxfs are not
 // aligned but still use the union for consistency with Mtx.
-typedef union {
+typedef union
+{
 	f32 m[4][4];
 	u32 l[4][4];
 	s32 unused;
@@ -50,9 +51,12 @@ typedef union {
 // coord->x, coord->y and coord->z, but also as
 // coord->f[0], coord->f[1] and coord->f[2].
 // In some places code only matches when using the float array.
-struct coord {
-	union {
-		struct {
+struct coord
+{
+	union
+	{
+		struct
+		{
 			f32 x;
 			f32 y;
 			f32 z;
@@ -61,7 +65,8 @@ struct coord {
 	};
 };
 
-struct bbox {
+struct bbox
+{
 	f32 xmin;
 	f32 xmax;
 	f32 ymin;
@@ -70,7 +75,8 @@ struct bbox {
 	f32 zmax;
 };
 
-struct propstate {
+struct propstate
+{
 	/*0x00*/ u16 propcount;
 	/*0x02*/ u16 chrpropcount;
 	/*0x04*/ u16 foregroundpropcount;
@@ -82,7 +88,8 @@ struct propstate {
 	/*0x18*/ u16 lastupdateframe;
 };
 
-struct playerstats {
+struct playerstats
+{
 	/*0x00*/ s32 shotcount[7];
 	/*0x1c*/ s32 killcount;
 	/*0x20*/ s32 ggkillcount;
@@ -104,9 +111,10 @@ struct playerstats {
 	/*0x6c*/ s32 speedpillcount;
 
 	// Temporary hack
-	union {
-	/*0x70*/ s32 mpindex;
-	/*0x70*/ u32 mpindexu32;
+	union
+	{
+		/*0x70*/ s32 mpindex;
+		/*0x70*/ u32 mpindexu32;
 	};
 
 	/*0x74*/ f32 scale_bg2gfx;
@@ -114,12 +122,14 @@ struct playerstats {
 	/*0x7c*/ f32 damtransmitted;
 };
 
-struct fileguid {
+struct fileguid
+{
 	s32 fileid;
 	u16 deviceserial;
 };
 
-struct g_vars {
+struct g_vars
+{
 	// lv values pause when the game is paused, and reset when a new level is loaded
 	// diff values run all the time
 	// names ending in f are the same as their non-f counterparts, but as a float
@@ -128,25 +138,25 @@ struct g_vars {
 	// names ending in 240 mean their units are 240ths of a second
 	// names ending in t mean their units are CPU ticks/cycles
 
-	/*0x000*/ s32 diffframe60;         // time between current frame start and previous frame start in 60ths of a second
-	/*0x004*/ f32 diffframe60f;        // always .0 decimal
-	/*0x008*/ s32 lvframe60;           // incrementing 60ths, but it doesn't apply remainder so it drops behind lvframe240 / 4
-	/*0x00c*/ s32 lvframenum;          // increments by 1 each frame
+	/*0x000*/ s32 diffframe60;	// time between current frame start and previous frame start in 60ths of a second
+	/*0x004*/ f32 diffframe60f; // always .0 decimal
+	/*0x008*/ s32 lvframe60;	// incrementing 60ths, but it doesn't apply remainder so it drops behind lvframe240 / 4
+	/*0x00c*/ s32 lvframenum;	// increments by 1 each frame
 	/*0x010*/ f32 diffframe60freal;
-	/*0x014*/ s32 prevframestartt;     // cycle count at start of previous frame
-	/*0x018*/ s32 thisframestartt;     // cycle count at start of current frame
-	/*0x01c*/ s32 diffframet;          // previous frame's duration in ticks, including any wait time after it finished
+	/*0x014*/ s32 prevframestartt; // cycle count at start of previous frame
+	/*0x018*/ s32 thisframestartt; // cycle count at start of current frame
+	/*0x01c*/ s32 diffframet;	   // previous frame's duration in ticks, including any wait time after it finished
 	/*0x020*/ s32 lostframetime60t;
 	/*0x024*/ s32 lostframetime240t;
-	/*0x028*/ u32 mininc60;            // minimum amount of time between frames (always set to 1, ie. max 60fps)
+	/*0x028*/ u32 mininc60; // minimum amount of time between frames (always set to 1, ie. max 60fps)
 	/*0x02c*/ s32 roomportalrecursionlimit;
-	/*0x030*/ s32 lvframe240;          // incrementing 240ths
-	/*0x034*/ s32 lvupdate240;         // update multiplier, capped at 4 if slow motion
-	/*0x038*/ s32 lvupdate60;          // update multiplier, factoring in remainder from previous frame
-	/*0x03c*/ s32 lvupdate240rem;      // update multiplier's remainder for next frame's lvupdate60 (0 - 3)
-	/*0x040*/ s32 diffframe240;        // time between current frame start and previous frame start in 240ths of a second
-	/*0x044*/ f32 lvupdate60f;         // with decimal
-	/*0x048*/ f32 diffframe240f;       // always .0 decimal
+	/*0x030*/ s32 lvframe240;	  // incrementing 240ths
+	/*0x034*/ s32 lvupdate240;	  // update multiplier, capped at 4 if slow motion
+	/*0x038*/ s32 lvupdate60;	  // update multiplier, factoring in remainder from previous frame
+	/*0x03c*/ s32 lvupdate240rem; // update multiplier's remainder for next frame's lvupdate60 (0 - 3)
+	/*0x040*/ s32 diffframe240;	  // time between current frame start and previous frame start in 240ths of a second
+	/*0x044*/ f32 lvupdate60f;	  // with decimal
+	/*0x048*/ f32 diffframe240f;  // always .0 decimal
 	/*0x04c*/ f32 lvupdate60freal;
 	/*0x050*/ f32 lvupdate60frealprev; // previous frame's lvupdate60freal
 	/*0x054*/ s32 prevframestart240;   // previous frame's start time in 240ths (incrementing)
@@ -158,7 +168,7 @@ struct g_vars {
 	/*0x274*/ u32 playerorder[MAX_PLAYERS];
 	/*0x284*/ struct player *currentplayer;
 	/*0x288*/ struct playerstats *currentplayerstats;
-	/*0x28c*/ s32 currentplayernum; // 0-3 - controller numbers I think
+	/*0x28c*/ s32 currentplayernum;	  // 0-3 - controller numbers I think
 	/*0x290*/ s32 currentplayerindex; // 0-3 - but 2 or 3 probably only used in combat simulator
 	/*0x294*/ s32 bondplayernum;
 	/*0x298*/ s32 coopplayernum;
@@ -173,7 +183,7 @@ struct g_vars {
 	/*0x2bc*/ s32 roomcount;
 	/*0x2c0*/ s32 hitboundscount;
 	/*0x2c4*/ struct modelnode *hitnodes[20];
-	/*0x314*/ u32 mplayerisrunning;     // combat sim with any number of players, coop with human buddy, and counter-op
+	/*0x314*/ u32 mplayerisrunning;		// combat sim with any number of players, coop with human buddy, and counter-op
 	/*0x318*/ u32 normmplayerisrunning; // combat sim with any number of players
 	/*0x31c*/ s32 lvmpbotlevel;
 	/*0x320*/ s32 lockscreen;
@@ -182,11 +192,11 @@ struct g_vars {
 	/*0x32c*/ bool enableslopes;
 	/*0x330*/ u32 padrandomroutes;
 	/*0x334*/ s32 maxprops;
-	/*0x338*/ struct prop *props; // pointer to array of structs
-	/*0x33c*/ struct prop *activeprops; // head of a doubly linked list
+	/*0x338*/ struct prop *props;			// pointer to array of structs
+	/*0x33c*/ struct prop *activeprops;		// head of a doubly linked list
 	/*0x340*/ struct prop *activepropstail; // next pointer points to pausedprops
-	/*0x344*/ struct prop *freeprops; // head of a singularly linked list
-	/*0x348*/ struct prop **onscreenprops; // sorted by distance, furthest first
+	/*0x344*/ struct prop *freeprops;		// head of a singularly linked list
+	/*0x348*/ struct prop **onscreenprops;	// sorted by distance, furthest first
 	/*0x34c*/ struct prop **endonscreenprops;
 	/*0x350*/ s32 numonscreenprops;
 	/*0x354*/ struct prop *pausedprops; // head of a doubly linked list, prev pointer points to activepropstail
@@ -244,11 +254,11 @@ struct g_vars {
 	/*0x4cc*/ s32 in_cutscene;
 	/*0x4d0*/ u8 paksneededformenu;
 	/*0x4d1*/ u8 paksneededforgame;
-	/*0x4d2*/ s8 autocutnum; // cutscene scene number (0, 1 or 2), set to -1 while loading cutscene
-	/*0x4d3*/ s8 autocutplaying; // true if playing a cutscene via the menu, false when a button is pressed
-	/*0x4d4*/ s8 autocutgroupcur; // index into g_Cutscenes
+	/*0x4d2*/ s8 autocutnum;	   // cutscene scene number (0, 1 or 2), set to -1 while loading cutscene
+	/*0x4d3*/ s8 autocutplaying;   // true if playing a cutscene via the menu, false when a button is pressed
+	/*0x4d4*/ s8 autocutgroupcur;  // index into g_Cutscenes
 	/*0x4d5*/ s8 autocutgroupleft; // number of cutscenes left to play
-	/*0x4d6*/ s8 autocutfinished; // true if cutscene reached natural end
+	/*0x4d6*/ s8 autocutfinished;  // true if cutscene reached natural end
 	/*0x4d7*/ s8 autocutgroupskip; // true if pressed start during auto cutscene
 	/*0x4d8*/ s32 joydisableframestogo;
 	/*0x4dc*/ u8 playertojoymap[MAX_PLAYERS];
@@ -273,6 +283,8 @@ struct g_vars {
 	/*0x508*/ u32 unk000508;
 	/*0x50c*/ u32 unk00050c;
 	/*0x510*/ f32 unk000510;
+	bool vrEnabled;
+	s8 vrRenderEye;
 };
 
 struct weaponobj;
@@ -288,13 +300,15 @@ struct explosion;
  * The type field indicates what type it is (chr, obj etc) and the entity
  * pointer points back to the proper entity struct.
  */
-struct prop {
+struct prop
+{
 	/*0x00*/ u8 type;
 	/*0x01*/ u8 flags;
 	/*0x02*/ s16 timetoregen; // 0 when available, ticks down when unavailable
 
 	/*0x04*/
-	union {
+	union
+	{
 		struct chrdata *chr;
 		struct defaultobj *obj;
 		struct doorobj *door;
@@ -305,7 +319,8 @@ struct prop {
 
 	/*0x08*/ struct coord pos;
 	/*0x14*/ f32 z;
-	union {
+	union
+	{
 		/*0x18*/ struct prop *parent;
 		/*0x18*/ struct model *parentmodel;
 	};
@@ -326,7 +341,8 @@ struct prop {
 	/*0x44*/ struct wallhit *xluwallhits; // translucent
 };
 
-struct packedpad {
+struct packedpad
+{
 #ifdef PLATFORM_BIG_ENDIAN
 	s32 liftnum : 4;
 	s32 flags : 18;
@@ -338,7 +354,8 @@ struct packedpad {
 #endif
 };
 
-struct pad {
+struct pad
+{
 	/*0x00*/ struct coord pos;
 	/*0x0c*/ struct coord look;
 	/*0x18*/ struct coord up;
@@ -350,12 +367,14 @@ struct pad {
 	/*0x52*/ s16 unk52;
 };
 
-union filedataptr {
+union filedataptr
+{
 	u8 *u8;
 	u32 *u32;
 };
 
-struct attackanimconfig {
+struct attackanimconfig
+{
 	/*0x00*/ s16 animnum;
 	/*0x04*/ f32 unk04; // frame number
 	/*0x08*/ f32 unk08;
@@ -378,7 +397,8 @@ struct attackanimconfig {
 
 struct model;
 
-struct anim {
+struct anim
+{
 	/*0x00*/ s16 animnum;
 	/*0x02*/ s16 animnum2;
 	/*0x04*/ u8 frameslot1;
@@ -425,25 +445,30 @@ struct anim {
 	/*0x88*/ f32 animscale;
 };
 
-struct skeleton {
+struct skeleton
+{
 	s16 skel;
 	u16 numthings;
 	u8 (*things)[2];
 };
 
-struct modelrodata_chrinfo { // type 0x01
+struct modelrodata_chrinfo
+{ // type 0x01
 	u16 animpart;
 	s16 mtxindex;
 	f32 unk04;
 	u16 rwdataindex;
 };
 
-struct modelrodata_position { // type 0x02
+struct modelrodata_position
+{ // type 0x02
 	struct coord pos;
 	u16 part;
-	union {
+	union
+	{
 		s16 mtxindexes[3];
-		struct {
+		struct
+		{
 			s16 mtxindex0;
 			s16 mtxindex1;
 			s16 mtxindex2;
@@ -452,7 +477,8 @@ struct modelrodata_position { // type 0x02
 	f32 drawdist;
 };
 
-struct modelrodata_gundl { // type 0x04
+struct modelrodata_gundl
+{ // type 0x04
 	Gfx *opagdl;
 	Gfx *xlugdl;
 	void *baseaddr;
@@ -461,14 +487,16 @@ struct modelrodata_gundl { // type 0x04
 	s16 unk12;
 };
 
-struct modelrodata_distance { // type 0x08
+struct modelrodata_distance
+{ // type 0x08
 	f32 near;
 	f32 far;
 	struct modelnode *target;
 	u16 rwdataindex;
 };
 
-struct modelrodata_reorder { // type 0x09
+struct modelrodata_reorder
+{ // type 0x09
 	f32 unk00;
 	f32 unk04;
 	f32 unk08;
@@ -479,7 +507,8 @@ struct modelrodata_reorder { // type 0x09
 	u16 rwdataindex;
 };
 
-struct modelrodata_bbox { // type 0x0a
+struct modelrodata_bbox
+{ // type 0x0a
 	s32 hitpart;
 	f32 xmin;
 	f32 xmax;
@@ -489,7 +518,8 @@ struct modelrodata_bbox { // type 0x0a
 	f32 zmax;
 };
 
-struct modelrodata_type0b { // type 0x0b
+struct modelrodata_type0b
+{ // type 0x0b
 	u32 unk00;
 	u32 unk04;
 	u32 unk08;
@@ -511,7 +541,8 @@ struct modelrodata_type0b { // type 0x0b
 	void *baseaddr;
 };
 
-struct modelrodata_chrgunfire { // type 0x0c
+struct modelrodata_chrgunfire
+{ // type 0x0c
 	struct coord pos;
 	struct coord dim;
 	struct textureconfig *texture;
@@ -520,7 +551,8 @@ struct modelrodata_chrgunfire { // type 0x0c
 	void *baseaddr;
 };
 
-struct modelrodata_type0d { // type 0x0d
+struct modelrodata_type0d
+{ // type 0x0d
 	u32 unk00;
 	u32 unk04;
 	u32 unk08;
@@ -531,7 +563,8 @@ struct modelrodata_type0d { // type 0x0d
 	void *baseaddr;
 };
 
-struct modelrodata_type11 { // type 0x11
+struct modelrodata_type11
+{ // type 0x11
 	u32 unk00;
 	u32 unk04;
 	u32 unk08;
@@ -540,28 +573,33 @@ struct modelrodata_type11 { // type 0x11
 	void *unk14;
 };
 
-struct modelrodata_toggle { // type 0x12
+struct modelrodata_toggle
+{ // type 0x12
 	struct modelnode *target;
 	u16 rwdataindex;
 };
 
-struct modelrodata_positionheld { // type 0x15
+struct modelrodata_positionheld
+{ // type 0x15
 	struct coord pos;
 	s16 mtxindex;
 };
 
-struct modelrodata_stargunfire { // type 0x16
+struct modelrodata_stargunfire
+{ // type 0x16
 	s32 unk00;
 	Vtx *vertices;
 	Gfx *gdl;
 	void *baseaddr;
 };
 
-struct modelrodata_headspot { // type 0x17
+struct modelrodata_headspot
+{ // type 0x17
 	u16 rwdataindex;
 };
 
-struct modelrodata_dl { // type 0x18
+struct modelrodata_dl
+{ // type 0x18
 	/*0x00*/ Gfx *opagdl;
 	/*0x04*/ Gfx *xlugdl;
 	/*0x08*/ Col *colours;
@@ -572,12 +610,14 @@ struct modelrodata_dl { // type 0x18
 	/*0x16*/ u16 numcolours;
 };
 
-struct modelrodata_type19 { // type 0x19
+struct modelrodata_type19
+{ // type 0x19
 	/*0x00*/ s32 numvertices;
 	/*0x04*/ struct coord vertices[4];
 };
 
-union modelrodata {
+union modelrodata
+{
 	struct modelrodata_chrinfo chrinfo;
 	struct modelrodata_position position;
 	struct modelrodata_gundl gundl;
@@ -596,7 +636,8 @@ union modelrodata {
 	struct modelrodata_type19 type19;
 };
 
-struct modelnode {
+struct modelnode
+{
 	/*0x00*/ u16 type;
 	/*0x04*/ union modelrodata *rodata;
 	/*0x08*/ struct modelnode *parent;
@@ -605,7 +646,8 @@ struct modelnode {
 	/*0x14*/ struct modelnode *child;
 };
 
-struct modeldef {
+struct modeldef
+{
 	struct modelnode *rootnode;
 	struct skeleton *skel;
 
@@ -621,12 +663,14 @@ struct modeldef {
 	struct textureconfig *texconfigs;
 };
 
-struct model {
+struct model
+{
 	/*0x00*/ u8 unk00;
 	/*0x01*/ u8 unk01;
 	/*0x02*/ s16 rwdatalen; // in words
 	/*0x04*/
-	union {
+	union
+	{
 		struct chrdata *chr;
 		struct defaultobj *obj;
 	};
@@ -639,7 +683,8 @@ struct model {
 	/*0x20*/ struct anim *anim;
 };
 
-struct modelrwdata_chrinfo { // type 0x01
+struct modelrwdata_chrinfo
+{ // type 0x01
 	s8 unk00;
 	s8 unk01;
 	s8 unk02;
@@ -658,44 +703,53 @@ struct modelrwdata_chrinfo { // type 0x01
 	f32 unk5c;
 };
 
-struct modelrwdata_05 { // type 0x05
+struct modelrwdata_05
+{ // type 0x05
 	bool unk00;
 };
 
-struct modelrwdata_distance { // type 0x08
+struct modelrwdata_distance
+{ // type 0x08
 	bool visible;
 };
 
-struct modelrwdata_reorder { // type 0x09
+struct modelrwdata_reorder
+{ // type 0x09
 	bool reverse;
 };
 
-struct modelrwdata_0b { // type 0x0b
+struct modelrwdata_0b
+{ // type 0x0b
 	u16 unk00;
 	u16 unk04;
 };
 
-struct modelrwdata_chrgunfire { // type 0x0c
+struct modelrwdata_chrgunfire
+{ // type 0x0c
 	s16 visible;
 	u16 unk02;
 };
 
-struct modelrwdata_toggle { // type 0x12
+struct modelrwdata_toggle
+{ // type 0x12
 	bool visible;
 };
 
-struct modelrwdata_headspot { // type 0x17
+struct modelrwdata_headspot
+{ // type 0x17
 	struct modeldef *headmodeldef;
 	void *rwdatas;
 };
 
-struct modelrwdata_dl { // type 0x18
+struct modelrwdata_dl
+{ // type 0x18
 	Vtx *vertices;
 	Gfx *gdl;
 	Col *colours;
 };
 
-union modelrwdata {
+union modelrwdata
+{
 	struct modelrwdata_chrinfo chrinfo;
 	struct modelrwdata_05 type05;
 	struct modelrwdata_distance distance;
@@ -707,20 +761,23 @@ union modelrwdata {
 	struct modelrwdata_dl dl;
 };
 
-struct waygroup {
+struct waygroup
+{
 	s32 *neighbours;
 	s32 *waypoints;
 	s32 step;
 };
 
-struct waypoint {
+struct waypoint
+{
 	s32 padnum;
 	s32 *neighbours; // most significant two bits are booleans, remaining bits are waypoint index
 	s32 groupnum;
 	s32 step;
 };
 
-struct aibot {
+struct aibot
+{
 	/*0x000*/ u8 followchance;
 	/*0x002*/ s16 aibotnum;
 	/*0x004*/ struct mpbotconfig *config;
@@ -772,11 +829,11 @@ struct aibot {
 	/*0x08c*/ struct coord defendholdpos;
 	/*0x098*/ f32 defendholdrot;
 	/*0x09c*/ u8 hasbriefcase : 1; // htb
-	/*0x09c*/ u8 hascase : 1;      // ctc
+	/*0x09c*/ u8 hascase : 1;	   // ctc
 	/*0x09c*/ u8 rcp120cloakenabled : 1;
 	/*0x09c*/ u8 canseecloaked : 1;
 	/*0x09c*/ u8 unk09c_04 : 3; // unused
-	/*0x09c*/ u8 cheap : 1; // True if aibot is not in any visible room
+	/*0x09c*/ u8 cheap : 1;		// True if aibot is not in any visible room
 	/*0x09d*/ u8 distoverridetimer60;
 	/*0x0a0*/ s32 htbheldtimer60;
 	/*0x0a4*/ f32 roty;
@@ -848,13 +905,15 @@ struct aibot {
 	/*0x2dc*/ u32 unk2dc; // unused
 };
 
-struct geo {
+struct geo
+{
 	/*0x00*/ u8 type;
 	/*0x01*/ u8 numvertices;
 	/*0x02*/ u16 flags;
 };
 
-struct geotilei {
+struct geotilei
+{
 	struct geo header;
 	/*0x04*/ u16 floortype;
 	/*0x06*/ u8 xmin; // These are byte offsets relative to the start of tile
@@ -867,18 +926,22 @@ struct geotilei {
 	/*0x0e*/ s16 vertices[64][3];
 };
 
-struct geotilef {
+struct geotilef
+{
 	struct geo header;
 	/*0x04*/ u16 floortype;
-	union {
+	union
+	{
 		// The arrays are surely the correct type here, but they create
 		// mismatches in code that has already been matched using individual
 		// properties (eg. cdCollectGeoForCylFromList). @TODO: Rematch them using the arrays.
-		struct {
+		struct
+		{
 			/*0x06*/ u8 min[3]; // These are indexes into vertices
 			/*0x09*/ u8 max[3];
 		};
-		struct {
+		struct
+		{
 			/*0x06*/ u8 xmin;
 			/*0x07*/ u8 ymin;
 			/*0x08*/ u8 zmin;
@@ -891,14 +954,16 @@ struct geotilef {
 	/*0x10*/ struct coord vertices[64];
 };
 
-struct geoblock {
+struct geoblock
+{
 	struct geo header;
 	/*0x04*/ f32 ymax;
 	/*0x08*/ f32 ymin;
 	/*0x0c*/ f32 vertices[8][2];
 };
 
-struct geocyl {
+struct geocyl
+{
 	struct geo header;
 	/*0x04*/ f32 ymax;
 	/*0x08*/ f32 ymin;
@@ -907,14 +972,16 @@ struct geocyl {
 	/*0x14*/ f32 radius;
 };
 
-union geounion {
+union geounion
+{
 	struct geotilei tilei;
 	struct geotilef tilef;
 	struct geoblock block;
 	struct geocyl cyl;
 };
 
-struct act_stand {
+struct act_stand
+{
 	/*0x2c*/ s32 prestand;
 	/*0x30*/ s32 flags;
 	/*0x34*/ s32 entityid;
@@ -926,7 +993,8 @@ struct act_stand {
 	/*0x4c*/ u8 playwalkanim;
 };
 
-struct act_anim {
+struct act_anim
+{
 	/*0x2c*/ bool movewheninvis;
 	/*0x30*/ bool pauseatend;
 	/*0x34*/ bool completed;
@@ -945,7 +1013,8 @@ struct act_anim {
 	/*0x58*/ f32 blend;
 };
 
-struct act_die {
+struct act_die
+{
 	/*0x2c*/ s32 notifychrindex;
 	/*0x30*/ f32 thudframe1;
 	/*0x34*/ f32 thudframe2;
@@ -955,7 +1024,8 @@ struct act_die {
 	/*0x4c*/ s16 drcarollimagedelay;
 };
 
-struct act_dead {
+struct act_dead
+{
 	/*0x2c*/ bool fadenow;
 	/*0x30*/ bool fadewheninvis;
 	/*0x34*/ s32 invistimer60;
@@ -963,20 +1033,23 @@ struct act_dead {
 	/*0x3c*/ s32 notifychrindex;
 };
 
-struct act_argh {
+struct act_argh
+{
 	/*0x2c*/ s32 notifychrindex;
 	/*0x30*/ s32 lvframe60;
 };
 
 // Gun settings
-struct gset {
+struct gset
+{
 	u8 weaponnum;
 	u8 unk0639;
 	u8 unk063a;
 	u8 weaponfunc; // 0 or 1
 };
 
-struct act_preargh {
+struct act_preargh
+{
 	/*0x2c*/ struct coord dir;
 	/*0x38*/ f32 relshotdir;
 	/*0x3c*/ s32 hitpart;
@@ -984,7 +1057,8 @@ struct act_preargh {
 	/*0x44*/ s32 aplayernum;
 };
 
-struct act_attack {
+struct act_attack
+{
 	/*0x2c*/ struct attackanimconfig *animcfg;
 	/*0x30*/ s8 turning;
 	/*0x31*/ s8 fired;
@@ -994,7 +1068,7 @@ struct act_attack {
 	/*0x35*/ s8 onehanded;
 	/*0x36*/ s8 dorecoil;
 	/*0x37*/ s8 dooneburst;
-	/*0x38*/ s8 firegun[2]; // whether this gun is going to attempt to fire in this anim
+	/*0x38*/ s8 firegun[2];	  // whether this gun is going to attempt to fire in this anim
 	/*0x3a*/ s8 everytick[2]; // whether gun's fire rate is high enough to fire on every tick
 	/*0x3c*/ u8 singleshot[2];
 	/*0x3e*/ s8 flip;
@@ -1007,7 +1081,8 @@ struct act_attack {
 	/*0x58*/ s32 reaim;
 };
 
-struct act_attackwalk {
+struct act_attackwalk
+{
 	/*0x2c*/ s32 unk02c;
 	/*0x30*/ s32 frame60count;
 	/*0x34*/ s32 frame60max;
@@ -1023,28 +1098,32 @@ struct act_attackwalk {
 	/*0x54*/ f32 turnspeed;
 };
 
-struct act_sidestep {
+struct act_sidestep
+{
 	/*0x2c*/ bool side;
 };
 
-struct act_jumpout {
+struct act_jumpout
+{
 	/*0x2c*/ bool side;
 };
 
-struct act_runpos {
+struct act_runpos
+{
 	/*0x2c*/ struct coord pos;
 	/*0x38*/ f32 neardist;
 	/*0x3c*/ s32 eta60;
 	/*0x40*/ f32 turnspeed;
 };
 
-struct waydata {
+struct waydata
+{
 	/*0x00*/ s8 mode;
 	/*0x01*/ s8 iter;
 	/*0x02*/ s8 gotaimpos;
 	/*0x03*/ s8 gotaimposobj;
-	/*0x04*/ struct coord aimpos; // world coords of next pad
-	/*0x10*/ struct coord obstacleleft;  // world coord of left (from chr's perspective) edge of obj
+	/*0x04*/ struct coord aimpos;		 // world coords of next pad
+	/*0x10*/ struct coord obstacleleft;	 // world coord of left (from chr's perspective) edge of obj
 	/*0x1c*/ struct coord obstacleright; // world coord of right (from chr's perspective) edge of obj
 	/*0x28*/ s32 age;
 	/*0x2c*/ struct coord aimposobj; // left or right edge + chr's width, or aimpos if no obj
@@ -1056,7 +1135,8 @@ struct waydata {
 	/*0x40*/ s32 lastvisible60;
 };
 
-struct act_patrol {
+struct act_patrol
+{
 	/*0x02c*/ struct path *path;
 	/*0x030*/ s32 nextstep;
 	/*0x034*/ bool forward;
@@ -1064,7 +1144,8 @@ struct act_patrol {
 	/*0x07c*/ f32 turnspeed;
 };
 
-struct act_gopos {
+struct act_gopos
+{
 	/*0x02c*/ struct coord endpos;
 	/*0x038*/ RoomNum endrooms[8];
 	/*0x048*/ struct waypoint *target; // Target/final waypoint
@@ -1086,26 +1167,31 @@ struct act_gopos {
 	/*0x0ac*/ f32 turnspeed;
 };
 
-struct act_surprised {
+struct act_surprised
+{
 	/*0x2c*/ u32 type;
 };
 
-struct act_throwgrenade {
+struct act_throwgrenade
+{
 	/*0x2c*/ u32 flags;
 	/*0x30*/ u32 entityid;
 	/*0x34*/ u32 hand;
 	/*0x38*/ bool needsequip;
 };
 
-struct act_bondmulti {
+struct act_bondmulti
+{
 	/*0x2c*/ struct attackanimconfig *animcfg;
 };
 
-struct act_druggedcomingup {
+struct act_druggedcomingup
+{
 	/*0x2c*/ s16 timer60;
 };
 
-struct act_robotattack {
+struct act_robotattack
+{
 	/*0x2c*/ struct coord pos[2];
 	/*0x44*/ struct coord dir[2];
 	/*0x5c*/ u32 guntype[2];
@@ -1114,7 +1200,8 @@ struct act_robotattack {
 	/*0x6e*/ u8 finished;
 };
 
-struct act_skjump {
+struct act_skjump
+{
 	/*0x2c*/ u8 state;
 	/*0x2d*/ u8 needsnewanim;
 	/*0x2e*/ u8 hit;
@@ -1126,7 +1213,8 @@ struct act_skjump {
 	/*0x50*/ f32 ground;
 };
 
-struct chrdata {
+struct chrdata
+{
 	/*0x000*/ s16 chrnum;
 	/*0x002*/ s8 accuracyrating;
 	/*0x003*/ s8 speedrating; // 0-100
@@ -1151,7 +1239,8 @@ struct chrdata {
 	/*0x024*/ f32 radius;
 	/*0x028*/ f32 height;
 
-	union {
+	union
+	{
 		struct act_stand act_stand;
 		struct act_anim act_anim;
 		struct act_die act_die;
@@ -1350,7 +1439,8 @@ struct chrdata {
 // This appears to be misnamed. Not only is it projectiles such as grenades and
 // crossbow bolts, but objects being pushed like couches also have this struct.
 // So I guess it denotes a generic moving object?
-struct projectile {
+struct projectile
+{
 	/*0x000*/ u32 flags;
 	/*0x004*/ struct coord speed; // distance moved in last tick
 	/*0x010*/ f32 unk010;
@@ -1393,13 +1483,15 @@ struct projectile {
 	/*0x108*/ struct prop *pickupby;
 };
 
-struct embedment {
+struct embedment
+{
 	/*0x000*/ u32 flags;
 	/*0x004*/ Mtxf matrix;
 	/*0x044*/ struct projectile *projectile;
 };
 
-struct tvscreen {
+struct tvscreen
+{
 	/*0x00*/ u32 *cmdlist;
 	/*0x04*/ u16 offset;
 	/*0x06*/ s16 pause60;
@@ -1441,7 +1533,8 @@ struct tvscreen {
 	/*0x70*/ f32 colinc;
 };
 
-struct hov {
+struct hov
+{
 	/*0x00*/ u8 type;
 	/*0x01*/ u8 flags;
 	/*0x04*/ f32 bobycur;
@@ -1461,7 +1554,8 @@ struct hov {
 	/*0x3c*/ s32 prevgroundframe60;
 };
 
-struct defaultobj {
+struct defaultobj
+{
 	/*0x00*/ u16 extrascale;
 	/*0x02*/ u8 hidden2;
 	/*0x03*/ u8 type;
@@ -1474,13 +1568,15 @@ struct defaultobj {
 	/*0x18*/ struct model *model;
 	/*0x1c*/ f32 realrot[3][3];
 	/*0x40*/ u32 hidden;
-	union {
+	union
+	{
 		/*0x44*/ struct geotilef *geotilef;
 		/*0x44*/ struct geoblock *geoblock;
 		/*0x44*/ struct geocyl *geocyl;
 		/*0x44*/ struct geocyl *unkgeo; // temporary, to indicate that I don't know which geo pointer is being used
 	};
-	union {
+	union
+	{
 		/*0x48*/ struct projectile *projectile;
 		/*0x48*/ struct embedment *embedment;
 	};
@@ -1492,7 +1588,8 @@ struct defaultobj {
 	/*0x5a*/ s8 geocount;
 };
 
-struct doorobj { // objtype 0x01
+struct doorobj
+{ // objtype 0x01
 	struct defaultobj base;
 	/*0x5c*/ f32 maxfrac;
 	/*0x60*/ f32 perimfrac;
@@ -1511,8 +1608,10 @@ struct doorobj { // objtype 0x01
 	/*0x88*/ s16 xludist;
 	/*0x8a*/ s16 opadist;
 	/*0x8c*/ struct coord startpos;
-	union {
-		struct {
+	union
+	{
+		struct
+		{
 			/*0x98*/ struct coord unk98;
 			/*0xa4*/ Vtx *unka4;
 		};
@@ -1522,7 +1621,7 @@ struct doorobj { // objtype 0x01
 	/*0xc0*/ s32 lastopen60;
 	/*0xc4*/ s16 portalnum;
 	/*0xc6*/ s8 soundtype;
-	/*0xc7*/ s8 fadetime60; // counts down
+	/*0xc7*/ s8 fadetime60;	 // counts down
 	/*0xc8*/ s32 lastcalc60; // port: actually stores 240hz frame number
 	/*0xcc*/ u8 laserfade;
 	/*0xcd*/ u8 unusedmaybe[3];
@@ -1534,21 +1633,25 @@ struct doorobj { // objtype 0x01
 	/*0xdb*/ u8 extra2;
 };
 
-struct doorscaleobj { // objtype 0x02
+struct doorscaleobj
+{ // objtype 0x02
 	u32 unk00;
 	s32 scale;
 };
 
-struct keyobj { // objtype 0x04
+struct keyobj
+{ // objtype 0x04
 	struct defaultobj base;
 	u32 keyflags;
 };
 
-struct alarmobj { // objtype 0x05
+struct alarmobj
+{ // objtype 0x05
 	struct defaultobj base;
 };
 
-struct cctvobj { // objtype 0x06
+struct cctvobj
+{ // objtype 0x06
 	struct defaultobj base;
 
 	// Note y is being used as an abbreviation for yaw
@@ -1566,17 +1669,21 @@ struct cctvobj { // objtype 0x06
 	/*0xc0*/ f32 xzero;
 };
 
-struct ammocrateobj { // objtype 0x07
+struct ammocrateobj
+{ // objtype 0x07
 	struct defaultobj base;
 	/*0x5c*/ s32 ammotype;
 };
 
-struct weaponobj { // objtype 0x08
+struct weaponobj
+{ // objtype 0x08
 	struct defaultobj base;
 
-	union {
+	union
+	{
 		struct gset gset;
-		struct {
+		struct
+		{
 			/*0x5c*/ u8 weaponnum;
 			/*0x5d*/ s8 unk5d;
 			/*0x5e*/ s8 unk5e;
@@ -1587,7 +1694,8 @@ struct weaponobj { // objtype 0x08
 	/*0x60*/ s8 fadeouttimer60;
 	/*0x61*/ s8 dualweaponnum;
 
-	union {
+	union
+	{
 		/**
 		 * timer240 is used for activation of proxy Dragons, grenades and proxy
 		 * mines. It ticks down to 1 where it becomes active, and set to 0 when the
@@ -1604,7 +1712,8 @@ struct weaponobj { // objtype 0x08
 	/*0x64*/ struct weaponobj *dualweapon; // other weapon when dual wielding
 };
 
-struct packedchr { // objtype 0x09
+struct packedchr
+{ // objtype 0x09
 	s16 chrindex;
 	s8 unk02;
 	s8 typenum;
@@ -1630,7 +1739,8 @@ struct packedchr { // objtype 0x09
 	u8 teamscandist;
 };
 
-struct singlemonitorobj { // objtype 0x0a
+struct singlemonitorobj
+{ // objtype 0x0a
 	struct defaultobj base;
 	/*0x5c*/ struct tvscreen screen;
 	/*0xd0*/ s16 owneroffset;
@@ -1638,17 +1748,20 @@ struct singlemonitorobj { // objtype 0x0a
 	/*0xd3*/ u8 imagenum;
 };
 
-struct multimonitorobj { // objtype 0x0b
+struct multimonitorobj
+{ // objtype 0x0b
 	struct defaultobj base;
 	struct tvscreen screens[4];
 	u8 imagenums[4];
 };
 
-struct hangingmonitorsobj { // objtype 0x0c
+struct hangingmonitorsobj
+{ // objtype 0x0c
 	struct defaultobj base;
 };
 
-struct autogunobj { // objtype 0x0d
+struct autogunobj
+{ // objtype 0x0d
 	struct defaultobj base;
 	/*0x5c*/ s16 targetpad;
 	/*0x5e*/ s8 firing;
@@ -1676,27 +1789,32 @@ struct autogunobj { // objtype 0x0d
 	/*0xaa*/ s16 nextchrtest;
 };
 
-struct linkgunsobj { // objtype 0x0e
+struct linkgunsobj
+{ // objtype 0x0e
 	u32 unk00;
 	s16 offset1;
 	s16 offset2;
 };
 
-struct debrisobj { // objtype 0x0f
+struct debrisobj
+{ // objtype 0x0f
 	struct defaultobj base;
 };
 
-struct hatobj { // objtype 0x11
+struct hatobj
+{ // objtype 0x11
 	struct defaultobj base;
 };
 
-struct grenadeprobobj { // objtype 0x12
+struct grenadeprobobj
+{ // objtype 0x12
 	u32 unk00;
 	s16 chrnum;
 	u16 probability;
 };
 
-struct linkliftdoorobj {
+struct linkliftdoorobj
+{
 	u32 unk00;
 	struct prop *door;
 	struct prop *lift;
@@ -1704,24 +1822,28 @@ struct linkliftdoorobj {
 	s32 stopnum;
 };
 
-struct multiammocrateslot {
+struct multiammocrateslot
+{
 	u16 modelnum;
 	u16 quantity;
 };
 
-struct multiammocrateobj { // objtype 0x14
+struct multiammocrateobj
+{ // objtype 0x14
 	struct defaultobj base;
 	/*0x5c*/ struct multiammocrateslot slots[19]; // indexed by ammotype minus 1
 };
 
-struct shieldobj { // objtype 0x15
+struct shieldobj
+{ // objtype 0x15
 	struct defaultobj base;
 	/*0x5c*/ f32 initialamount;
 	/*0x60*/ f32 amount;
 	/*0x64*/ u32 unk64;
 };
 
-struct tag { // objtype 0x16
+struct tag
+{							 // objtype 0x16
 	/*0x00*/ u32 identifier; // always 0x00000016
 	/*0x04*/ u16 tagnum;
 	/*0x06*/ s16 cmdoffset;
@@ -1729,7 +1851,8 @@ struct tag { // objtype 0x16
 	/*0x0c*/ struct defaultobj *obj;
 };
 
-struct objective { // objtype 0x17
+struct objective
+{ // objtype 0x17
 	/*0x00*/ u32 unk00;
 	/*0x04*/ s32 index;
 	/*0x08*/ u32 text;
@@ -1738,25 +1861,29 @@ struct objective { // objtype 0x17
 	/*0x0f*/ s8 difficulties;
 };
 
-struct briefingobj { // objtype 0x23
+struct briefingobj
+{ // objtype 0x23
 	u32 unk00;
 	u32 type;
 	u32 text;
 	struct briefingobj *next;
 };
 
-struct gasbottleobj { // objtype 0x24
+struct gasbottleobj
+{ // objtype 0x24
 	struct defaultobj base;
 };
 
-struct padlockeddoorobj { // objtype 0x26
+struct padlockeddoorobj
+{ // objtype 0x26
 	u32 unk00;
 	struct doorobj *door;
 	struct defaultobj *lock;
 	struct padlockeddoorobj *next;
 };
 
-struct truckobj { // objtype 0x27
+struct truckobj
+{ // objtype 0x27
 	struct defaultobj base;
 	/*0x5c*/ u8 *ailist;
 	/*0x60*/ u16 aioffset;
@@ -1772,7 +1899,8 @@ struct truckobj { // objtype 0x27
 	/*0x84*/ s32 nextstep;
 };
 
-struct heliobj { // objtype 0x28
+struct heliobj
+{ // objtype 0x28
 	struct defaultobj base;
 	/*0x5c*/ u8 *ailist;
 	/*0x60*/ u16 aioffset;
@@ -1789,16 +1917,19 @@ struct heliobj { // objtype 0x28
 	/*0x88*/ s32 nextstep;
 };
 
-struct glassobj { // objtype 0x2a
+struct glassobj
+{ // objtype 0x2a
 	struct defaultobj base;
 	/*0x5c*/ s16 portalnum;
 };
 
-struct safeobj { // objtype 0x2b
+struct safeobj
+{ // objtype 0x2b
 	struct defaultobj base;
 };
 
-struct safeitemobj {
+struct safeitemobj
+{
 	u32 unk00;
 	struct defaultobj *item;
 	struct safeobj *safe;
@@ -1806,7 +1937,8 @@ struct safeitemobj {
 	struct safeitemobj *next;
 };
 
-struct cameraposobj { // objtype 0x2e
+struct cameraposobj
+{ // objtype 0x2e
 	s32 type;
 	f32 x;
 	f32 y;
@@ -1816,7 +1948,8 @@ struct cameraposobj { // objtype 0x2e
 	s32 pad;
 };
 
-struct tintedglassobj { // objtype 0x2f
+struct tintedglassobj
+{ // objtype 0x2f
 	struct defaultobj base;
 	/*0x5c*/ s16 xludist;
 	/*0x5e*/ s16 opadist;
@@ -1825,7 +1958,8 @@ struct tintedglassobj { // objtype 0x2f
 	/*0x64*/ f32 unk64;
 };
 
-struct liftobj { // objtype 0x30
+struct liftobj
+{ // objtype 0x30
 	struct defaultobj base;
 	/*0x5c*/ s16 pads[4];
 	/*0x64*/ struct doorobj *doors[4];
@@ -1839,7 +1973,8 @@ struct liftobj { // objtype 0x30
 	/*0x88*/ struct coord prevpos;
 };
 
-struct linksceneryobj { // objtype 0x31
+struct linksceneryobj
+{ // objtype 0x31
 	u32 unk00;
 	struct defaultobj *trigger;
 	struct defaultobj *unexp;
@@ -1847,7 +1982,8 @@ struct linksceneryobj { // objtype 0x31
 	struct linksceneryobj *next;
 };
 
-struct blockedpathobj { // objtype 0x32
+struct blockedpathobj
+{ // objtype 0x32
 	u32 unk00;
 	struct defaultobj *blocker;
 	s16 waypoint1;
@@ -1855,7 +1991,8 @@ struct blockedpathobj { // objtype 0x32
 	struct blockedpathobj *next;
 };
 
-struct hoverbikeobj { // objtype 0x33
+struct hoverbikeobj
+{ // objtype 0x33
 	struct defaultobj base;
 	struct hov hov;
 	/*0x09c*/ f32 speed[2];
@@ -1872,12 +2009,14 @@ struct hoverbikeobj { // objtype 0x33
 	/*0x0d8*/ f32 speedrel[2];
 };
 
-struct hoverpropobj { // objtype 0x35
+struct hoverpropobj
+{ // objtype 0x35
 	struct defaultobj base;
 	struct hov hov;
 };
 
-struct fanobj { // objtype 0x36
+struct fanobj
+{ // objtype 0x36
 	struct defaultobj base;
 	/*0x5c*/ f32 yrot;
 	/*0x60*/ f32 yrotprev;
@@ -1887,7 +2026,8 @@ struct fanobj { // objtype 0x36
 	/*0x70*/ s8 on;
 };
 
-struct hovercarobj { // objtype 0x37
+struct hovercarobj
+{ // objtype 0x37
 	struct defaultobj base;
 	/*0x5c*/ u8 *ailist;
 	/*0x60*/ u16 aioffset;
@@ -1909,19 +2049,23 @@ struct hovercarobj { // objtype 0x37
 	/*0x96*/ s16 sparkstimer60;
 };
 
-struct padeffectobj { // objtype 0x38
+struct padeffectobj
+{ // objtype 0x38
 	u32 unk00;
 	s32 effect;
 	s32 pad;
 };
 
-struct chopperobj { // objtype 0x39
+struct chopperobj
+{ // objtype 0x39
 	struct defaultobj base;
 	/*0x5c*/ u8 *ailist;
 	/*0x60*/ u16 aioffset;
 	/*0x62*/ s16 aireturnlist;
-	union {
-		struct {
+	union
+	{
+		struct
+		{
 			/*0x64*/ f32 speed;
 			/*0x68*/ f32 speedaim;
 			/*0x6c*/ f32 speedtime60;
@@ -1963,17 +2107,20 @@ struct chopperobj { // objtype 0x39
 	/*0xe4*/ bool dead;
 };
 
-struct mineobj { // objtype 0x3a
+struct mineobj
+{ // objtype 0x3a
 	struct defaultobj base;
 };
 
-struct escalatorobj { // objtype 0x3b
+struct escalatorobj
+{ // objtype 0x3b
 	struct defaultobj base;
 	/*0x5c*/ s32 frame;
 	/*0x60*/ struct coord prevpos;
 };
 
-struct eyespy {
+struct eyespy
+{
 	/*0x00*/ struct prop *prop;
 	/*0x04*/ struct coord look;
 	/*0x10*/ struct coord up;
@@ -1983,7 +2130,7 @@ struct eyespy {
 	/*0x28*/ f32 verta;
 	/*0x2c*/ f32 cosverta;
 	/*0x30*/ f32 sinverta;
-	/*0x34*/ u8 held; // the eyespy is held by the player (opposite of deployed)
+	/*0x34*/ u8 held;	  // the eyespy is held by the player (opposite of deployed)
 	/*0x35*/ u8 deployed; // the eyespy is deployed in the stage somewhere
 	/*0x36*/ s8 startuptimer60;
 	/*0x37*/ s8 active; // player is currently controlling the eyespy
@@ -2007,7 +2154,8 @@ struct eyespy {
 	/*0x7c*/ f32 pitch;
 };
 
-struct sndstate {
+struct sndstate
+{
 	/*0x00*/ ALLink node;
 	/*0x08*/ ALSound *sound;
 	/*0x0c*/ N_ALVoice voice;
@@ -2038,13 +2186,15 @@ struct sndstate {
  * The list is only 10 items long. If an 11th item is used, the least used item
  * in the list will be removed.
  */
-struct gunheld {
+struct gunheld
+{
 	s32 weapon1;
 	s32 weapon2;
 	s32 totaltime240_60;
 };
 
-struct playerbond {
+struct playerbond
+{
 
 	// unk00.x = look vector x (-1 to +1)
 	// unk00.y = always 0?
@@ -2066,7 +2216,8 @@ struct playerbond {
 	/*0x0360 0x0394*/ struct coord unk28;
 };
 
-struct trackedprop {
+struct trackedprop
+{
 	struct prop *prop;
 	s16 x1;
 	s16 y1;
@@ -2074,7 +2225,8 @@ struct trackedprop {
 	s16 y2;
 };
 
-struct beam {
+struct beam
+{
 	/*0x00*/ s8 age;
 	/*0x01*/ s8 weaponnum;
 	/*0x04*/ struct coord from;
@@ -2085,7 +2237,8 @@ struct beam {
 	/*0x28*/ f32 dist;
 };
 
-struct abmag {
+struct abmag
+{
 	// When the gauge uses separate bars, this is zero/unused. When the gauge
 	// uses merged bars, this is the same figure as displayed on the HUD.
 	/*0x00*/ s16 loadedammo;
@@ -2111,7 +2264,8 @@ struct abmag {
 };
 
 // Weapon data per hand
-struct hand {
+struct hand
+{
 	struct gset gset;
 	/*0x063c*/ s8 firing;
 	/*0x063d*/ s8 flashon;
@@ -2166,7 +2320,7 @@ struct hand {
 	/*0x0840*/ f32 noiseradius;
 	/*0x0844*/ u32 fingerroty;
 	/*0x0848*/ f32 slidetrans; // 0 at rest, positive when back (struct weaponfunc_shoot.slidemax)
-	/*0x084c*/ bool slideinc; // true when moving back, false when moving forward or not moving
+	/*0x084c*/ bool slideinc;  // true when moving back, false when moving forward or not moving
 	/*0x0850*/ struct weaponobj *rocket;
 	/*0x0854*/ bool firedrocket;
 	/*0x0858*/ s32 loadedammo[2];
@@ -2312,24 +2466,28 @@ struct hand {
 	/*0x0dd8*/ Mtxf *unk0dd8;
 };
 
-struct texpool {
+struct texpool
+{
 	u8 *start;
-	union {
+	union
+	{
 		struct tex *head; // for shared pool
-		struct tex *end; // for dedicated pools
+		struct tex *end;  // for dedicated pools
 	};
 	u8 *leftpos;
 	struct tex *rightpos;
 };
 
-struct fileinfo {
+struct fileinfo
+{
 	u32 loadedsize;
 	u32 allocsize;
 };
 
-struct gunctrl {
+struct gunctrl
+{
 	/*0x1580*/ s8 weaponnum;
-	/*0x1581*/ s8 prevweaponnum; // previously drawn weapon, switched to when throwing Dragon/Laptop or when ammo depleted
+	/*0x1581*/ s8 prevweaponnum;	 // previously drawn weapon, switched to when throwing Dragon/Laptop or when ammo depleted
 	/*0x1582*/ s8 switchtoweaponnum; // weaponnum to change to
 	/*0x1583*/ u8 dualwielding : 1;
 	/*0x1583*/ u8 prevwasdualwielding : 1;
@@ -2339,7 +2497,7 @@ struct gunctrl {
 	/*0x1583*/ u8 wantammo : 1;
 	/*0x1583*/ u8 loadall : 1;
 	/*0x1583*/ u8 passivemode : 1;
-	/*0x1584*/ s32 gunmemnew; // a weapon number, -1 when not changing guns
+	/*0x1584*/ s32 gunmemnew;  // a weapon number, -1 when not changing guns
 	/*0x1588*/ s32 gunmemtype; // also a weapon number
 	/*0x158c*/ u8 *gunmem;
 	/*0x1590*/ struct modeldef *gunmodeldef;
@@ -2375,7 +2533,8 @@ struct gunctrl {
 	/*0x15f4*/ u8 paddingashdown;
 };
 
-struct player {
+struct player
+{
 	/*0x0000*/ s32 cameramode;
 	/*0x0004*/ struct coord memcampos; // Room that the camera is in (differs from the player's room during cutscenes and Slayer rocket)
 	/*0x0010*/ u16 visionmode;
@@ -2395,15 +2554,15 @@ struct player {
 	/*0x0068*/ Mtxf *mtxf0068;
 	/*0x006c*/ Mtxf *mtxf006c;
 	/*0x0070*/ f32 sumground;
-	/*0x0074*/ f32 vv_manground; // Feet Y value in absolute coordinates
-	/*0x0078*/ f32 vv_ground; // Ground Y value in absolute coordinates
+	/*0x0074*/ f32 vv_manground;	   // Feet Y value in absolute coordinates
+	/*0x0078*/ f32 vv_ground;		   // Ground Y value in absolute coordinates
 	/*0x007c*/ struct coord bdeltapos; // Only y is used? Negative when falling
 
 	// These crouch fields are related to recovering after a fall - not actual crouching
 	/*0x0088*/ f32 sumcrouch;
-	/*0x008c*/ f32 crouchheight; // Negative, is Y offset to regular standing height
+	/*0x008c*/ f32 crouchheight;  // Negative, is Y offset to regular standing height
 	/*0x0090*/ s32 crouchtime240; // Set to 60 when landing, counts down
-	/*0x0094*/ f32 crouchfall; // -90 when slowing the descent, increments back to 0 while returning to stand
+	/*0x0094*/ f32 crouchfall;	  // -90 when slowing the descent, increments back to 0 while returning to stand
 
 	/*0x0098*/ s32 swaypos;
 	/*0x009c*/ f32 swayoffset;
@@ -2456,17 +2615,17 @@ struct player {
 	/*0x014c*/ f32 vv_costheta;
 	/*0x0150*/ f32 vv_sintheta;
 
-	/*0x0154*/ f32 vv_verta;   // look up/down angle. 0 = horizontal, 90 = up
+	/*0x0154*/ f32 vv_verta; // look up/down angle. 0 = horizontal, 90 = up
 	/*0x0158*/ f32 vv_verta360;
 	/*0x015c*/ f32 speedverta; // look up/down speed
 	/*0x0160*/ f32 vv_cosverta;
 	/*0x0164*/ f32 vv_sinverta;
 
-	/*0x0168*/ f32 speedsideways;    // range -1 to 1
+	/*0x0168*/ f32 speedsideways; // range -1 to 1
 	/*0x016c*/ f32 speedstrafe;
-	/*0x0170*/ f32 speedforwards;    // range -1 to 1
-	/*0x0174*/ f32 speedboost;       // speed multiplier - ranges from 1 to 1.25 - kicks in after 3 seconds of full speed
-	/*0x0178*/ s32 speedmaxtime60;   // amount of time player has held full forward speed
+	/*0x0170*/ f32 speedforwards;  // range -1 to 1
+	/*0x0174*/ f32 speedboost;	   // speed multiplier - ranges from 1 to 1.25 - kicks in after 3 seconds of full speed
+	/*0x0178*/ s32 speedmaxtime60; // amount of time player has held full forward speed
 	/*0x017c*/ struct coord bondshotspeed;
 	/*0x0188*/ f32 bondfadetime60;
 	/*0x018c*/ f32 bondfadetimemax60;
@@ -2570,7 +2729,7 @@ struct player {
 	/*0x0630*/ s16 viewwidth;  // 320 lo-res, 640 hi-res
 	/*0x0632*/ s16 viewheight; // 220 regardless of res
 	/*0x0634*/ s16 viewleft;   // 0
-	/*0x0636*/ s16 viewtop;    // 0
+	/*0x0636*/ s16 viewtop;	   // 0
 	/*0x0638*/ struct hand hands[2];
 	struct gunctrl gunctrl;
 	/*0x15f8*/ f32 gunposamplitude;
@@ -2658,7 +2817,7 @@ struct player {
 	/*0x1858*/ f32 aspect;
 	/*0x185c*/ u32 hudmessoff;
 	/*0x1860*/ s32 bondmesscnt;
-	/*0x1864*/ struct invitem *weapons; // circular linked list, sorted
+	/*0x1864*/ struct invitem *weapons;	  // circular linked list, sorted
 	/*0x1868*/ struct invitem *equipment; // slots, allocated, unsorted
 	/*0x186c*/ s32 equipmaxitems;
 	/*0x1870*/ u32 equipallguns;
@@ -2703,9 +2862,9 @@ struct player {
 	/*0x19b3*/ u8 dostartnewlife;
 	/*0x19b4*/ f32 crouchoffsetsmall;
 	/*0x19b8*/ s32 crouchoffsetrealsmall; // 0 = standing, -90 = squatting, can be between during transition
-	/*0x19bc*/ f32 vv_height;     // 159 when Jo, regardless of crouch state
-	/*0x19c0*/ f32 vv_headheight; // 172 when Jo, regardless of crouch state
-	/*0x19c4*/ f32 vv_eyeheight;  // 159 when Jo, regardless of crouch state
+	/*0x19bc*/ f32 vv_height;			  // 159 when Jo, regardless of crouch state
+	/*0x19c0*/ f32 vv_headheight;		  // 172 when Jo, regardless of crouch state
+	/*0x19c4*/ f32 vv_eyeheight;		  // 159 when Jo, regardless of crouch state
 	/*0x19c8*/ bool haschrbody;
 	/*0x19cc*/ struct geocyl periminfo;
 	/*0x19e4*/ struct geocyl perimshoot;
@@ -2763,7 +2922,7 @@ struct player {
 	/*0x1b84*/ bool tickdiefinished;
 	/*0x1b88*/ s32 introanimnum;
 	/*0x1b8c*/ s32 lastsighton;
-	/*0x1b90*/ u16 targetset[4]; // related to trackedprops
+	/*0x1b90*/ u16 targetset[4];  // related to trackedprops
 	/*0x1b98*/ u8 sighttracktype; // eg. threat detector, follow lock-on
 	/*0x1b9c*/ f32 speedthetacontrol;
 	/*0x1ba0*/ s32 cam_room;
@@ -2784,7 +2943,7 @@ struct player {
 	/*0x1be7*/ u8 aibuddynums[MAX_BOTS];
 	/*0x1bf0*/ bool bondexploding;
 	/*0x1bf4*/ s32 bondnextexplode; // lvframe60 of next explosion
-	/*0x1bf8*/ s32 bondcurexplode;  // Increases by 1 on each tick even when not exploding
+	/*0x1bf8*/ s32 bondcurexplode;	// Increases by 1 on each tick even when not exploding
 	/*0x1bfc*/ u8 teleportstate;
 	/*0x1bfd*/ u8 teleporttime;
 	/*0x1bfe*/ u16 teleportpad;
@@ -2817,43 +2976,49 @@ struct player {
 	/*0x1c68*/ u32 unk1c68;
 	/*0x1c6c*/ u32 unk1c6c;
 	/*0x1c70*/ s16 altdowntime; // for alt-modes, used like invdowntime and amdowntime
-	/*0x1c72*/ s16 amdowntime; // for alt-modes, used like invdowntime and amdowntime
+	/*0x1c72*/ s16 amdowntime;	// for alt-modes, used like invdowntime and amdowntime
 #ifndef PLATFORM_N64
 	/*0x1c74*/ f32 swivelpos[2];
 #endif
 };
 
-struct ailist {
+struct ailist
+{
 	u8 *list;
 	s32 id;
 };
 
-struct path {
+struct path
+{
 	/*0x00*/ s32 *pads;
 	/*0x04*/ u8 id;
 	/*0x05*/ u8 flags;
 	/*0x06*/ u16 len;
 };
 
-struct covercandidate {
+struct covercandidate
+{
 	u64 sqdist;
 	s32 covernum;
 };
 
-struct coverdefinition {
+struct coverdefinition
+{
 	struct coord pos;
 	struct coord look;
 	u16 flags;
 };
 
-struct cover {
+struct cover
+{
 	/*0x00*/ struct coord *pos;
 	/*0x04*/ struct coord *look;
 	/*0x08*/ RoomNum rooms[2];
 	/*0x0c*/ u16 flags;
 };
 
-struct padsfileheader {
+struct padsfileheader
+{
 	s32 numpads;
 	s32 numcovers;
 	s32 waypointsoffset;
@@ -2862,7 +3027,8 @@ struct padsfileheader {
 	u16 padoffsets[1];
 };
 
-struct stagesetup {
+struct stagesetup
+{
 	/*0x00*/ struct waypoint *waypoints;
 	/*0x04*/ struct waygroup *waygroups;
 	/*0x08*/ void *cover;
@@ -2873,7 +3039,8 @@ struct stagesetup {
 	/*0x1c*/ s8 *padfiledata;
 };
 
-struct noisesettings {
+struct noisesettings
+{
 	f32 minradius;
 	f32 maxradius;
 	f32 incradius;
@@ -2881,7 +3048,8 @@ struct noisesettings {
 	f32 decremspeed;
 };
 
-struct recoilsettings {
+struct recoilsettings
+{
 	f32 xrange;
 	f32 yrange;
 	f32 zrange;
@@ -2889,19 +3057,21 @@ struct recoilsettings {
 	u8 unk10;  // not used
 };
 
-struct invaimsettings {
+struct invaimsettings
+{
 	f32 zoomfov;
-	f32 guntransup;   // gun y translation when aiming upwards
+	f32 guntransup;	  // gun y translation when aiming upwards
 	f32 guntransdown; // gun y translation when aiming downwards
 	f32 guntransside; // gun x translation when aiming sideways
-	f32 aimdamppal;   // slowdown speed when aiming or turning (PAL)
-	f32 aimdamp;      // slowdown speed when aiming or turning (NTSC)
+	f32 aimdamppal;	  // slowdown speed when aiming or turning (PAL)
+	f32 aimdamp;	  // slowdown speed when aiming or turning (NTSC)
 	u32 tracktype : 4;
-	u32 unk18_04 : 4;  // not used
+	u32 unk18_04 : 4; // not used
 	u32 flags;
 };
 
-struct gunviscmd {
+struct gunviscmd
+{
 	// See related functions: bgunExecuteGunVisCommands and bgunTestGunVisCommand
 
 	// unk00 - Some kind of condition field
@@ -2922,17 +3092,19 @@ struct gunviscmd {
 	u16 unk08;
 };
 
-struct weaponfunc {
+struct weaponfunc
+{
 	/*0x00*/ s32 type;
 	/*0x04*/ u16 name;
-	/*0x06*/ u8 unk06; // not used
+	/*0x06*/ u8 unk06;	   // not used
 	/*0x07*/ s8 ammoindex; // -1 = no ammo, 0 or 1 = index into weapon->ammos[]
 	/*0x08*/ struct noisesettings *noisesettings;
 	/*0x0c*/ struct guncmd *fire_animation;
 	/*0x10*/ u32 flags;
 };
 
-struct weaponfunc_shoot {
+struct weaponfunc_shoot
+{
 	struct weaponfunc base;
 	/*0x14*/ struct recoilsettings *recoilsettings;
 	/*0x18*/ s8 recoverytime60;
@@ -2957,21 +3129,24 @@ struct weaponfunc_shoot {
 	/*0x3c*/ u8 penetration;
 };
 
-struct weaponfunc_shootsingle {
+struct weaponfunc_shootsingle
+{
 	struct weaponfunc_shoot base;
 };
 
-struct weaponfunc_shootauto {
+struct weaponfunc_shootauto
+{
 	struct weaponfunc_shoot base;
 	/*0x40*/ f32 initialrpm; // rounds per minute
-	/*0x44*/ f32 maxrpm; // rounds per minute
+	/*0x44*/ f32 maxrpm;	 // rounds per minute
 	/*0x48*/ f32 *vibrationstart;
 	/*0x4c*/ f32 *vibrationmax;
 	/*0x50*/ s8 turretaccel;
 	/*0x51*/ s8 turretdecel;
 };
 
-struct weaponfunc_shootprojectile {
+struct weaponfunc_shootprojectile
+{
 	struct weaponfunc_shoot base;
 	/*0x40*/ s32 projectilemodelnum;
 	/*0x44*/ u32 unk44; // unused
@@ -2984,7 +3159,8 @@ struct weaponfunc_shootprojectile {
 	/*0x60*/ s16 soundnum;
 };
 
-struct weaponfunc_throw {
+struct weaponfunc_throw
+{
 	struct weaponfunc base;
 	/*0x14*/ s32 projectilemodelnum;
 	/*0x18*/ s16 activatetime60; // time until proxies become active, or timed mine/grenade explodes
@@ -2992,7 +3168,8 @@ struct weaponfunc_throw {
 	/*0x20*/ f32 damage;
 };
 
-struct weaponfunc_melee {
+struct weaponfunc_melee
+{
 	struct weaponfunc base;
 	/*0x14*/ f32 damage;
 	/*0x18*/ f32 range;
@@ -3010,19 +3187,22 @@ struct weaponfunc_melee {
 	/*0x48*/ u32 unk48; // unused
 };
 
-struct weaponfunc_special {
+struct weaponfunc_special
+{
 	struct weaponfunc base;
 	/*0x14*/ s32 specialfunc;
 	/*0x18*/ s32 recoverytime60;
 	/*0x1c*/ u16 soundnum; // unused
 };
 
-struct weaponfunc_device {
+struct weaponfunc_device
+{
 	struct weaponfunc base;
 	/*0x14*/ u32 device;
 };
 
-struct inventory_ammo {
+struct inventory_ammo
+{
 	u32 type;
 	u32 casingeject;
 	s16 clipsize;
@@ -3030,12 +3210,14 @@ struct inventory_ammo {
 	u8 flags;
 };
 
-struct modelpartvisibility {
+struct modelpartvisibility
+{
 	u8 part;
 	u8 visible;
 };
 
-struct weapon {
+struct weapon
+{
 	/*0x00*/ u16 hi_model;
 	/*0x02*/ u16 lo_model;
 	/*0x04*/ struct guncmd *equip_animation;
@@ -3059,14 +3241,16 @@ struct weapon {
 	/*0x4c*/ u32 flags;
 };
 
-struct cutscene {
+struct cutscene
+{
 	s16 stage;
 	s16 mission;
 	u32 scene;
 	u16 name;
 };
 
-struct cheat {
+struct cheat
+{
 	u16 nametextid;
 	u16 time;
 	u8 stage_index;
@@ -3074,7 +3258,8 @@ struct cheat {
 	u8 flags;
 };
 
-struct headorbody {
+struct headorbody
+{
 	/*0x00*/ u16 ismale : 1;
 	/*0x00*/ u16 unk00_01 : 1;
 	/*0x00*/ u16 canvaryheight : 1;
@@ -3087,7 +3272,8 @@ struct headorbody {
 	/*0x10*/ u16 handfilenum;
 };
 
-struct stagetableentry {
+struct stagetableentry
+{
 	/*0x00*/ s16 id;
 	/*0x02*/ u8 light_type;
 	/*0x03*/ u8 light_alpha;
@@ -3115,7 +3301,8 @@ struct stagetableentry {
 	/*0x3a*/ u16 extragunmem;
 };
 
-struct mpweaponset {
+struct mpweaponset
+{
 	/*0x00*/ u16 name;
 	/*0x02*/ u8 slots[NUM_MPWEAPONSLOTS];
 	/*0x08*/ u8 requirefeatures[4];
@@ -3127,12 +3314,14 @@ struct mpweaponset {
 	/*0x11*/ u8 unk11;
 };
 
-struct mphead {
+struct mphead
+{
 	s16 headnum;
 	u8 requirefeature;
 };
 
-struct botprofile {
+struct botprofile
+{
 	/*0x00*/ u8 type;
 	/*0x01*/ u8 difficulty;
 	/*0x02*/ s16 name;
@@ -3140,21 +3329,24 @@ struct botprofile {
 	/*0x06*/ u8 requirefeature;
 };
 
-struct mpbody {
+struct mpbody
+{
 	s16 bodynum;
 	s16 name;
 	s16 headnum;
 	u8 requirefeature;
 };
 
-struct mptrack {
+struct mptrack
+{
 	u16 musicnum : 7;
 	u16 duration : 9;
 	s16 name;
 	s16 unlockstage;
 };
 
-struct solostage {
+struct solostage
+{
 	/*0x00*/ u32 stagenum;
 	/*0x04*/ u8 unk04;
 	/*0x06*/ u16 name1; // "dataDyne Central"
@@ -3162,14 +3354,16 @@ struct solostage {
 	/*0x0a*/ u16 name3; // "dataDyne Defection"
 };
 
-struct stagemusic {
+struct stagemusic
+{
 	s16 stagenum;
 	s16 primarytrack;
 	s16 ambienttrack;
 	s16 xtrack;
 };
 
-struct shadesettings {
+struct shadesettings
+{
 	f32 znear;
 	f32 zfar;
 	u32 unk08;
@@ -3178,7 +3372,8 @@ struct shadesettings {
 	f32 alphanear;
 };
 
-struct environment {
+struct environment
+{
 	/*0x00*/ s32 fogmin;
 	/*0x04*/ s32 fogmax;
 	/*0x08*/ u8 sky_r;
@@ -3204,7 +3399,8 @@ struct environment {
 	/*0x4c*/ f32 skybluefrac;
 };
 
-struct sun {
+struct sun
+{
 	/*0x00*/ u8 lens_flare;
 	/*0x01*/ u8 red;
 	/*0x02*/ u8 green;
@@ -3214,7 +3410,8 @@ struct sun {
 	/*0x12*/ s16 orb_size;
 };
 
-struct fogenvironment {
+struct fogenvironment
+{
 	/*0x00*/ s16 stage;
 	/*0x02*/ s16 near;
 	/*0x04*/ s16 far;
@@ -3243,7 +3440,8 @@ struct fogenvironment {
 	/*0x28*/ u8 clouds_height;
 };
 
-struct nofogenvironment {
+struct nofogenvironment
+{
 	/*0x00*/ s32 stage;
 	/*0x04*/ s16 near;
 	/*0x06*/ s16 far;
@@ -3271,7 +3469,8 @@ struct nofogenvironment {
 	/*0x34*/ bool transparency;
 };
 
-struct menuitemdata_controller {
+struct menuitemdata_controller
+{
 	u8 textfadetimer;
 	u8 contfadetimer;
 	u8 curmode;
@@ -3279,14 +3478,16 @@ struct menuitemdata_controller {
 	s8 prevmode;
 };
 
-struct menuitemdata_list {
+struct menuitemdata_list
+{
 	s16 curoffsety;
 	s16 index;
 	s16 targetoffsety;
 	s16 viewheight;
 };
 
-struct menuitemdata_dropdown {
+struct menuitemdata_dropdown
+{
 	struct menuitemdata_list list;
 	u16 unk08; // unused
 	u16 unk0a; // unused
@@ -3294,26 +3495,30 @@ struct menuitemdata_dropdown {
 	u16 unk0e; // unused
 };
 
-struct menuitemdata_keyboard {
+struct menuitemdata_keyboard
+{
 	char string[11];
 	s8 col;
 	s8 row;
-	u8 capslock : 1;      // Pressed A on caps button
+	u8 capslock : 1;	  // Pressed A on caps button
 	u8 capseffective : 1; // Same as above, but inverted if holding L or R
 };
 
-struct menuitemdata_marquee {
+struct menuitemdata_marquee
+{
 	u16 totalmoved;
 	u16 texthash;
 	u16 viewwidth;
 	u16 unk06; // unused
 };
 
-struct menuitemdata_ranking {
+struct menuitemdata_ranking
+{
 	s16 scrolloffset;
 };
 
-struct menuitemdata_scrollable {
+struct menuitemdata_scrollable
+{
 	s16 scrolloffset;
 	s16 unk02; // unused
 	s16 maxscrolloffset;
@@ -3323,11 +3528,13 @@ struct menuitemdata_scrollable {
 #endif
 };
 
-struct menuitemdata_slider {
+struct menuitemdata_slider
+{
 	s16 multiplier;
 };
 
-union menuitemdata {
+union menuitemdata
+{
 	struct menuitemdata_controller controller;
 	struct menuitemdata_dropdown dropdown;
 	struct menuitemdata_keyboard keyboard;
@@ -3338,35 +3545,43 @@ union menuitemdata {
 	struct menuitemdata_slider slider;
 };
 
-struct handlerdata_carousel {
+struct handlerdata_carousel
+{
 	s32 value;
 	u32 unk04;
 };
 
-struct handlerdata_checkbox {
+struct handlerdata_checkbox
+{
 	u32 value;
 };
 
-struct handlerdata_dropdown {
+struct handlerdata_dropdown
+{
 	u32 value;
 	u32 unk04;
 };
 
-struct handlerdata_keyboard {
+struct handlerdata_keyboard
+{
 	char *string;
 };
 
-struct handlerdata_label {
+struct handlerdata_label
+{
 	u32 colour1;
 	u32 colour2;
 };
 
-struct handlerdata_list {
-	union {
+struct handlerdata_list
+{
+	union
+	{
 		u32 value;
 		s32 values32;
 	};
-	union {
+	union
+	{
 		s32 unk04;
 		u32 unk04u32;
 	};
@@ -3374,12 +3589,14 @@ struct handlerdata_list {
 	s32 unk0c;
 };
 
-struct handlerdata_slider {
+struct handlerdata_slider
+{
 	u32 value;
 	char *label;
 };
 
-struct menuitemrenderdata {
+struct menuitemrenderdata
+{
 	s32 x;
 	s32 y;
 	s32 width;
@@ -3387,9 +3604,11 @@ struct menuitemrenderdata {
 	u8 unk10;
 };
 
-struct handlerdata_type19 {
+struct handlerdata_type19
+{
 	Gfx *gdl;
-	union {
+	union
+	{
 		s32 unk04;
 		u32 unk04u32;
 	};
@@ -3397,15 +3616,18 @@ struct handlerdata_type19 {
 	s32 unk0c;
 };
 
-struct handlerdata_dialog1 {
+struct handlerdata_dialog1
+{
 	u32 preventclose;
 };
 
-struct handlerdata_dialog2 {
+struct handlerdata_dialog2
+{
 	struct menuinputs *inputs;
 };
 
-union handlerdata {
+union handlerdata
+{
 	struct handlerdata_carousel carousel;
 	struct handlerdata_checkbox checkbox;
 	struct handlerdata_list list;
@@ -3419,20 +3641,23 @@ union handlerdata {
 	struct handlerdata_dialog2 dialog2;
 };
 
-struct menuitem {
+struct menuitem
+{
 	u8 type;
 	u8 param;
 	u32 flags;
 	intptr_t param2;
 	intptr_t param3;
 
-	union {
+	union
+	{
 		s32 (*handler)(s32 operation, struct menuitem *item, union handlerdata *data);
 		void (*handlervoid)(s32 operation, struct menuitem *item, union handlerdata *data);
 	};
 };
 
-struct menudialogdef {
+struct menudialogdef
+{
 	u8 type;
 	uintptr_t title;
 	struct menuitem *items;
@@ -3441,33 +3666,39 @@ struct menudialogdef {
 	struct menudialogdef *nextsibling;
 };
 
-struct surfacetype {
+struct surfacetype
+{
 	u16 *sounds;
 	u8 *wallhittexes;
 	s16 numsounds;
 	s16 numwallhittexes;
 };
 
-union soundnumhack {
+union soundnumhack
+{
 	s16 packed;
 
 #ifdef PLATFORM_BIG_ENDIAN
-	struct {
+	struct
+	{
 		u16 hasconfig : 1;
 		u16 confignum : 15;
 	};
-	struct {
+	struct
+	{
 		u16 hasconfig2 : 1;
 		u16 unk02 : 2;
 		u16 mp3priority : 2;
 		u16 id : 11;
 	};
 #else
-	struct {
+	struct
+	{
 		u16 confignum : 15;
 		u16 hasconfig : 1;
 	};
-	struct {
+	struct
+	{
 		u16 id : 11;
 		u16 mp3priority : 2;
 		u16 unk02 : 2;
@@ -3476,12 +3707,14 @@ union soundnumhack {
 #endif
 };
 
-struct audiorussmapping {
+struct audiorussmapping
+{
 	s16 soundnum;
 	u16 audioconfig_index;
 };
 
-struct audioconfig {
+struct audioconfig
+{
 	f32 dist1; // full volume within dist1
 	f32 dist2; // dist1 to dist2 -> taper volume using curve
 	f32 dist3; // dist2 to dist3 -> scale volume linearly to zero
@@ -3492,15 +3725,18 @@ struct audioconfig {
 	u32 flags;
 };
 
-struct artifact {
+struct artifact
+{
 	u16 type;
 	u16 unk02;
 	u16 unk04;
 	u16 unk06;
 	u16 *unk08;
-	union {
+	union
+	{
 		u16 *u16p;
-		struct {
+		struct
+		{
 			u16 u16_1;
 			u16 u16_2;
 		};
@@ -3508,7 +3744,8 @@ struct artifact {
 	struct light *light;
 };
 
-struct credit {
+struct credit
+{
 	u8 more : 1;
 	u8 retain : 2;
 	u8 durationindex : 2;
@@ -3517,7 +3754,8 @@ struct credit {
 	u16 text2;
 };
 
-struct sparktype {
+struct sparktype
+{
 	u16 unk00;
 	s16 unk02;
 	u16 unk04;
@@ -3534,7 +3772,8 @@ struct sparktype {
 	f32 decel;
 };
 
-struct sparkgroup {
+struct sparkgroup
+{
 	s32 type;
 	s32 numsparks;
 	s32 age;
@@ -3544,15 +3783,19 @@ struct sparkgroup {
 	struct coord pos;
 };
 
-struct spark {
+struct spark
+{
 	struct coord pos;
 	struct coord speed;
 	s32 ttl; // time to live (number of ticks remaining)
 };
 
-struct screenbox {
-	union {
-		struct {
+struct screenbox
+{
+	union
+	{
+		struct
+		{
 			s16 xmin;
 			s16 ymin;
 			s16 xmax;
@@ -3562,23 +3805,28 @@ struct screenbox {
 	};
 };
 
-struct roomblock {
+struct roomblock
+{
 	u8 type;
 	struct roomblock *next;
-	union {
-		struct { // type 0 (leaf)
+	union
+	{
+		struct
+		{ // type 0 (leaf)
 			Gfx *gdl;
 			Vtx *vertices;
 			Col *colours;
 		};
-		struct { // type 1 (parent)
+		struct
+		{ // type 1 (parent)
 			struct roomblock *child;
 			struct coord *unk0c; // pointer to 2 coords at least
 		};
 	};
 };
 
-struct roomgfxdata {
+struct roomgfxdata
+{
 	/*0x00*/ Vtx *vertices;
 	/*0x04*/ Col *colours;
 	/*0x08*/ struct roomblock *opablocks;
@@ -3590,7 +3838,8 @@ struct roomgfxdata {
 	/*0x18*/ struct roomblock blocks[1];
 };
 
-struct vtxbatch {
+struct vtxbatch
+{
 	/*0x00*/ u16 gbicmdindex;
 	/*0x02*/ u16 type;
 	/*0x04*/ Gfx *gdl;
@@ -3598,7 +3847,8 @@ struct vtxbatch {
 	/*0x14*/ struct coord bbmax;
 };
 
-struct room {
+struct room
+{
 	/*0x00*/ u16 flags;
 	/*0x02*/ s16 loaded240; // 0 when unloaded, 1 when visible, ticks up to 120 when recently visible
 	/*0x04*/ u8 portalrecursioncount;
@@ -3606,8 +3856,8 @@ struct room {
 	/*0x06*/ u8 snakecount;
 	/*0x07*/ u8 unk07;
 	/*0x08*/ s8 numlights;
-	/*0x09*/ u8 numwaypoints; // note: excludes waypoints with PADFLAG_AIDROP
-	/*0x0a*/ u16 lightindex; // index of start of this room's lights in data file
+	/*0x09*/ u8 numwaypoints;	// note: excludes waypoints with PADFLAG_AIDROP
+	/*0x0a*/ u16 lightindex;	// index of start of this room's lights in data file
 	/*0x0c*/ u16 firstwaypoint; // offset into g_Vars.waypoints
 	/*0x0e*/ s16 roomportallistoffset;
 	/*0x10*/ s16 roommtxindex;
@@ -3664,12 +3914,12 @@ struct room {
 	/*0x60*/ f32 lightop_to_frac;
 	/*0x64*/ f32 lightop_from_frac;
 	/*0x68*/ f32 lightop_duration240;
-	/*0x6c*/ f32 volume;      // in metres
+	/*0x6c*/ f32 volume;	  // in metres
 	/*0x70*/ f32 surfacearea; // in centimetres
 	/*0x74*/ f32 highlightfrac_r;
 	/*0x78*/ f32 highlightfrac_g;
 	/*0x7c*/ f32 highlightfrac_b;
-	/*0x80*/ s32 gfxdatalen; // when inflated
+	/*0x80*/ s32 gfxdatalen;			  // when inflated
 	/*0x84*/ struct wallhit *opawallhits; // opaque
 	/*0x88*/ struct wallhit *xluwallhits; // translucent
 
@@ -3678,7 +3928,8 @@ struct room {
 #endif
 };
 
-struct fireslotthing {
+struct fireslotthing
+{
 	/*0x00*/ u8 unk00;
 	/*0x01*/ u8 unk01;
 	/*0x04*/ struct beam *beam;
@@ -3690,7 +3941,8 @@ struct fireslotthing {
 	/*0x1c*/ u32 unk1c;
 };
 
-struct fireslot {
+struct fireslot
+{
 	/*0x00*/ s32 endlvframe;
 #if VERSION < VERSION_NTSC_1_0
 	struct sndstate *unk04nb;
@@ -3699,13 +3951,15 @@ struct fireslot {
 	/*0x04*/ struct beam beam;
 };
 
-struct menulayer {
+struct menulayer
+{
 	struct menudialog *siblings[5];
 	s8 numsiblings;
 	s8 cursibling;
 };
 
-struct menudialog {
+struct menudialog
+{
 	struct menudialogdef *definition;
 	u8 colstart;
 	u8 numcols;
@@ -3723,8 +3977,8 @@ struct menudialog {
 	/*0x30*/ s32 dsty;
 	/*0x34*/ s32 dstwidth;
 	/*0x38*/ s32 dstheight;
-	/*0x3c*/ u8 type; // dialog type
-	/*0x3d*/ u8 type2; // used when transitioning
+	/*0x3c*/ u8 type;			 // dialog type
+	/*0x3d*/ u8 type2;			 // used when transitioning
 	/*0x40*/ f32 transitionfrac; // >= 0 means transitioning from one dialog type to another
 	/*0x44*/ u32 colourweight;
 	/*0x48*/ f32 redrawtimer;
@@ -3734,19 +3988,21 @@ struct menudialog {
 	/*0x58*/ u32 unk58;
 	/*0x5c*/ s32 unk5c;
 	/*0x60*/ u8 state;
-	/*0x64*/ s32 scroll; // scroll related, 0 when at top, negative when scrolled down
+	/*0x64*/ s32 scroll;	// scroll related, 0 when at top, negative when scrolled down
 	/*0x68*/ s32 dstscroll; // same value as unk64
 	/*0x6c*/ u8 unk6c;
 	/*0x6d*/ s8 swipedir;
 	/*0x6e*/ u8 unk6e;
 };
 
-struct menudfc {
+struct menudfc
+{
 	struct menuitem *item;
 	f32 unk04;
 };
 
-struct menudata_endscreen {
+struct menudata_endscreen
+{
 	u32 unke1c;
 
 	// ......xx = timed cheat ID
@@ -3763,7 +4019,8 @@ struct menudata_endscreen {
 	u32 stageindex;
 };
 
-struct menudata_main {
+struct menudata_main
+{
 	u32 unke1c;
 	u32 controlmode;
 	u32 mpindex;
@@ -3771,13 +4028,15 @@ struct menudata_main {
 	u32 unke2c;
 };
 
-struct menudata_mpsetup {
+struct menudata_mpsetup
+{
 	u32 slotindex;
 	u32 slotcount;
 	u32 unke24;
 };
 
-struct menudata_mppause {
+struct menudata_mppause
+{
 	u32 unke1c;
 	u32 unke20;
 	u32 unke24;
@@ -3790,15 +4049,18 @@ struct menudata_mppause {
 	u8 unke40_00 : 1;
 };
 
-struct menudata_mpend {
+struct menudata_mpend
+{
 	u32 unke1c;
 };
 
-struct menudata_filemgr {
+struct menudata_filemgr
+{
 	/*0xe1c*/ u32 filetypeplusone;
 	/*0xe20*/ u32 device;
 	/*0xe24*/ u32 unke24;
-	union {
+	union
+	{
 		u32 isdeletingforsave;
 		u32 noteindex;
 	};
@@ -3814,7 +4076,8 @@ struct menudata_filemgr {
 	/*0xe40*/ u16 unke40_01 : 1;
 	/*0xe41*/ u8 unke41;
 	/*0xe42*/ u8 fileop;
-	union {
+	union
+	{
 		void *unke44;
 		s32 mpplayernum;
 	};
@@ -3830,19 +4093,23 @@ struct menudata_filemgr {
 	/*0xe6c*/ s8 device3;
 };
 
-struct menudata_main4mb {
+struct menudata_main4mb
+{
 	u32 slotindex;
 };
 
-struct menudata_training {
+struct menudata_training
+{
 	u32 unke1c;
 	struct mpconfigfull *mpconfig;
 	u32 unke24;
 	u32 weaponnum;
 };
 
-struct textureconfig {
-	union {
+struct textureconfig
+{
+	union
+	{
 		texnum_t texturenum;
 		u8 *textureptr;
 	};
@@ -3856,14 +4123,16 @@ struct textureconfig {
 	u8 unk0b;
 };
 
-struct perfectheadtexturelist {
+struct perfectheadtexturelist
+{
 	u8 unk000[16][0x80];
 	struct fileguid fileguids[16];
 	s32 lastupdated240;
 	struct textureconfig selectedtexture;
 };
 
-struct menumodel {
+struct menumodel
+{
 	/*0x000*/ u8 loaddelay;
 	/*0x002*/ s16 headnum;
 	/*0x004*/ u8 *allocstart;
@@ -3895,7 +4164,7 @@ struct menumodel {
 	/*0x548*/ f32 newrotx;
 	/*0x54c*/ f32 newroty;
 	/*0x550*/ f32 newrotz;
-	/*0x554*/ f32 zoom; // character selection: far = 100, near = 370
+	/*0x554*/ f32 zoom;	  // character selection: far = 100, near = 370
 	/*0x558*/ f32 unk558; // unused
 	/*0x55c*/ f32 unk55c; // unused
 	/*0x560*/ s16 unk560; // unused
@@ -3930,13 +4199,15 @@ struct menumodel {
 	/*0x5b4*/ struct modelpartvisibility *partvisibility;
 };
 
-struct menurow {
+struct menurow
+{
 	s16 height;
 	u8 itemindex;
 	s8 blockindex;
 };
 
-struct menucolumn {
+struct menucolumn
+{
 	s16 width;
 	s16 height;
 	u8 unk04;
@@ -3944,7 +4215,8 @@ struct menucolumn {
 	u8 numrows;
 };
 
-struct menu {
+struct menu
+{
 	struct menudialog dialogs[VERSION >= VERSION_NTSC_1_0 ? 10 : 9];
 	/*0x460*/ s16 numdialogs;
 	/*0x464*/ struct menulayer layers[6];
@@ -3975,7 +4247,8 @@ struct menu {
 	/*0xdf8*/ s8 bannernum;
 	/*0xdfc*/ struct menudfc unkdfc[4];
 
-	union {
+	union
+	{
 		struct menudata_endscreen endscreen;
 		struct menudata_main main;
 		struct menudata_mpsetup mpsetup;
@@ -3987,7 +4260,8 @@ struct menu {
 	};
 };
 
-struct gamefile {
+struct gamefile
+{
 	/*0x00*/ char name[11];
 	/*0x0b*/ u8 thumbnail : 5; // stage index of the image to show on file select screen
 	/*0x0b*/ u8 autodifficulty : 3;
@@ -4001,7 +4275,8 @@ struct gamefile {
 	/*0xb5*/ u8 weaponsfound[6];
 };
 
-struct mpchrconfig {
+struct mpchrconfig
+{
 	/*0x00*/ char name[15];
 	/*0x0f*/ u8 mpheadnum;
 	/*0x10*/ u8 mpbodynum;
@@ -4018,7 +4293,8 @@ struct mpchrconfig {
 	/*0x40*/ s16 unk40;
 };
 
-struct mpplayerconfig {
+struct mpplayerconfig
+{
 	/*0x00*/ struct mpchrconfig base;
 	/*0x44*/ u8 controlmode;
 	/*0x45*/ s8 contpad1;
@@ -4048,14 +4324,16 @@ struct mpplayerconfig {
 	/*0x9d*/ u8 handicap;
 };
 
-struct mpbotconfig {
+struct mpbotconfig
+{
 	/*0x00*/ struct mpchrconfig base;
 	/*0x44*/ u8 unk44[3];
 	/*0x47*/ u8 type;
 	/*0x48*/ u8 difficulty;
 };
 
-struct missionconfig {
+struct missionconfig
+{
 	u8 difficulty : 7;
 	u8 pdmode : 1;
 
@@ -4075,7 +4353,8 @@ struct missionconfig {
 	/*0x14*/ f32 pdmodeaccuracyf;
 };
 
-struct mpsetup {
+struct mpsetup
+{
 	/*0x800acb88*/ char name[12];
 	/*0x800acb94*/ u32 options;
 	/*0x800acb98*/ u8 scenario;
@@ -4097,7 +4376,8 @@ struct mpsetup {
 	/*0x800acba8*/ struct fileguid fileguid;
 };
 
-struct bossfile {
+struct bossfile
+{
 	/*0x00*/ char teamnames[MAX_TEAMS][12];
 	/*0x60*/ u8 locktype;
 	/*0x61*/ u8 unk89;
@@ -4107,18 +4387,21 @@ struct bossfile {
 	/*0x8d*/ u8 multipletracknums[6];
 };
 
-struct savebuffer {
+struct savebuffer
+{
 	u32 bitpos;
 	u8 bytes[220];
 };
 
-struct mparena {
+struct mparena
+{
 	s16 stagenum;
 	u8 requirefeature;
 	u16 name;
 };
 
-struct filelistfile {
+struct filelistfile
+{
 	s32 fileid;
 	u16 deviceserial;
 	char name[16];
@@ -4127,13 +4410,14 @@ struct filelistfile {
 // This stores information about all files of a particular filetype across all
 // devices. For example, the copy file dialog might list all MP player files
 // from all devices in one listing, and that information is stored here.
-struct filelist {
+struct filelist
+{
 	/*0x000*/ struct filelistfile files[30];
 	/*0x2d0*/ s16 numfiles;
 	/*0x2d2*/ s8 spacesfree[5]; // per device - controller paks then game pak
 	/*0x2d8*/ struct fileguid deviceguids[5];
 	/*0x300*/ s8 devicestartindexes[5]; // game pak then controller paks
-	/*0x308*/ s8 unk305[5]; // controller paks then game pak - error count?
+	/*0x308*/ s8 unk305[5];				// controller paks then game pak - error count?
 	/*0x30a*/ u8 numdevices;
 	/*0x30b*/ u8 filetype;
 	/*0x30c*/ u8 timeuntilupdate;
@@ -4141,7 +4425,8 @@ struct filelist {
 	/*0x30e*/ u8 updatedthisframe;
 };
 
-struct challenge {
+struct challenge
+{
 	/*0x00*/ u16 name;
 	/*0x02*/ s16 confignum;
 
@@ -4161,7 +4446,8 @@ struct challenge {
 	/*0x09*/ u8 unlockfeatures[16];
 };
 
-struct scenariodata_htb {
+struct scenariodata_htb
+{
 	u32 unk00;
 	struct prop *token; // Briefcase or chr
 	struct coord pos;
@@ -4170,7 +4456,8 @@ struct scenariodata_htb {
 	s16 padnums[60];
 };
 
-struct htmterminal {
+struct htmterminal
+{
 	u32 unk00;
 	struct prop *prop;
 	s16 padnum;
@@ -4178,7 +4465,8 @@ struct htmterminal {
 	u8 unk0b;
 };
 
-struct scenariodata_htm {
+struct scenariodata_htm
+{
 	/*0x800ac110*/ s16 numpads;
 	/*0x800ac112*/ s16 numterminals;
 	/*0x800ac114*/ s16 padnums[60];
@@ -4194,16 +4482,18 @@ struct scenariodata_htm {
 	/*0x800ac250*/ u32 unk144;
 };
 
-struct scenariodata_pac {
+struct scenariodata_pac
+{
 	s16 unk00;
 	u16 age240;
 	s32 victimindex;
-	s16 victims[MAX_MPCHRS]; // shuffled list of player numbers
-	s16 killcounts[MAX_MPCHRS]; // indexed by player num
+	s16 victims[MAX_MPCHRS];		// shuffled list of player numbers
+	s16 killcounts[MAX_MPCHRS];		// indexed by player num
 	s16 survivalcounts[MAX_MPCHRS]; // indexed by player num
 };
 
-struct scenariodata_koh {
+struct scenariodata_koh
+{
 	/*0x800ac110*/ u32 unk00;
 	/*0x800ac114*/ s16 occupiedteam;
 	/*0x800ac116*/ s16 elapsed240;
@@ -4218,13 +4508,15 @@ struct scenariodata_koh {
 	/*0x800ac148*/ f32 colourfracb;
 };
 
-struct ctcspawnpadsperteam {
+struct ctcspawnpadsperteam
+{
 	s16 homepad;
 	s16 numspawnpads;
 	s16 spawnpads[6];
 };
 
-struct scenariodata_ctc {
+struct scenariodata_ctc
+{
 	/*0x00*/ s16 playercountsperteam[4];
 	/*0x08*/ s16 teamindexes[4];
 	/*0x10*/ RoomNum baserooms[4];
@@ -4232,8 +4524,10 @@ struct scenariodata_ctc {
 	/*0x58*/ struct prop *tokens[4];
 };
 
-struct scenariodata {
-	union {
+struct scenariodata
+{
+	union
+	{
 		struct scenariodata_htb htb;
 		struct scenariodata_htm htm;
 		struct scenariodata_pac pac;
@@ -4242,14 +4536,16 @@ struct scenariodata {
 	};
 };
 
-struct bgportal {
+struct bgportal
+{
 	u16 verticesoffset;
 	s16 roomnum1;
 	s16 roomnum2;
 	u8 flags;
 };
 
-struct portalcamcacheitem {
+struct portalcamcacheitem
+{
 	u16 updatedframe1;
 	s16 side;
 	u16 updatedframe2;
@@ -4260,13 +4556,15 @@ struct portalcamcacheitem {
 	s16 ymax;
 };
 
-struct portalmetric { // related to portals
+struct portalmetric
+{ // related to portals
 	struct coord normal;
 	f32 min;
 	f32 max;
 };
 
-struct trainingdata {
+struct trainingdata
+{
 	u8 intraining : 1;
 	u8 failed : 1;
 	u8 completed : 1;
@@ -4278,7 +4576,8 @@ struct trainingdata {
 	u32 unk0c;
 };
 
-struct activemenu {
+struct activemenu
+{
 	/*0x00*/ s8 screenindex;
 	/*0x02*/ s16 xradius;
 	/*0x04*/ s16 slotwidth;
@@ -4286,7 +4585,7 @@ struct activemenu {
 	/*0x08*/ s16 sely;
 	/*0x0a*/ s16 dstx;
 	/*0x0c*/ s16 dsty;
-	/*0x0e*/ u8 slotnum; // 0-8, where 4 is middle
+	/*0x0e*/ u8 slotnum;	 // 0-8, where 4 is middle
 	/*0x0f*/ u8 fromslotnum; // when moving from one slot to another
 	/*0x10*/ s32 cornertimer;
 	/*0x14*/ s32 returntimer; // time before selection returns to middle after releasing control stick
@@ -4308,9 +4607,9 @@ struct activemenu {
 	/*0x28*/ u8 favourites[8];
 
 	/*0x30*/ u8 togglefunc;
-	/*0x31*/ u8 numitems; // number of items in player's inventory; can be higher than the number of AM slots
-	/*0x32*/ u8 allbots; // when player holds R on the bot command screen
-	/*0x33*/ u8 prevallbots; // used when opening "Pick Target" menu for attack command
+	/*0x31*/ u8 numitems;	   // number of items in player's inventory; can be higher than the number of AM slots
+	/*0x32*/ u8 allbots;	   // when player holds R on the bot command screen
+	/*0x33*/ u8 prevallbots;   // used when opening "Pick Target" menu for attack command
 	/*0x34*/ s8 origscreennum; // original screen number before using allbots
 
 #ifndef PLATFORM_N64
@@ -4319,21 +4618,24 @@ struct activemenu {
 #endif
 };
 
-struct briefing {
+struct briefing
+{
 	u16 briefingtextnum;
-	u16 objectivenames[6]; // index 0 is the briefing, and the rest are objectives
+	u16 objectivenames[6];		  // index 0 is the briefing, and the rest are objectives
 	u16 objectivedifficulties[6]; // index 0 is unused
 	u16 langbank;
 };
 
-struct criteria_roomentered {
+struct criteria_roomentered
+{
 	u32 unk00;
 	u32 pad;
 	u32 status;
 	struct criteria_roomentered *next;
 };
 
-struct criteria_throwinroom {
+struct criteria_throwinroom
+{
 	u32 unk00;
 	u32 unk04;
 	u32 pad;
@@ -4341,20 +4643,23 @@ struct criteria_throwinroom {
 	struct criteria_throwinroom *next;
 };
 
-struct criteria_holograph {
+struct criteria_holograph
+{
 	u32 unk00;
 	u32 obj;
 	u32 status;
 	struct criteria_holograph *next;
 };
 
-struct mppreset {
+struct mppreset
+{
 	u16 name;
 	u32 confignum;
 	u8 requirefeatures[16]; // Doesn't seem to be used? All values are zero
 };
 
-struct explosiontype {
+struct explosiontype
+{
 	/*0x00*/ f32 rangeh;
 	/*0x04*/ f32 rangev;
 	/*0x08*/ f32 changerateh;
@@ -4370,7 +4675,8 @@ struct explosiontype {
 	/*0x28*/ f32 damage;
 };
 
-struct explosionpart {
+struct explosionpart
+{
 	struct coord pos;
 	f32 size;
 	f32 rot;
@@ -4378,15 +4684,17 @@ struct explosionpart {
 	u8 bb;
 };
 
-struct explosionbb {
+struct explosionbb
+{
 	struct coord bbmin;
 	struct coord bbmax;
 	RoomNum room;
 	RoomNum room2;
 };
 
-struct explosion {
-	struct prop *prop; // Prop of the explosion
+struct explosion
+{
+	struct prop *prop;	 // Prop of the explosion
 	struct prop *source; // Prop of the thing that created the explosion
 	struct explosionpart parts[40];
 	/*0x3c8*/ s16 age;
@@ -4401,7 +4709,8 @@ struct explosion {
 	/*0x474*/ u32 unk474;
 };
 
-struct smoketype {
+struct smoketype
+{
 	/*0x00*/ s16 duration;
 	/*0x02*/ s16 fadespeed;
 	/*0x04*/ s16 spreadspeed;
@@ -4417,7 +4726,8 @@ struct smoketype {
 	/*0x20*/ f32 unk20;
 };
 
-struct smokepart {
+struct smokepart
+{
 	/*0x00*/ struct coord pos;
 	/*0x0c*/ f32 size;
 	/*0x10*/ f32 rot;
@@ -4428,7 +4738,8 @@ struct smokepart {
 	/*0x24*/ s16 count;
 };
 
-struct smoke {
+struct smoke
+{
 	/*0x000*/ struct prop *prop; // Prop of the smoke itself
 	/*0x004*/ s16 age;
 	/*0x006*/ u16 type : 7;
@@ -4441,7 +4752,8 @@ struct smoke {
 	/*0x008*/ struct smokepart parts[10];
 
 	/*0x198*/
-	union {
+	union
+	{
 		// The thing generating smoke
 		struct prop *sourceprop;
 		struct padeffectobj *padeffect;
@@ -4449,32 +4761,36 @@ struct smoke {
 	};
 };
 
-struct textoverride {
+struct textoverride
+{
 	/*0x00*/ u32 unk00;
 	/*0x04*/ s32 objoffset;
 	/*0x08*/ s32 weapon;
-	/*0x0c*/ u32 obtaintext;     // eg. "Obtain medlab 2 keycard\n"
-	/*0x10*/ u32 ownertext;      // eg. "Guard's\n"
-	/*0x14*/ u32 inventorytext;  // eg. "Medlab 2 key card\n"
+	/*0x0c*/ u32 obtaintext;	 // eg. "Obtain medlab 2 keycard\n"
+	/*0x10*/ u32 ownertext;		 // eg. "Guard's\n"
+	/*0x14*/ u32 inventorytext;	 // eg. "Medlab 2 key card\n"
 	/*0x18*/ u32 inventory2text; // eg. "Medlab 2 key card\n"
-	/*0x1c*/ u32 pickuptext;     // eg. "Picked up medlab 2 key card.\n"
+	/*0x1c*/ u32 pickuptext;	 // eg. "Picked up medlab 2 key card.\n"
 	/*0x20*/ struct textoverride *next;
 	/*0x24*/ struct defaultobj *obj;
 };
 
-struct pakdata {
+struct pakdata
+{
 	/*0x000*/ OSPfsState notes[16];
 	/*0x200*/ bool notesinuse[16];
 	/*0x240*/ u16 pagesused;
 	/*0x242*/ u16 pagesfree;
 };
 
-struct pakheadercache {
+struct pakheadercache
+{
 	s32 blocknum;
 	u8 payload[0x20];
 };
 
-struct pak {
+struct pak
+{
 	/*0x000*/ s32 type;
 	/*0x004*/ u32 rumblestate;
 	/*0x008*/ u32 unk008;
@@ -4494,8 +4810,8 @@ struct pak {
 	/*0x280*/ u32 unk280;
 	/*0x284*/ s32 rumblepulsestopat;
 	/*0x288*/ u32 rumblepulselen;
-	/*0x28c*/ u32 rumblepulsetimer;  // counts up to pulselen then loops
-	/*0x290*/ s32 notestotal; // always 16
+	/*0x28c*/ u32 rumblepulsetimer; // counts up to pulselen then loops
+	/*0x290*/ s32 notestotal;		// always 16
 	/*0x294*/ s32 notesused;
 	/*0x298*/ u32 unk298;
 	/*0x29c*/ s32 pdnoteindex;
@@ -4525,7 +4841,8 @@ struct pak {
 #endif
 };
 
-struct gecreditsdata {
+struct gecreditsdata
+{
 	/*0x00*/ u16 text1;
 	/*0x02*/ u16 text2;
 	/*0x04*/ u16 posoffset1;
@@ -4534,24 +4851,29 @@ struct gecreditsdata {
 	/*0x0a*/ u16 alignoffset2;
 };
 
-struct invitem_weap {
+struct invitem_weap
+{
 	s16 weapon1;
 	s16 pickuppad;
 };
 
-struct invitem_prop {
+struct invitem_prop
+{
 	struct prop *prop;
 };
 
-struct invitem_dual {
+struct invitem_dual
+{
 	s32 weapon1;
 	s32 weapon2;
 };
 
-struct invitem {
+struct invitem
+{
 	/*0x00*/ s32 type;
 
-	union {
+	union
+	{
 		struct invitem_weap type_weap;
 		struct invitem_prop type_prop;
 		struct invitem_dual type_dual;
@@ -4561,18 +4883,21 @@ struct invitem {
 	/*0x10*/ struct invitem *prev;
 };
 
-struct chrnumaction {
+struct chrnumaction
+{
 	s16 chrnum;
 	u8 myaction;
 };
 
-struct modelstate {
+struct modelstate
+{
 	struct modeldef *modeldef;
 	u16 fileid;
 	u16 scale;
 };
 
-struct botdifficulty {
+struct botdifficulty
+{
 	u8 shootdelay;
 	f32 unk04;
 	f32 unk08;
@@ -4583,7 +4908,8 @@ struct botdifficulty {
 	s32 dizzyamount;
 };
 
-struct animtablerow {
+struct animtablerow
+{
 	s16 animnum;
 	bool flip;
 	f32 endframe;
@@ -4593,7 +4919,8 @@ struct animtablerow {
 	f32 thudframe2;
 };
 
-struct animtable {
+struct animtable
+{
 	s32 hitpart;
 	struct animtablerow *deathanims;
 	struct animtablerow *injuryanims;
@@ -4601,7 +4928,8 @@ struct animtable {
 	s32 injuryanimcount;
 };
 
-struct headanim {
+struct headanim
+{
 	s16 animnum;
 	f32 loopframe;
 	f32 endframe;
@@ -4610,7 +4938,8 @@ struct headanim {
 	f32 maxspeed;
 };
 
-struct vimode {
+struct vimode
+{
 	s32 fbwidth;
 	s32 fbheight;
 	s32 width;
@@ -4624,28 +4953,33 @@ struct vimode {
 	s32 cinematop;
 };
 
-struct miscbio {
+struct miscbio
+{
 	u32 name;
 	u32 description;
 };
 
-struct hangarbio {
+struct hangarbio
+{
 	u32 name;
 	u32 description;
 	u32 unk08;
 	u32 unk0c;
 };
 
-struct chrbio {
+struct chrbio
+{
 	u32 name;
 	u32 race;
 	u32 age;
 	u32 description;
 };
 
-struct ranking {
+struct ranking
+{
 	struct mpchrconfig *mpchr;
-	union {
+	union
+	{
 		u32 teamnum;
 		u32 chrnum;
 	};
@@ -4654,7 +4988,8 @@ struct ranking {
 	s32 score;
 };
 
-struct hudmsgtype {
+struct hudmsgtype
+{
 	/*0x00*/ u8 unk00;
 	/*0x01*/ u8 unk01;
 	/*0x02*/ u8 unk02;
@@ -4669,7 +5004,8 @@ struct hudmsgtype {
 	/*0x1c*/ s32 duration;
 };
 
-struct hudmessage {
+struct hudmessage
+{
 	/*0x000*/ u8 state;
 	/*0x001*/ u8 boxed;
 	/*0x002*/ u8 allowfadein;
@@ -4699,9 +5035,10 @@ struct hudmessage {
 	/*0x1d8*/ u32 hash;
 };
 
-struct frtarget {
-	/*0x00*/ u8 inuse : 1;         // 1 if being used at all in this session
-	/*0x00*/ u8 active : 1;        // 1 if target has appeared
+struct frtarget
+{
+	/*0x00*/ u8 inuse : 1;	// 1 if being used at all in this session
+	/*0x00*/ u8 active : 1; // 1 if target has appeared
 	/*0x00*/ u8 destroyed : 1;
 	/*0x00*/ u8 scriptenabled : 1;
 	/*0x00*/ u8 rotating : 1;
@@ -4716,18 +5053,19 @@ struct frtarget {
 	/*0x1c*/ f32 travelspeed;
 	/*0x20*/ u8 damage;
 	/*0x21*/ u8 scriptoffset;
-	/*0x24*/ f32 rotatespeed;      // Negative for reverse direction
+	/*0x24*/ f32 rotatespeed; // Negative for reverse direction
 	/*0x28*/ f32 angle;
 	/*0x2c*/ f32 rotatetoangle;
 	/*0x30*/ u8 flags;
-	/*0x31*/ u8 silent;            // 0 if playing the hum sound while travelling
-	/*0x32*/ u8 donestopsound;     // 1 if the clank sound has played when stopping travelling
+	/*0x31*/ u8 silent;		   // 0 if playing the hum sound while travelling
+	/*0x32*/ u8 donestopsound; // 1 if the clank sound has played when stopping travelling
 	/*0x33*/ u8 travelling;
 	/*0x34*/ s8 frpadnum;
 	/*0x38*/ s32 invincibletimer;
 };
 
-struct frdata {
+struct frdata
+{
 	/*0x000*/ u8 maxactivetargets;
 	/*0x002*/ u16 goalscore;
 	/*0x004*/ u8 goaltargets;
@@ -4768,7 +5106,8 @@ struct frdata {
 	/*0x47c*/ u32 unk47c;
 };
 
-struct menudata_5d8 {
+struct menudata_5d8
+{
 	struct fileguid fileguid;
 	u8 unk08;
 	u8 unk09;
@@ -4776,7 +5115,8 @@ struct menudata_5d8 {
 	u8 unk0b;
 };
 
-struct menudata {
+struct menudata
+{
 	/*0x000*/ s32 count;
 	/*0x004*/ s32 root;
 	/*0x008*/ s32 unk008; // also a menuroot constant
@@ -4806,19 +5146,22 @@ struct menudata {
 	/*0x674*/ s32 unk674;
 };
 
-struct ammotype {
+struct ammotype
+{
 	s32 capacity;
 	u32 unk04;
 	f32 unk08;
 };
 
-struct weather58 {
+struct weather58
+{
 	f32 unk00;
 	f32 unk04;
 	s32 unk08;
 };
 
-struct weatherdata {
+struct weatherdata
+{
 	/*0x00*/ f32 windspeedx;
 	/*0x04*/ f32 windspeedz;
 	/*0x08*/ f32 windanglerad;
@@ -4870,14 +5213,16 @@ struct weatherdata {
 	/*0xfc*/ u32 unkfc;
 };
 
-struct weatherparticle {
+struct weatherparticle
+{
 	struct coord pos;
 	s32 active;
 	struct coord inc;
 	f32 unk1c;
 };
 
-struct weatherparticledata {
+struct weatherparticledata
+{
 	struct weatherparticle particles[500];
 	/*0x3e80*/ struct coord unk3e80;
 	/*0x3e8c*/ struct coord boundarymax;
@@ -4900,7 +5245,8 @@ struct weatherparticledata {
 
 #ifndef PLATFORM_N64
 
-struct weathercfg {
+struct weathercfg
+{
 	s32 stagenum;
 	u32 flags;
 	f32 windspeed;
@@ -4908,14 +5254,15 @@ struct weathercfg {
 	f32 ymax;
 	f32 zmax;
 	RoomNum skiprooms[WEATHERCFG_MAX_SKIPROOMS]; // if flags has WEATHERFLAG_INCLUDE, rooms that have weather, else rooms that don't
-	f32 windanglerad; // wind fields only used if flags has WEATHERFLAG_FORCE_WINDDIR
+	f32 windanglerad;							 // wind fields only used if flags has WEATHERFLAG_FORCE_WINDDIR
 	f32 windspeedx;
 	f32 windspeedz;
 };
 
 #endif
 
-struct texture {
+struct texture
+{
 	u32 soundsurfacetype : 4;
 	u32 surfacetype : 4;
 	u32 dataoffset : 24;
@@ -4925,33 +5272,40 @@ struct texture {
 	u32 unk04_0c : 4;
 };
 
-struct jpncharpixels {
+struct jpncharpixels
+{
 	/*0x00*/ u32 unk00;
 	/*0x04*/ u32 unk04;
 	/*0x08*/ u32 unk08;
 };
 
-struct jpncacheitem {
+struct jpncacheitem
+{
 	u16 ttl : 2;
 	u16 codepoint : 14;
 };
 
-struct bgcmd {
+struct bgcmd
+{
 	u8 type;
 	u8 len;
 	s32 param;
 };
 
-struct drawslot {
+struct drawslot
+{
 	RoomNum roomnum;
 	u8 unk02;
 	u8 draworder;
 	struct screenbox box;
 };
 
-struct zrange {
-	union {
-		struct {
+struct zrange
+{
+	union
+	{
+		struct
+		{
 			f32 near;
 			f32 far;
 		};
@@ -4959,7 +5313,8 @@ struct zrange {
 	};
 };
 
-struct bgsnakeitem {
+struct bgsnakeitem
+{
 	/*0x00*/ RoomNum roomnum;
 	/*0x02*/ RoomNum fromroomnums[5];
 	/*0x0c*/ u8 depth;
@@ -4968,7 +5323,8 @@ struct bgsnakeitem {
 	/*0x10*/ struct screenbox screenbox;
 };
 
-struct bgsnake {
+struct bgsnake
+{
 	s16 count;
 	s16 headindex;
 	s16 tailindex;
@@ -4976,17 +5332,18 @@ struct bgsnake {
 	struct bgsnakeitem items[250];
 };
 
-struct menuinputs {
-	/*0x00*/ s8 leftright;     // Both control stick and C/D buttons - set on initial press and on key repeat intervals
-	/*0x01*/ s8 updown;        // As above
-	/*0x02*/ u8 select;        // A/Z buttons
-	/*0x03*/ u8 back;          // B button
-	/*0x04*/ s8 xaxis;         // Control stick's current left/right position
-	/*0x05*/ s8 yaxis;         // Control stick's current up/down position
-	/*0x06*/ u8 shoulder;      // L or R buttons
-	/*0x07*/ u8 back2;         // Used in keyboard
+struct menuinputs
+{
+	/*0x00*/ s8 leftright;	   // Both control stick and C/D buttons - set on initial press and on key repeat intervals
+	/*0x01*/ s8 updown;		   // As above
+	/*0x02*/ u8 select;		   // A/Z buttons
+	/*0x03*/ u8 back;		   // B button
+	/*0x04*/ s8 xaxis;		   // Control stick's current left/right position
+	/*0x05*/ s8 yaxis;		   // Control stick's current up/down position
+	/*0x06*/ u8 shoulder;	   // L or R buttons
+	/*0x07*/ u8 back2;		   // Used in keyboard
 	/*0x08*/ s8 leftrightheld; // Same as leftright, but is also set between repeat intervals
-	/*0x09*/ s8 updownheld;    // As above
+	/*0x09*/ s8 updownheld;	   // As above
 	/*0x0a*/ s8 start;
 	/*0x0c*/ s32 unk0c;
 	/*0x10*/ s32 unk10;
@@ -4999,7 +5356,8 @@ struct menuinputs {
 #endif
 };
 
-struct mpconfigsim {
+struct mpconfigsim
+{
 	u8 type;
 	u8 mpheadnum;
 	u8 mpbodynum;
@@ -5007,12 +5365,14 @@ struct mpconfigsim {
 	u8 difficulties[MAX_PLAYERS];
 };
 
-struct mpconfig {
+struct mpconfig
+{
 	struct mpsetup setup;
 	struct mpconfigsim simulants[MAX_BOTS];
 };
 
-struct mpweapon {
+struct mpweapon
+{
 	/*0x00*/ u8 weaponnum;
 	/*0x01*/ s8 priammotype;
 	/*0x02*/ u8 priammoqty;
@@ -5024,17 +5384,20 @@ struct mpweapon {
 	/*0x08*/ s16 extrascale;
 };
 
-struct mpstrings {
+struct mpstrings
+{
 	char description[200];
 	char aibotnames[MAX_BOTS][15];
 };
 
-struct mpconfigfull {
+struct mpconfigfull
+{
 	struct mpconfig config;
 	struct mpstrings strings;
 };
 
-struct movedata {
+struct movedata
+{
 	/*0x00*/ bool canswivelgun;
 	/*0x04*/ bool canmanualaim;
 	/*0x08*/ bool triggeron;
@@ -5084,15 +5447,16 @@ struct movedata {
 	/*    */ f32 freelookdy; // ... scaled by sensitivity
 	/*    */ f32 analoglean; // how much we're trying to lean
 #endif
-
 };
 
-struct attackanimgroup {
+struct attackanimgroup
+{
 	struct attackanimconfig *animcfg;
 	s32 len;
 };
 
-struct modelthing {
+struct modelthing
+{
 	/*0x00*/ u32 unk00;
 	/*0x04*/ u32 unk04;
 	/*0x08*/ u32 unk08;
@@ -5103,7 +5467,8 @@ struct modelthing {
 	/*0x16*/ u16 unk16;
 };
 
-struct animtableentry {
+struct animtableentry
+{
 	/*0x00*/ u16 numframes;
 	/*0x02*/ u16 bytesperframe; // in bytes
 	/*0x04*/ u32 data;
@@ -5112,7 +5477,8 @@ struct animtableentry {
 	/*0x0b*/ u8 flags;
 };
 
-struct modelrenderdata {
+struct modelrenderdata
+{
 	/*0x00*/ Mtxf *unk00;
 	/*0x04*/ bool zbufferenabled;
 	/*0x08*/ u32 flags;
@@ -5131,7 +5497,8 @@ struct modelrenderdata {
 	/*0x3c*/ u32 cullmode;
 };
 
-struct rend_vidat {
+struct rend_vidat
+{
 	/*0x00*/ u8 mode;
 	/*0x01*/ u8 unk01;
 	/*0x02*/ u8 unk02;
@@ -5152,7 +5519,8 @@ struct rend_vidat {
 	/*0x28*/ u16 *fb;
 };
 
-struct shieldhit {
+struct shieldhit
+{
 	/*0x00*/ struct prop *prop;
 	/*0x04*/ struct modelnode *node;
 	/*0x08*/ struct model *model;
@@ -5167,14 +5535,16 @@ struct shieldhit {
 	/*0x58*/ f32 shield;
 };
 
-struct bgroom {
+struct bgroom
+{
 	u32 unk00;
 	struct coord pos;
 	u8 br_light_min;
 	u8 br_light_max;
 };
 
-struct damagetype {
+struct damagetype
+{
 	f32 flashstartframe;
 	f32 flashfullframe;
 	f32 flashendframe;
@@ -5184,7 +5554,8 @@ struct damagetype {
 	s32 blue;
 };
 
-struct healthdamagetype {
+struct healthdamagetype
+{
 	s32 openendframe;
 	s32 updatestartframe;
 	s32 updateendframe;
@@ -5192,14 +5563,17 @@ struct healthdamagetype {
 	s32 closeendframe;
 };
 
-struct optiongroup {
+struct optiongroup
+{
 	s32 offset;
 	u16 name;
 };
 
-struct musicevent {
+struct musicevent
+{
 	s32 tracktype;
-	union {
+	union
+	{
 		s32 tracknum;
 		s32 timer240;
 	};
@@ -5212,7 +5586,8 @@ struct musicevent {
 	u16 numattempts;
 };
 
-struct casing {
+struct casing
+{
 	/*0x00*/ f32 ground;
 	/*0x04*/ struct coord pos;
 	/*0x10*/ struct coord speed;
@@ -5221,7 +5596,8 @@ struct casing {
 	/*0x40*/ struct modeldef *modeldef;
 };
 
-struct mplockinfo {
+struct mplockinfo
+{
 	s8 lockedplayernum;
 	s8 lastwinner;
 	s8 lastloser;
@@ -5229,8 +5605,10 @@ struct mplockinfo {
 	s32 unk04;
 };
 
-struct boltbeam {
-	union {
+struct boltbeam
+{
+	union
+	{
 		s32 unk00;
 		struct prop *unk00_prop;
 	};
@@ -5245,19 +5623,22 @@ struct boltbeam {
 	f32 speed;
 };
 
-struct drawslotpointer {
+struct drawslotpointer
+{
 	u16 updatedframe;
 	s16 slotnum;
 };
 
-struct seqchannel {
+struct seqchannel
+{
 	s32 tracktype;
 	s32 inuse;
 	s32 keepafterfade;
 	s32 unk0c;
 };
 
-struct seqinstance {
+struct seqinstance
+{
 	/*0x000*/ ALCSeq seq;
 	/*0x0f8*/ N_ALCSPlayer *seqp;
 	/*0x0fc*/ u8 *data;
@@ -5265,7 +5646,8 @@ struct seqinstance {
 	/*0x104*/ s32 tracknum;
 };
 
-struct lasersight {
+struct lasersight
+{
 	s32 id;
 	struct coord unk04;
 	struct coord beamnear;
@@ -5276,9 +5658,12 @@ struct lasersight {
 	u32 unk44;
 };
 
-struct vec3s16 {
-	union {
-		struct {
+struct vec3s16
+{
+	union
+	{
+		struct
+		{
 			s16 x;
 			s16 y;
 			s16 z;
@@ -5287,7 +5672,8 @@ struct vec3s16 {
 	};
 };
 
-struct light {
+struct light
+{
 	/*0x00*/ u16 roomnum;
 	/*0x02*/ u16 colour; // 4/4/4/4
 	/*0x04*/ u8 brightness;
@@ -5303,12 +5689,14 @@ struct light {
 	/*0x0a*/ struct vec3s16 bbox[4];
 };
 
-struct var80061420 {
+struct var80061420
+{
 	u8 *unk00;
 	u8 *unk04;
 };
 
-struct menurendercontext {
+struct menurendercontext
+{
 	s16 x;
 	s16 y;
 	s16 width;
@@ -5320,7 +5708,8 @@ struct menurendercontext {
 	bool unk18;
 };
 
-struct menucolourpalette {
+struct menucolourpalette
+{
 	/*0x00*/ u32 dialog_border1;
 	/*0x04*/ u32 dialog_titlebg;
 	/*0x08*/ u32 dialog_border2;
@@ -5338,7 +5727,8 @@ struct menucolourpalette {
 	/*0x38*/ u32 unused38;
 };
 
-struct bytelist {
+struct bytelist
+{
 	u8 b0;
 	u8 b1;
 	u8 b2;
@@ -5354,19 +5744,22 @@ struct bytelist {
 	u8 b12;
 };
 
-struct stageallocation {
+struct stageallocation
+{
 	s32 stagenum;
 	char *string;
 };
 
-struct guncmd {
+struct guncmd
+{
 	u8 type;
 	u8 unk01;
 	u16 unk02;
 	s32 unk04;
 };
 
-struct pakthing {
+struct pakthing
+{
 	char unk00[4]; // len unknown
 	u32 unk04;
 	u32 unk08;
@@ -5374,26 +5767,29 @@ struct pakthing {
 	u16 unk10;
 };
 
-struct pakfileheader {
-	u16 headersum[2];       // checksum from filetype to end of header
+struct pakfileheader
+{
+	u16 headersum[2]; // checksum from filetype to end of header
 	u16 bodysum[2];
-	u32 filetype : 9;       // PAKFILETYPE constant
-	u32 bodylen : 11;       // not aligned
-	u32 filelen : 12;       // aligned to 0x10
+	u32 filetype : 9; // PAKFILETYPE constant
+	u32 bodylen : 11; // not aligned
+	u32 filelen : 12; // aligned to 0x10
 	u32 deviceserial : 13;
 	u32 fileid : 7;
-	u32 generation : 9;     // increments by 1 each time the same file is saved
+	u32 generation : 9; // increments by 1 each time the same file is saved
 	u32 occupied : 1;
 	u32 writecompleted : 1; // 0 while writing data, then updated to 1 afterwards
-	u32 version : 1;        // 0, but can be set to 1 using -forceversion argument
+	u32 version : 1;		// 0, but can be set to 1 using -forceversion argument
 };
 
-struct var80067e6c {
+struct var80067e6c
+{
 	s16 animnum;
 	f32 value;
 };
 
-struct shard {
+struct shard
+{
 	/*0x00*/ RoomNum room;
 	/*0x04*/ s32 age60;
 	/*0x08*/ struct coord pos;
@@ -5405,7 +5801,8 @@ struct shard {
 	/*0x68*/ u8 type;
 };
 
-struct pschannel {
+struct pschannel
+{
 	/*0x00*/ struct sndstate *audiohandle;
 	/*0x04*/ s16 targetvol;
 	/*0x06*/ s16 currentvol;
@@ -5445,7 +5842,8 @@ struct pschannel {
 #endif
 };
 
-struct var8007e3d0_data {
+struct var8007e3d0_data
+{
 	void *unk00;
 	struct modelnode *node;
 	s32 level;
@@ -5453,7 +5851,8 @@ struct var8007e3d0_data {
 	s16 unk0e;
 };
 
-struct vtxstoretype {
+struct vtxstoretype
+{
 	s32 valifsp;
 	s32 numifsp;
 	s32 valifmp;
@@ -5469,7 +5868,8 @@ struct vtxstoretype {
 	s32 numallocated;
 };
 
-struct wallhit {
+struct wallhit
+{
 	/*0x00*/ Vtx vertices[4];
 	/*0x30*/ Col basecolours[4];  // without room lighting applied
 	/*0x40*/ Col finalcolours[4]; // with room lighting applied
@@ -5492,7 +5892,7 @@ struct wallhit {
 	/*0x70*/ u32 createdframe : 28;
 	/*0x70*/ u32 timerspeed : 4;
 	/*0x74*/ struct wallhit *globalnext; // for the used/free linked lists
-	/*0x78*/ struct wallhit *localnext; // for the room/prop specific linked list
+	/*0x78*/ struct wallhit *localnext;	 // for the room/prop specific linked list
 };
 
 /**
@@ -5503,11 +5903,13 @@ struct wallhit {
  *
  * The first item in the propnums array is -2 if this chunk is unallocated.
  */
-struct roomproplistchunk {
+struct roomproplistchunk
+{
 	s16 propnums[MAX_PROPSPERROOMCHUNK + 1];
 };
 
-struct nbomb {
+struct nbomb
+{
 	struct coord pos;
 	s32 age240;
 	f32 radius;
@@ -5521,24 +5923,28 @@ struct nbomb {
 #endif
 };
 
-struct roomacousticdata {
+struct roomacousticdata
+{
 	f32 surfacearea;
 	f32 unk04;
 	f32 unk08;
 	f32 roomvolume;
 };
 
-struct var8009dd78 {
+struct var8009dd78
+{
 	s16 unk00;
 	f32 unk04;
 };
 
-struct texturepair {
+struct texturepair
+{
 	texnum_t texturenum1;
 	texnum_t texturenum2;
 };
 
-struct collision {
+struct collision
+{
 	struct geo *geo;
 	bool intile;
 	s32 vertexindex;
@@ -5546,12 +5952,14 @@ struct collision {
 	s32 room;
 };
 
-struct escastepkeyframe {
+struct escastepkeyframe
+{
 	s32 frame;
 	struct coord pos;
 };
 
-struct fontchar {
+struct fontchar
+{
 #if VERSION == VERSION_JPN_FINAL
 	u16 index;
 #else
@@ -5568,60 +5976,70 @@ struct fontchar {
 	u8 *pixeldata;
 };
 
-struct font {
+struct font
+{
 	s32 kerning[13 * 13];
 	struct fontchar chars[94]; // can be 135 in PAL
 };
 
-typedef union {
-	struct {
-		short     type;
+typedef union
+{
+	struct
+	{
+		short type;
 	} gen;
 
-	struct {
-		short     type;
-		struct    AudioInfo_s *info;
+	struct
+	{
+		short type;
+		struct AudioInfo_s *info;
 	} done;
 
-	OSScMsg       app;
+	OSScMsg app;
 } AudioMsg;
 
-typedef struct AudioInfo_s {
-	short         *data;          /* Output data pointer */
-	short         frameSamples;   /* # of samples synthesized in this frame */
-	OSScTask      task;           /* scheduler structure */
+typedef struct AudioInfo_s
+{
+	short *data;		/* Output data pointer */
+	short frameSamples; /* # of samples synthesized in this frame */
+	OSScTask task;		/* scheduler structure */
 } AudioInfo;
 
-typedef struct {
-	Acmd          *ACMDList[2];
-	AudioInfo     *audioInfo[3];
-	OSThread      thread;
-	OSMesgQueue   audioFrameMsgQ;
-	OSMesg        audioFrameMsgBuf[8];
-	OSMesgQueue   audioReplyMsgQ;
-	OSMesg        audioReplyMsgBuf[8];
-	N_ALGlobals   g;
+typedef struct
+{
+	Acmd *ACMDList[2];
+	AudioInfo *audioInfo[3];
+	OSThread thread;
+	OSMesgQueue audioFrameMsgQ;
+	OSMesg audioFrameMsgBuf[8];
+	OSMesgQueue audioReplyMsgQ;
+	OSMesg audioReplyMsgBuf[8];
+	N_ALGlobals g;
 } AMAudioMgr;
 
-typedef struct {
-	ALLink        node;
-	u32           startAddr;
-	u32           lastFrame;
-	char          *ptr;
+typedef struct
+{
+	ALLink node;
+	u32 startAddr;
+	u32 lastFrame;
+	char *ptr;
 } AMDMABuffer;
 
-typedef struct {
-	u8            initialized;
-	AMDMABuffer   *firstUsed;
-	AMDMABuffer   *firstFree;
+typedef struct
+{
+	u8 initialized;
+	AMDMABuffer *firstUsed;
+	AMDMABuffer *firstFree;
 } AMDMAState;
 
-union audioparam {
+union audioparam
+{
 	s32 s32;
 	f32 f32;
 };
 
-struct animationdefinition {
+struct animationdefinition
+{
 	u16 numkeyframes;
 	u16 numkeyframebytes;
 	void *data;
@@ -5630,12 +6048,14 @@ struct animationdefinition {
 	u8 flags;
 };
 
-struct portalvertices {
+struct portalvertices
+{
 	u8 count;
 	struct coord vertices[1];
 };
 
-struct aibotweaponpreference {
+struct aibotweaponpreference
+{
 	u8 unk00;
 	u8 unk01;
 	u8 unk02;
@@ -5652,28 +6072,33 @@ struct aibotweaponpreference {
 	u16 allowpartialreloaddelay : 1;
 };
 
-struct handweaponinfo {
+struct handweaponinfo
+{
 	s32 weaponnum;
 	struct weapon *definition;
 	struct gunctrl *gunctrl;
 };
 
-struct seqtableentry {
+struct seqtableentry
+{
 	u32 romaddr;
 	u16 binlen;
 	u16 ziplen;
 };
 
-struct seqtable {
+struct seqtable
+{
 	u16 count;
 	struct seqtableentry entries[1];
 };
 
-struct mp3thing {
+struct mp3thing
+{
 	u16 unk00[580];
 };
 
-struct mp3vars {
+struct mp3vars
+{
 #ifdef PLATFORM_N64
 	/*0x00*/ s32 romaddr;
 #else
@@ -5716,20 +6141,23 @@ struct mp3vars {
 #endif
 };
 
-struct rdptask {
+struct rdptask
+{
 	OSScTask sctask;
 	u16 *framebuffer;
 	u32 unk5c;
 };
 
-struct warpparams {
+struct warpparams
+{
 	/*0x00*/ u32 unk00;
 	/*0x04*/ struct coord pos;
 	/*0x10*/ f32 look[2];
 	/*0x18*/ s32 pad;
 };
 
-struct hitthing {
+struct hitthing
+{
 	struct coord pos; // world pos
 	struct coord unk0c;
 	Vtx *unk18;
@@ -5741,7 +6169,8 @@ struct hitthing {
 	s16 unk2c;
 };
 
-struct hit {
+struct hit
+{
 	/*0x00*/ f32 distance;
 	/*0x04*/ struct prop *prop;
 	/*0x08*/ s32 hitpart;
@@ -5756,7 +6185,8 @@ struct hit {
 	/*0x5c*/ struct coord dir;
 };
 
-struct shotdata {
+struct shotdata
+{
 	/*0x00*/ struct coord gunpos2d;
 	/*0x0c*/ struct coord gundir2d;
 	/*0x18*/ struct gset gset;
@@ -5767,7 +6197,8 @@ struct shotdata {
 	/*0x3c*/ struct hit hits[10];
 };
 
-struct var800a45a0 {
+struct var800a45a0
+{
 	/*0x000*/ u32 unk000;
 	/*0x004*/ u32 unk004;
 	/*0x008*/ u32 unk008;
@@ -5870,7 +6301,8 @@ struct var800a45a0 {
 	/*0x48c*/ u32 unk48c;
 };
 
-struct var8007f8e0 { // perfect head?
+struct var8007f8e0
+{ // perfect head?
 	/*0x000*/ u32 unk000;
 	/*0x004*/ struct textureconfig unk004;
 	/*0x010*/ struct textureconfig unk010;
@@ -5911,7 +6343,8 @@ struct var8007f8e0 { // perfect head?
 	/*0x3f8*/ struct fileguid fileguid;
 };
 
-struct var8007f8dc {
+struct var8007f8dc
+{
 	/*0x000*/ u32 unk000;
 	/*0x004*/ f32 unk004;
 	/*0x008*/ f32 unk008;
@@ -5970,7 +6403,8 @@ struct var8007f8dc {
 	/*0x100*/ u32 unk100;
 };
 
-struct hatposition {
+struct hatposition
+{
 	f32 x;
 	f32 y;
 	f32 z;
@@ -5979,7 +6413,8 @@ struct hatposition {
 	f32 unk14;
 };
 
-struct var80062960 {
+struct var80062960
+{
 	/*0x000*/ struct prop *prop;
 	/*0x004*/ bool unk004;
 	/*0x008*/ f32 unk008;
@@ -6000,7 +6435,8 @@ struct var80062960 {
 	/*0x158*/ f32 unk158;
 };
 
-struct awardmetrics {
+struct awardmetrics
+{
 	/*0x00*/ s32 numshots;
 	/*0x04*/ s32 numheadshots;
 	/*0x08*/ s32 numkills;
@@ -6018,7 +6454,8 @@ struct awardmetrics {
 	/*0x38*/ f32 accuracyfrac;
 };
 
-struct tex {
+struct tex
+{
 	/*0x00*/ u16 texturenum : 12;
 	/*0x04*/ u8 *data;
 	/*0x08*/ u8 width;
@@ -6037,13 +6474,15 @@ struct tex {
 #endif
 };
 
-struct texcacheitem {
+struct texcacheitem
+{
 	s16 texturenum;
 	u8 widths[7];
 	u8 heights[7];
 };
 
-struct skyvtx3d {
+struct skyvtx3d
+{
 	/*0x00*/ f32 x;
 	/*0x04*/ f32 y;
 	/*0x08*/ f32 z;
@@ -6055,7 +6494,8 @@ struct skyvtx3d {
 	/*0x17*/ u8 a;
 };
 
-struct skyvtx2d {
+struct skyvtx2d
+{
 	/*0x00*/ f32 unk00;
 	/*0x04*/ f32 unk04;
 	/*0x08*/ f32 unk08;
@@ -6072,7 +6512,8 @@ struct skyvtx2d {
 	/*0x34*/ f32 unk34;
 };
 
-struct hovtype {
+struct hovtype
+{
 	/*0x00*/ f32 bobymid;
 	/*0x04*/ f32 bobyminradius;
 	/*0x08*/ f32 bobyrandradius;
@@ -6088,22 +6529,26 @@ struct hovtype {
 	/*0x30*/ f32 bobrollmaxspeed;
 };
 
-struct modelrwdatabinding {
+struct modelrwdatabinding
+{
 	struct model *model;
 	void *rwdata;
 };
 
-struct portalthing2 {
+struct portalthing2
+{
 	struct coord coord;
 	bool behind;
 };
 
-struct var800a6538 {
+struct var800a6538
+{
 	s32 vtxbatchindex;
 	f32 unk04;
 };
 
-struct xraydata {
+struct xraydata
+{
 	/*0x000*/ s32 unk000;
 	/*0x004*/ s32 unk004;
 	/*0x008*/ s32 unk008;
@@ -6121,20 +6566,23 @@ struct xraydata {
 	/*0x24a*/ s16 numtris;
 };
 
-struct widthxz {
+struct widthxz
+{
 	f32 width;
 	f32 x;
 	f32 z;
 };
 
-struct xz {
+struct xz
+{
 	f32 x;
 	f32 z;
 };
 
 #ifndef PLATFORM_N64
 
-struct extplayerconfig {
+struct extplayerconfig
+{
 	f32 fovy;
 	f32 fovzoommult;
 	s32 fovzoom;
