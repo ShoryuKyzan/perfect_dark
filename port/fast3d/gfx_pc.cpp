@@ -32,8 +32,6 @@
 #include "gfx_screen_config.h"
 
 #include "openvr.h"
-#include "../../src/include/types.h"
-#include "../../src/include/bss.h"
 
 #include "Matrices.h"
 
@@ -245,6 +243,8 @@ static int game_framebuffer;
 static int game_framebuffer_msaa_resolved;
 
 // VR
+bool vrEnabled;
+s8 vrRenderEye;
 vr::IVRSystem *m_pHMD;
 static int eye_l_fb;
 static int eye_r_fb;
@@ -1173,10 +1173,10 @@ static void gfx_sp_matrix(uint8_t parameters, const int32_t *addr)
         rsp.lights_changed = 1;
     }
     float P_mat[4][4];
-    if (g_Vars.vrEnabled && g_Vars.vrRenderEye != -1)
+    if (vrEnabled && vrRenderEye != -1)
     {
         float vrp[4][4];
-        gfx_vr_get_current_projection_mtx(vrp, (vr::Hmd_Eye)g_Vars.vrRenderEye);
+        gfx_vr_get_current_projection_mtx(vrp, (vr::Hmd_Eye)vrRenderEye);
         gfx_matrix_mul(P_mat, vrp, rsp.P_matrix); // XXX this is probably the wrong thing to do. i probably need to extract cam position and transform by hmdpos instead.
     }
     else
@@ -2928,7 +2928,7 @@ static bool gfx_init_vr()
     if (!vr::VRCompositor())
     {
         sysLogPrintf(LOG_ERROR, "vr compositor failed to init");
-        g_Vars.vrEnabled = false;
+        vrEnabled = false;
         return false;
     }
     sysLogPrintf(LOG_NOTE, "vr compositor init success"); // XXX
@@ -2960,18 +2960,18 @@ static bool gfx_init_vr()
     mat4VREyePosRight = gfx_vr_steamvrmtx34_to_mat4(m_pHMD->GetEyeToHeadTransform(vr::Eye_Right));
     mat4VREyePosRight.invert();
 
-    g_Vars.vrEnabled = true;
+    vrEnabled = true;
 
     return true;
 }
 
 static void gfx_vr_shutdown()
 {
-    if (m_pHMD && g_Vars.vrEnabled)
+    if (m_pHMD && vrEnabled)
     {
         vr::VR_Shutdown();
         m_pHMD = NULL;
-        g_Vars.vrEnabled = false;
+        vrEnabled = false;
         sysLogPrintf(LOG_NOTE, "vr shutdown"); // XXX
     }
 }
@@ -3233,7 +3233,7 @@ extern "C" void gfx_run(Gfx *commands)
 
     bool frame_started = false;
     int fb_id = 0;
-    int num_passes = g_Vars.vrEnabled ? 3 : 1;
+    int num_passes = vrEnabled ? 3 : 1;
     gfx_sp_reset();
     if (!gfx_wapi->start_frame())
     {
@@ -3242,10 +3242,10 @@ extern "C" void gfx_run(Gfx *commands)
     }
     dropped_frame = false;
     // -1 means 2d, 0 for left, 1 for right
-    for (g_Vars.vrRenderEye = -1; g_Vars.vrRenderEye < num_passes - 1; g_Vars.vrRenderEye++)
+    for (vrRenderEye = -1; vrRenderEye < num_passes - 1; vrRenderEye++)
     {
-        sysLogPrintf(LOG_NOTE, "frame pass %d", g_Vars.vrRenderEye); // XXX
-        if (g_Vars.vrRenderEye == -1)
+        sysLogPrintf(LOG_NOTE, "frame pass %d", vrRenderEye); // XXX
+        if (vrRenderEye == -1)
         {
             gfx_rapi->update_framebuffer_parameters(0, gfx_current_window_dimensions.width,
                                                     gfx_current_window_dimensions.height, 1, false, true, true,
@@ -3260,10 +3260,10 @@ extern "C" void gfx_run(Gfx *commands)
 
         // set correct frame buffer
         fb_id =
-            g_Vars.vrRenderEye == -1  ? game_renders_to_framebuffer ? game_framebuffer : 0
-            : g_Vars.vrRenderEye == 0 ? eye_l_fb
-            : g_Vars.vrRenderEye == 1 ? eye_r_fb
-                                      : 0;
+            vrRenderEye == -1  ? game_renders_to_framebuffer ? game_framebuffer : 0
+            : vrRenderEye == 0 ? eye_l_fb
+            : vrRenderEye == 1 ? eye_r_fb
+                               : 0;
         gfx_rapi->start_draw_to_framebuffer(fb_id,
                                             (float)gfx_current_dimensions.height / SCREEN_HEIGHT);
         gfx_rapi->clear_framebuffer(true, false);
@@ -3275,7 +3275,7 @@ extern "C" void gfx_run(Gfx *commands)
         gfxFramebuffer = 0;
 
         // 2d only, resolve msaa
-        if (game_renders_to_framebuffer && g_Vars.vrRenderEye == -1)
+        if (game_renders_to_framebuffer && vrRenderEye == -1)
         {
             gfx_rapi->start_draw_to_framebuffer(0, 1);
             gfx_rapi->clear_framebuffer(true, true);
@@ -3301,28 +3301,28 @@ extern "C" void gfx_run(Gfx *commands)
                 gfxFramebuffer = (uintptr_t)gfx_rapi->get_framebuffer_texture_id(game_framebuffer);
             }
         }
-        else if (g_Vars.vrRenderEye >= vr::Eye_Left)
+        else if (vrRenderEye >= vr::Eye_Left)
         {
             gfxFramebuffer = (uintptr_t)gfx_rapi->get_framebuffer_texture_id(fb_id);
         }
 
-        if (g_Vars.vrRenderEye == vr::Eye_Left)
+        if (vrRenderEye == vr::Eye_Left)
         {
             vr::Texture_t leftEyeTexture = {(void *)(uintptr_t)gfxFramebuffer, vr::TextureType_OpenGL, vr::ColorSpace_Gamma};
             vr::EVRCompositorError error = vr::VRCompositor()->Submit(vr::Eye_Left, &leftEyeTexture);
 
-            gfx_vr_log_submit_result(error, g_Vars.vrRenderEye);
+            gfx_vr_log_submit_result(error, vrRenderEye);
         }
-        else if (g_Vars.vrRenderEye == vr::Eye_Right)
+        else if (vrRenderEye == vr::Eye_Right)
         {
             vr::Texture_t rightEyeTexture = {(void *)(uintptr_t)gfxFramebuffer, vr::TextureType_OpenGL, vr::ColorSpace_Gamma};
             vr::EVRCompositorError error = vr::VRCompositor()->Submit(vr::Eye_Right, &rightEyeTexture);
-            gfx_vr_log_submit_result(error, g_Vars.vrRenderEye);
+            gfx_vr_log_submit_result(error, vrRenderEye);
         }
     }
     gfx_rapi->end_frame();
     gfx_wapi->swap_buffers_begin();
-    if (g_Vars.vrEnabled)
+    if (vrEnabled)
     {
         gfx_vr_tick();
     }

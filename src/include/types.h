@@ -283,8 +283,6 @@ struct g_vars
 	/*0x508*/ u32 unk000508;
 	/*0x50c*/ u32 unk00050c;
 	/*0x510*/ f32 unk000510;
-	bool vrEnabled;
-	s8 vrRenderEye;
 };
 
 struct weaponobj;
