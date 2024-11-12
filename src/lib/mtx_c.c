@@ -254,7 +254,18 @@ void mtx00015edc(f32 mult, Mtxf *mtx)
 	mtx->m[2][2] *= mult;
 }
 
-void mtx00015f04(f32 mult, Mtxf *mtx)
+/*
+ * mtxScaleRows - Scales the first three rows of a 4x4 floating point matrix
+ * 
+ * @param mult: Scale factor to multiply against each element
+ * @param mtx: Matrix to be scaled (modified in place)
+ * 
+ * (ai summary)
+ * Multiplies all elements in the first three rows by the scale factor.
+ * Preserves the bottom row (m[3][*]) which typically contains homogeneous coordinates.
+ * This scales both the rotational and translational components of the transformation.
+ */
+void mtxScaleRows(f32 mult, Mtxf *mtx)
 {
 	mtx->m[0][0] *= mult;
 	mtx->m[0][1] *= mult;

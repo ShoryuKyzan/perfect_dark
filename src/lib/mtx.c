@@ -291,7 +291,18 @@ void mtx00016798(Mtxf *src, Mtxf *dst)
 	}
 }
 
-void mtx00016820(Mtx *src, Mtx *dst)
+/*
+ * same as guMtxL2L - Converts an N64 fixed-point matrix from linear format to RSP-optimized format
+ * 
+ * @param src: Source matrix in linear fixed-point format
+ * @param dst: Destination matrix pointer for RSP-optimized format
+ *
+ * (ai summary)
+ * Rearranges a fixed-point matrix from standard memory layout (two blocks of 8 words)
+ * into an interleaved format required by the N64's RSP for efficient processing.
+ * Each pair of 32-bit words is repacked to group their high and low 16-bit components.
+ */
+void mtxL2L(Mtx *src, Mtx *dst)
 {
 	u32 *srcwords = (u32 *) src;
 	u32 *dstwords = (u32 *) dst;

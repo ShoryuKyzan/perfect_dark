@@ -4401,9 +4401,9 @@ void playerAllocateMatrices(struct coord *cam_pos, struct coord *cam_look, struc
 	camSetMtxF006c(s0);
 	guMtxF2L(s0->m, s1);
 	camSetOrthogonalMtxL(s1);
-	mtx00015f04(scale, &sp8c);
+	mtxScaleRows(scale, &sp8c);
 	guMtxF2L(sp8c.m, g_Vars.currentplayer->mtxl005c);
-	mtx00016820(g_Vars.currentplayer->mtxl005c, g_Vars.currentplayer->mtxl0060);
+	mtxL2L(g_Vars.currentplayer->mtxl005c, g_Vars.currentplayer->mtxl0060);
 	camSetMtxL173c(g_Vars.currentplayer->mtxl005c);
 	camSetMtxL1738(g_Vars.currentplayer->mtxl0060);
 	camSetWorldToScreenMtxf(g_Vars.currentplayer->mtxLookAt);

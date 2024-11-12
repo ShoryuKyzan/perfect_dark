@@ -584,7 +584,7 @@ void setupCreateObject(struct defaultobj *obj, s32 cmdindex)
 			}
 
 			modelSetScale(obj->model, obj->model->scale * scale);
-			mtx00015f04(obj->model->scale, &mtx);
+			mtxScaleRows(obj->model->scale, &mtx);
 
 			if (obj->flags2 & OBJFLAG2_DONTPAUSE) {
 				prop2->flags |= PROPFLAG_DONTPAUSE;
@@ -821,7 +821,7 @@ void setupCreateCctv(struct cctvobj *cctv, s32 cmdindex)
 		}
 
 		mtx00016d58(&cctv->camrotm, 0.0f, 0.0f, 0.0f, xdiff, ydiff, zdiff, 0.0f, 1.0f, 0.0f);
-		mtx00015f04(obj->model->scale, &cctv->camrotm);
+		mtxScaleRows(obj->model->scale, &cctv->camrotm);
 
 		cctv->toleft = 0;
 		cctv->yleft = *(s32 *)&cctv->yleft * M_BADTAU / 65536.0f;
@@ -943,7 +943,7 @@ void setupCreateSingleMonitor(struct singlemonitorobj *monitor, s32 cmdindex)
 
 			propReparent(prop, owner->prop);
 			mtx4LoadXRotation(0.3664608001709f, &sp64);
-			mtx00015f04(monitor->base.model->scale / owner->model->scale, &sp64);
+			mtxScaleRows(monitor->base.model->scale / owner->model->scale, &sp64);
 			modelGetRootPosition(monitor->base.model, &spa4);
 
 			spa4.x = -spa4.x;

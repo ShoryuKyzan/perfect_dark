@@ -1368,7 +1368,7 @@ void scenarioHandleDroppedToken(struct chrdata *chr, struct prop *prop)
 				mtx00016d58(&mtx, 0, 0, 0, -pad.look.x, -pad.look.y, -pad.look.z, pad.up.x, pad.up.y, pad.up.z);
 
 				if (obj->model) {
-					mtx00015f04(obj->model->scale, &mtx);
+					mtxScaleRows(obj->model->scale, &mtx);
 				}
 
 				rooms[0] = pad.room;

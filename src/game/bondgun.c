@@ -4316,7 +4316,7 @@ void bgun0f09ebcc(struct defaultobj *obj, struct coord *coord, RoomNum *rooms, M
 	if (objprop) {
 		propActivate(objprop);
 		propEnable(objprop);
-		mtx00015f04(obj->model->scale, matrix1);
+		mtxScaleRows(obj->model->scale, matrix1);
 		func0f06a580(obj, coord, matrix1, rooms);
 
 		if (obj->type == OBJTYPE_WEAPON && ((struct weaponobj *) obj)->weaponnum == WEAPON_BOLT) {
@@ -4690,7 +4690,7 @@ void bgunUpdateHeldRocket(s32 handnum)
 				mtx.m[3][1] = 0;
 				mtx.m[3][2] = 0;
 
-				mtx00015f04(obj->model->scale, &mtx);
+				mtxScaleRows(obj->model->scale, &mtx);
 				func0f06a580(obj, &hand->muzzlepos, &mtx, playerprop->rooms);
 				propDeregisterRooms(objprop);
 			}
@@ -4937,7 +4937,7 @@ void bgunCreateFiredProjectile(s32 handnum)
 							weapon->base.model->scale *= funcdef->scale;
 
 							mtx3ToMtx4(weapon->base.realrot, &sp78);
-							mtx00015f04(funcdef->scale, &sp78);
+							mtxScaleRows(funcdef->scale, &sp78);
 							mtx4ToMtx3(&sp78, weapon->base.realrot);
 						}
 
@@ -5013,7 +5013,7 @@ void bgunCreateFiredProjectile(s32 handnum)
 						weapon->base.model->scale *= funcdef->scale;
 
 						mtx3ToMtx4(weapon->base.realrot, &sp78);
-						mtx00015f04(funcdef->scale, &sp78);
+						mtxScaleRows(funcdef->scale, &sp78);
 						mtx4ToMtx3(&sp78, weapon->base.realrot);
 					}
 
@@ -7171,7 +7171,7 @@ void bgunUpdateMagnum(struct hand *hand, s32 handnum, struct modeldef *modeldef,
 				tmp += index;
 
 				mtx4Copy(tmp, &sp4c);
-				mtx00015f04(9.999999f, &sp4c);
+				mtxScaleRows(9.999999f, &sp4c);
 				mtx4MultMtx4InPlace(camGetProjectionMtxF(), &sp4c);
 
 				casingCreateForHand(handnum, ground, &sp4c);
@@ -7364,7 +7364,7 @@ void bgun0f0a4e44(struct hand *hand, struct weapon *weapondef, struct modeldef *
 	mtx += mtxindex;
 
 	mtx4MultMtx4InPlace(mtx, &spd8);
-	mtx00015f04(spb4, &spd8);
+	mtxScaleRows(spb4, &spd8);
 	mtx00015ea8(muzzlez, &spd8);
 	mtx4Copy(&spd8, mtx);
 
@@ -7401,7 +7401,7 @@ void bgun0f0a4e44(struct hand *hand, struct weapon *weapondef, struct modeldef *
 
 			mtx4LoadIdentity(&sp70);
 			mtx4Align(sp70.m, RANDOMFRAC() * M_BADTAU, -sp60.x, -sp60.y, -sp60.z);
-			mtx00015f04(0.10000001f * spb4, &sp70);
+			mtxScaleRows(0.10000001f * spb4, &sp70);
 
 			mtx = (Mtxf *)allocation;
 
@@ -7450,7 +7450,7 @@ void bgunCreateFx(struct hand *hand, s32 handnum, struct weaponfunc *funcdef, s3
 				mtx += modelFindNodeMtxIndex(node, 0);
 
 				mtx4Copy(mtx, &sp24);
-				mtx00015f04(9.999999f, &sp24);
+				mtxScaleRows(9.999999f, &sp24);
 				mtx4MultMtx4InPlace(camGetProjectionMtxF(), &sp24);
 
 				casingCreateForHand(handnum, ground, &sp24);
@@ -7768,7 +7768,7 @@ void bgun0f0a5550(s32 handnum)
 			mtx00015e24(-1, &sp2c4);
 		}
 
-		mtx00015f04(0.10000001f, &sp2c4);
+		mtxScaleRows(0.10000001f, &sp2c4);
 
 		mtx4Copy(&sp2c4, (Mtxf *)mtxallocation);
 

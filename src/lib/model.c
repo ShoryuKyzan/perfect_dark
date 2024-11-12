@@ -855,7 +855,7 @@ void modelPositionJointUsingVecRot(struct modelrenderdata *renderdata, struct mo
 		mtx4LoadRotationAndTranslation(pos, rot, &mtx68);
 
 		if (allowscale && model->scale != 1.0f) {
-			mtx00015f04(model->scale, &mtx68);
+			mtxScaleRows(model->scale, &mtx68);
 		}
 
 		if (arg6->x != 1.0f) {
@@ -881,7 +881,7 @@ void modelPositionJointUsingVecRot(struct modelrenderdata *renderdata, struct mo
 		mtx4LoadRotationAndTranslation(pos, rot, nodemtx);
 
 		if (allowscale && model->scale != 1.0f) {
-			mtx00015f04(model->scale, nodemtx);
+			mtxScaleRows(model->scale, nodemtx);
 		}
 
 		if (arg6->x != 1.0f) {

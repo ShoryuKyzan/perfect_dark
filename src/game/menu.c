@@ -2223,9 +2223,9 @@ Gfx *menuRenderModel(Gfx *gdl, struct menumodel *menumodel, s32 modeltype)
 		mtx4LoadTranslation(&tmpcoord, &posmtx);
 
 		if (haszoom) {
-			mtx00015f04(scale * zoomy, &posmtx);
+			mtxScaleRows(scale * zoomy, &posmtx);
 		} else {
-			mtx00015f04(scale, &posmtx);
+			mtxScaleRows(scale, &posmtx);
 		}
 
 		{

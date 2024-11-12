@@ -397,7 +397,7 @@ Gfx *nbombRender(Gfx *gdl, struct nbomb *nbomb, Gfx *subgdl)
 	sp3c.z = 0;
 
 	mtx4LoadRotation(&sp3c, &sp88);
-	mtx00015f04(nbomb->radius / 2000.0f, &sp88);
+	mtxScaleRows(nbomb->radius / 2000.0f, &sp88);
 	mtx4MultMtx4(&sp48, &sp88, &spc8);
 
 	mtx00015be0(camGetWorldToScreenMtxf(), &spc8);

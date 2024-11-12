@@ -3969,7 +3969,7 @@ void objLand2(struct defaultobj *obj, struct coord *arg1, struct coord *arg2)
 	RoomNum newrooms[8];
 
 	func0f06e9cc(arg2, &sp40);
-	mtx00015f04(obj->model->scale, &sp40);
+	mtxScaleRows(obj->model->scale, &sp40);
 
 	newpos.x = arg1->x - sp40.m[1][0] * ymin;
 	newpos.y = arg1->y - sp40.m[1][1] * ymin;
@@ -4037,7 +4037,7 @@ void knifeLand(struct defaultobj *obj, struct coord *arg1, struct coord *arg2)
 	func0f06e9cc(&sp1c, &sp90);
 	mtx4LoadXRotation(-1.5705463f, &sp50);
 	mtx4MultMtx4(&sp90, &sp50, &spd0);
-	mtx00015f04(obj->model->scale, &spd0);
+	mtxScaleRows(obj->model->scale, &spd0);
 
 	newpos.x = arg1->x - zero;
 	newpos.y = arg1->y - zero;
@@ -5436,7 +5436,7 @@ void hovTick(struct defaultobj *obj, struct hov *hov)
 		mtx00015be0(&sp108, &sp148);
 		mtx4LoadYRotation(hov->yrot, &sp108);
 		mtx00015be0(&sp108, &sp148);
-		mtx00015f04(obj->model->scale, &sp148);
+		mtxScaleRows(obj->model->scale, &sp148);
 
 		if (obj->type == OBJTYPE_HOVERBIKE) {
 			struct hoverbikeobj *bike = (struct hoverbikeobj *) obj;
@@ -5520,7 +5520,7 @@ s32 func0f072144(struct defaultobj *obj, struct coord *arg1, f32 arg2, bool arg3
 		}
 
 		mtx4LoadYRotation(yrot, &spa4);
-		mtx00015f04(obj->model->scale, &spa4);
+		mtxScaleRows(obj->model->scale, &spa4);
 		mtx4ToMtx3(&spa4, sp460);
 	} else {
 		yrot = 0.0f;
@@ -6063,7 +6063,7 @@ bool rocketTickFbw(struct weaponobj *rocket)
 		mtx4LoadXRotation(M_BADTAU - projectile->unk014, &sp118);
 		mtx4LoadYRotation(projectile->unk018, &spd8);
 		mtx4MultMtx4(&spd8, &sp118, &sp98);
-		mtx00015f04(rocket->base.model->scale, &sp98);
+		mtxScaleRows(rocket->base.model->scale, &sp98);
 		mtx4ToMtx3(&sp98, rocket->base.realrot);
 	}
 
@@ -8958,7 +8958,7 @@ void autogunInitMatrices(struct prop *prop, Mtxf *mtx)
 	mtx4TransformVecInPlace(mtx, &sp4c);
 	mtx4LoadYRotation(yrot, &matrices[1]);
 	mtx4SetTranslation(&sp4c, &matrices[1]);
-	mtx00015f04(autogun->base.model->scale, &matrices[1]);
+	mtxScaleRows(autogun->base.model->scale, &matrices[1]);
 	mtx00015be0(camGetWorldToScreenMtxf(), &matrices[1]);
 
 	node2 = modelGetPart(model->definition, MODELPART_AUTOGUN_0002);
@@ -9924,7 +9924,7 @@ void chopperIncrementMovement(struct prop *prop, f32 goalroty, f32 goalrotx, str
 	}
 
 	mtx4LoadRotation(&spfc, &sp7c);
-	mtx00015f04(chopper->base.model->scale, &sp7c);
+	mtxScaleRows(chopper->base.model->scale, &sp7c);
 	mtx4MultMtx4(&sp7c, &sp3c, &spbc);
 	mtx4ToMtx3(&spbc, rotmtx3);
 	mtx3Copy(rotmtx3, chopper->base.realrot);
@@ -10654,7 +10654,7 @@ void hovercarTick(struct prop *prop)
 		}
 
 		mtx4LoadRotation(&sp12c, &spac);
-		mtx00015f04(hovercar->base.model->scale, &spac);
+		mtxScaleRows(hovercar->base.model->scale, &spac);
 		mtx4MultMtx4(&spac, &sp6c, &spec);
 		mtx4ToMtx3(&spec, sp15c);
 		mtx3Copy(sp15c, hovercar->base.realrot);
@@ -14621,7 +14621,7 @@ bool objDrop(struct prop *prop, bool lazy)
 			} else {
 				// No collision checks
 				mtx4LoadIdentity(&spf0);
-				mtx00015f04(model->scale, &spf0);
+				mtxScaleRows(model->scale, &spf0);
 				mtx4SetTranslation(&root->pos, &spf0);
 				roomsCopy(root->rooms, rooms);
 			}
@@ -19393,7 +19393,7 @@ struct prop *doorInit(struct doorobj *door, struct coord *pos, Mtxf *mtx, RoomNu
 		}
 
 		mtx4Copy(mtx, &sp38);
-		mtx00015f04(g_ModelStates[door->base.modelnum].scale * (1.0f / 4096.0f), &sp38);
+		mtxScaleRows(g_ModelStates[door->base.modelnum].scale * (1.0f / 4096.0f), &sp38);
 		mtx4ToMtx3(&sp38, door->base.realrot);
 
 		door->frac = (door->base.flags & OBJFLAG_DOOR_KEEPOPEN) ? door->maxfrac : 0;

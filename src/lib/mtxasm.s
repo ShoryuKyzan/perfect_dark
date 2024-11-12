@@ -400,7 +400,7 @@ glabel mtx00015edc
 	jr     $ra
 	swc1   $f10, 0x28($a1)
 
-glabel mtx00015f04
+glabel mtxScaleRows
 	li     $t0, 0x3
 .L00015f08:
 	lwc1   $f4, 0x0($a1)

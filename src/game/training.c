@@ -1036,7 +1036,7 @@ void frInitTargets(void)
 				mtx4LoadYRotation(M_PI, &sp144);
 			}
 
-			mtx00015f04(obj->model->scale, &sp144);
+			mtxScaleRows(obj->model->scale, &sp144);
 			mtx4ToMtx3(&sp144, sp108);
 			mtx3Copy(sp108, obj->realrot);
 
@@ -2156,7 +2156,7 @@ void frTick(void)
 				}
 
 				mtx4LoadYRotation(g_FrData.targets[i].angle + M_PI, &spbc);
-				mtx00015f04(obj->model->scale, &spbc);
+				mtxScaleRows(obj->model->scale, &spbc);
 				mtx4ToMtx3(&spbc, sp98);
 				mtx3Copy(sp98, obj->realrot);
 			}

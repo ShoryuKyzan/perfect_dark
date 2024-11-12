@@ -1658,7 +1658,7 @@ void chrHandleJointPositioned(s32 joint, Mtxf *mtx)
 		mtx00015be0(&spb8, mtx);
 
 		if (scale != 1.0f) {
-			mtx00015f04(scale, mtx);
+			mtxScaleRows(scale, mtx);
 		}
 
 		mtx->m[3][0] = sp138.x;
@@ -1866,7 +1866,7 @@ void chrHandleJointPositioned(s32 joint, Mtxf *mtx)
 				}
 
 				if (scale != 1.0f) {
-					mtx00015f04(scale, mtx);
+					mtxScaleRows(scale, mtx);
 				}
 
 				mtx->m[3][0] = sp70.x;

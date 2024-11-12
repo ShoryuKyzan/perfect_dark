@@ -1401,7 +1401,7 @@ Gfx *titleRenderPdLogo(Gfx *gdl)
 	mtx4LoadXRotation(g_PdLogoXRotCur, &sp1a8);
 	mtx4MultMtx4InPlace(&sp1a8, &sp1e8);
 	mtx4MultMtx4(&sp2b0, &sp1e8, &sp270);
-	mtx00015f04(g_PdLogoScale, &sp270);
+	mtxScaleRows(g_PdLogoScale, &sp270);
 
 #if VERSION != VERSION_JPN_FINAL
 	g_TitleLightPdLogoNotFront.a.l.col[0] = g_TitleLightPdLogoNotFront.a.l.col[1] = g_TitleLightPdLogoNotFront.a.l.col[2] = g_TitleLightPdLogoNotFront.a.l.colc[0] = g_TitleLightPdLogoNotFront.a.l.colc[1] = g_TitleLightPdLogoNotFront.a.l.colc[2] = 255.0f * g_PdLogoAmbientLightFrac;
@@ -1494,8 +1494,8 @@ Gfx *titleRenderPdLogo(Gfx *gdl)
 #if VERSION == VERSION_JPN_FINAL
 	mtx00015ea8(0.01f, &sp1e8);
 	mtx4MultMtx4(&sp2b0, &sp1e8, &sp230);
-	mtx00015f04(0.308f, &sp230);
-	mtx00015f04(3.5f, &sp230);
+	mtxScaleRows(0.308f, &sp230);
+	mtxScaleRows(3.5f, &sp230);
 
 	if (g_PdLogoTitleStep >= 0) {
 		// Background flashing logo
@@ -1509,7 +1509,7 @@ Gfx *titleRenderPdLogo(Gfx *gdl)
 			envalpha = (1.0f - g_PdLogoTitleStepFrac) * 255.0f;
 
 			mtx4LoadIdentity(&sp1b0);
-			mtx00015f04(var8009d350jf * 1.5f, &sp1b0);
+			mtxScaleRows(var8009d350jf * 1.5f, &sp1b0);
 			mtx00016ae4(&sp2b0, 0.0f, 0.0f, 4000.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
 			mtx4MultMtx4InPlace(&sp2b0, &sp1b0);
 			mtx4Copy(&sp1b0, &sp2b0);
@@ -1605,7 +1605,7 @@ Gfx *titleRenderPdLogo(Gfx *gdl)
 			s32 mtxindex;
 
 			mtx4LoadIdentity(&spb0);
-			mtx00015f04(var8009d34cjf * 1.5f, &spb0);
+			mtxScaleRows(var8009d34cjf * 1.5f, &spb0);
 			mtx00016ae4(&sp2b0, 0.0f, 0.0f, 4000.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
 			mtx4MultMtx4InPlace(&sp2b0, &spb0);
 			mtx4Copy(&spb0, &sp2b0);
@@ -1639,7 +1639,7 @@ Gfx *titleRenderPdLogo(Gfx *gdl)
 #else
 	mtx00015f88(1.0f + sp13c, &sp1e8);
 	mtx4MultMtx4(&sp2b0, &sp1e8, &sp230);
-	mtx00015f04(0.308f, &sp230);
+	mtxScaleRows(0.308f, &sp230);
 
 	// Render the "PERFECT DARK" model
 	if (g_PdLogoTitleStep >= 0) {

@@ -245,7 +245,7 @@ Gfx *beamRenderGeneric(Gfx *gdl, struct textureconfig *texconfig,
 
 	mtx4LoadTranslation(headpos, &sp84);
 
-	mtx00015f04(1.0f / arg2, &sp84);
+	mtxScaleRows(1.0f / arg2, &sp84);
 	mtx00015be0(worldtoscreenmtx, &sp84);
 	mtxF2L(&sp84, spc8);
 
@@ -433,7 +433,7 @@ Gfx *beamRender(Gfx *gdl, struct beam *beam, bool arg2, u8 arg3)
 				&& sp138.f[2] > -32000.0f && sp138.f[2] < 32000.0f) {
 			spd8 = true;
 			mtx4LoadTranslation(&sp138, &sp148);
-			mtx00015f04(0.1f, &sp148);
+			mtxScaleRows(0.1f, &sp148);
 			mtx00015be0(worldtoscreenmtx, &sp148);
 
 			for (i = 0; i < 4; i++) {
@@ -847,7 +847,7 @@ void casingRender(struct casing *casing, Gfx **gdlptr)
 	mtx.m[2][3] = 0.0f;
 	mtx.m[3][3] = 1.0f;
 
-	mtx00015f04(0.1000000089407f, &mtx);
+	mtxScaleRows(0.1000000089407f, &mtx);
 	mtx4SetTranslation(&casing->pos, &mtx);
 	mtx00015be4(camGetWorldToScreenMtxf(), &mtx, model.matrices);
 
