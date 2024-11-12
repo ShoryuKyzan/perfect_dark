@@ -1379,10 +1379,8 @@ static void gfx_sp_matrix(uint8_t parameters, const int32_t *addr)
     float P_mat[4][4];
     if (vrEnabled && vrRenderEye != -1)
     {
-        float vrp[4][4];
-        gfx_vr_get_current_projection_mtx(vrp, (vr::Hmd_Eye)vrRenderEye);
-        gfx_matrix_mul(P_mat, vrp, rsp.P_matrix); // XXX this is probably the wrong thing to do. i probably need to extract cam position and transform by hmdpos instead.
-        // XXX quite right. not the right thing to do.
+        // TODO XXX need to not do this if its not the camera being rendered. need to detect which matrix is involved here.
+        gfx_vr_get_current_projection_mtx(P_mat, (vr::Hmd_Eye)vrRenderEye);
     }
     else
     {
