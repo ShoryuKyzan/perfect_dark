@@ -160,7 +160,7 @@ extern void guPosition(Mtx *m, float r, float p, float h, float s,
 		       float x, float y, float z);
 extern void guPositionF(float mf[4][4], float r, float p, float h, float s,
 			float x, float y, float z);
-extern void guMtxF2L(float mf[4][4], Mtx *m);
+extern void guMtxF2L(float src[4][4], Mtx *dest);
 extern void guMtxL2F(float mf[4][4], Mtx *m);
 extern void guMtxCatF(float m[4][4], float n[4][4], float r[4][4]);
 extern void guMtxCatL(Mtx *m, Mtx *n, Mtx *res);
