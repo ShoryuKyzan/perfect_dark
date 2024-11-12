@@ -31,7 +31,7 @@
 #include "gfx_rendering_api.h"
 #include "gfx_screen_config.h"
 
-#include "openvr.h"
+#include "openvr_mingw.hpp"
 
 #include "Matrices.h"
 
@@ -393,7 +393,7 @@ static bool gfx_init_vr()
         return false;
     }
 
-    sysLogPrintf(LOG_NOTE, "vr init success"); // XXX
+    sysLogPrintf(LOG_NOTE, "vr init success");
 
     if (!vr::VRCompositor())
     {
@@ -401,30 +401,46 @@ static bool gfx_init_vr()
         vrEnabled = false;
         return false;
     }
-    sysLogPrintf(LOG_NOTE, "vr compositor init success"); // XXX
+    sysLogPrintf(LOG_NOTE, "vr compositor init success");
 
     // vr init
     m_pHMD->GetRecommendedRenderTargetSize(&vrRenderWidth, &vrRenderHeight);
 
-    sprintf_s(buf, sizeof(buf), "vr got recommended sizes w %d h %d", vrRenderWidth, vrRenderHeight); // XXX
-    sysLogPrintf(LOG_NOTE, buf);                                                                      // XXX
+    sprintf_s(buf, sizeof(buf), "vr got recommended sizes w %d h %d", vrRenderWidth, vrRenderHeight);
+    sysLogPrintf(LOG_NOTE, buf);
 
     // VR framebuffers
     eye_l_fb = gfx_rapi->create_framebuffer();
     eye_r_fb = gfx_rapi->create_framebuffer();
 
-    sysLogPrintf(LOG_NOTE, "vr created framebuffers"); // XXX
+    sysLogPrintf(LOG_NOTE, "vr created framebuffers");
 
     // set sizes
     gfx_rapi->update_framebuffer_parameters(eye_l_fb, vrRenderWidth, vrRenderHeight, 1, false, true, true, true);
     gfx_rapi->update_framebuffer_parameters(eye_r_fb, vrRenderWidth, vrRenderHeight, 1, false, true, true, true);
-    sysLogPrintf(LOG_NOTE, "vr set framebuffer params"); // XXX
+    sysLogPrintf(LOG_NOTE, "vr set framebuffer params");
 
-    sysLogPrintf(LOG_NOTE, "vr get eye proj/position matrices"); // XXX
+    sysLogPrintf(LOG_NOTE, "vr initial waitgetposes");
+
+    // Check if system is still connected
+    bool connected = m_pHMD->IsTrackedDeviceConnected(vr::k_unTrackedDeviceIndex_Hmd);
+    if (!connected)
+    {
+        sysLogPrintf(LOG_NOTE, "vr hmd not connected");
+        return false;
+    }
+    else
+    {
+        sysLogPrintf(LOG_NOTE, "vr hmd connected");
+    }
+    vr::VRCompositor()->WaitGetPoses(vrTrackedDevicePoses, vr::k_unMaxTrackedDeviceCount, NULL, 0);
+
+    sysLogPrintf(LOG_NOTE, "vr get eye proj/position matrices");
+    vr::HmdMatrix44_t projMat = m_pHMD->GetProjectionMatrix(vr::Eye_Left, fNearClip, fFarClip);
     mat4VRProjectionLeft = gfx_vr_steamvrmtx44_to_mat4(m_pHMD->GetProjectionMatrix(vr::Eye_Left, fNearClip, fFarClip));
     mat4VRProjectionRight = gfx_vr_steamvrmtx44_to_mat4(m_pHMD->GetProjectionMatrix(vr::Eye_Right, fNearClip, fFarClip));
 
-    sysLogPrintf(LOG_NOTE, "vr get eye position matrices"); // XXX
+    sysLogPrintf(LOG_NOTE, "vr get eye position matrices");
     mat4VREyePosLeft = gfx_vr_steamvrmtx34_to_mat4(m_pHMD->GetEyeToHeadTransform(vr::Eye_Left));
     mat4VREyePosLeft.invert();
     mat4VREyePosRight = gfx_vr_steamvrmtx34_to_mat4(m_pHMD->GetEyeToHeadTransform(vr::Eye_Right));
@@ -442,7 +458,7 @@ static void gfx_vr_shutdown()
         vr::VR_Shutdown();
         m_pHMD = NULL;
         vrEnabled = false;
-        sysLogPrintf(LOG_NOTE, "vr shutdown"); // XXX
+        sysLogPrintf(LOG_NOTE, "vr shutdown");
     }
 }
 
@@ -1366,6 +1382,7 @@ static void gfx_sp_matrix(uint8_t parameters, const int32_t *addr)
         float vrp[4][4];
         gfx_vr_get_current_projection_mtx(vrp, (vr::Hmd_Eye)vrRenderEye);
         gfx_matrix_mul(P_mat, vrp, rsp.P_matrix); // XXX this is probably the wrong thing to do. i probably need to extract cam position and transform by hmdpos instead.
+        // XXX quite right. not the right thing to do.
     }
     else
     {
