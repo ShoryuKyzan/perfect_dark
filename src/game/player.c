@@ -4351,8 +4351,8 @@ void playerAllocateMatrices(struct coord *cam_pos, struct coord *cam_look, struc
 
 	g_Vars.currentplayer->mtxl005c = gfxAllocateMatrix();
 	g_Vars.currentplayer->mtxl0060 = gfxAllocateMatrix();
-	g_Vars.currentplayer->mtxf0064 = gfxAllocateMatrix();
-	g_Vars.currentplayer->mtxf0068 = gfxAllocateMatrix();
+	g_Vars.currentplayer->mtxLookAt = gfxAllocateMatrix();
+	g_Vars.currentplayer->mtxCamToWorld = gfxAllocateMatrix();
 
 	lookat = gfxAllocateLookAt(2);
 
@@ -4364,7 +4364,7 @@ void playerAllocateMatrices(struct coord *cam_pos, struct coord *cam_look, struc
 	sp80.f[1] = sp74.f[1] + cam_look->f[1];
 	sp80.f[2] = sp74.f[2] + cam_look->f[2];
 
-	mtx00016874(&sp8c,
+	mtxComputeLookAt(&sp8c,
 			sp74.x, sp74.y, sp74.z,
 			cam_look->x, cam_look->y, cam_look->z,
 			cam_up->x, cam_up->y, cam_up->z);
@@ -4374,12 +4374,12 @@ void playerAllocateMatrices(struct coord *cam_pos, struct coord *cam_look, struc
 			sp80.x, sp80.y, sp80.z,
 			cam_up->x, cam_up->y, cam_up->z);
 
-	mtx00016874(g_Vars.currentplayer->mtxf0064,
+	mtxComputeLookAt(g_Vars.currentplayer->mtxLookAt,
 			cam_pos->x, cam_pos->y, cam_pos->z,
 			cam_look->x, cam_look->y, cam_look->z,
 			cam_up->x, cam_up->y, cam_up->z);
 
-	mtx00016b58(g_Vars.currentplayer->mtxf0068,
+	mtxComputeCameraToWorld(g_Vars.currentplayer->mtxCamToWorld,
 			cam_pos->x, cam_pos->y, cam_pos->z,
 			cam_look->x, cam_look->y, cam_look->z,
 			cam_up->x, cam_up->y, cam_up->z);
@@ -4406,8 +4406,8 @@ void playerAllocateMatrices(struct coord *cam_pos, struct coord *cam_look, struc
 	mtx00016820(g_Vars.currentplayer->mtxl005c, g_Vars.currentplayer->mtxl0060);
 	camSetMtxL173c(g_Vars.currentplayer->mtxl005c);
 	camSetMtxL1738(g_Vars.currentplayer->mtxl0060);
-	camSetWorldToScreenMtxf(g_Vars.currentplayer->mtxf0064);
-	camSetProjectionMtxF(g_Vars.currentplayer->mtxf0068);
+	camSetWorldToScreenMtxf(g_Vars.currentplayer->mtxLookAt);
+	camSetProjectionMtxF(g_Vars.currentplayer->mtxCamToWorld);
 	camSetLookAt(lookat);
 	cam0f0b5838();
 	playerSetGlobalDrawCameraOffset();

@@ -47,7 +47,7 @@ void bbikeInit(void)
 	mtx3ToMtx4(hoverbike->base.realrot, &matrix);
 	mtx4SetTranslation(&hoverbike->base.prop->pos, &matrix);
 	mtx4TransformVec(&matrix, &g_Vars.currentplayer->bondvehicleoffset, &g_Vars.currentplayer->bondenteraim);
-	mtx00016b58(&g_Vars.currentplayer->bondentermtx,
+	mtxComputeCameraToWorld(&g_Vars.currentplayer->bondentermtx,
 			0, 0, 0,
 			-g_Vars.currentplayer->bond2.unk1c.x, -g_Vars.currentplayer->bond2.unk1c.y, -g_Vars.currentplayer->bond2.unk1c.z,
 			g_Vars.currentplayer->bond2.unk28.x, g_Vars.currentplayer->bond2.unk28.y, g_Vars.currentplayer->bond2.unk28.z);

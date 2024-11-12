@@ -2548,8 +2548,8 @@ struct player
 	/*0x0050*/ struct coord globaldrawworldbgoffset;
 	/*0x005c*/ Mtx *mtxl005c;
 	/*0x0060*/ Mtx *mtxl0060;
-	/*0x0064*/ Mtxf *mtxf0064;
-	/*0x0068*/ Mtxf *mtxf0068;
+	/*0x0064*/ Mtxf *mtxLookAt;
+	/*0x0068*/ Mtxf *mtxCamToWorld;
 	/*0x006c*/ Mtxf *mtxf006c;
 	/*0x0070*/ f32 sumground;
 	/*0x0074*/ f32 vv_manground;	   // Feet Y value in absolute coordinates

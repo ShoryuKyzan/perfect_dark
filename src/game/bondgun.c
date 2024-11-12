@@ -4572,8 +4572,8 @@ void bgunCreateThrownProjectile(s32 handnum, struct gset *gset)
 
 			// Check within 20 degrees
 			if (radians > 0.34901026f || radians < -0.34901026f) {
-				mtx00016b58(&spf8, 0, 0, 0, gundir.x, gundir.y, gundir.z, 0, 1, 0);
-				mtx00016b58(&spb8, 0, 0, 0, sp140.x, sp140.y, sp140.z, 0, 1, 0);
+				mtxComputeCameraToWorld(&spf8, 0, 0, 0, gundir.x, gundir.y, gundir.z, 0, 1, 0);
+				mtxComputeCameraToWorld(&spb8, 0, 0, 0, sp140.x, sp140.y, sp140.z, 0, 1, 0);
 
 				quaternion0f097044(&spf8, sp68);
 				quaternion0f097044(&spb8, sp58);
@@ -4815,8 +4815,8 @@ void bgunCreateFiredProjectile(s32 handnum)
 					radians = acosf(gundir.f[0] * sp1bc.f[0] + gundir.f[1] * sp1bc.f[1] + gundir.f[2] * sp1bc.f[2]);
 
 					if (radians > 0.17450513f || radians < -0.17450513f) {
-						mtx00016b58(&sp174, 0.0f, 0.0f, 0.0f, gundir.x, gundir.y, gundir.z, 0.0f, 1.0f, 0.0f);
-						mtx00016b58(&sp134, 0.0f, 0.0f, 0.0f, sp1bc.x, sp1bc.y, sp1bc.z, 0.0f, 1.0f, 0.0f);
+						mtxComputeCameraToWorld(&sp174, 0.0f, 0.0f, 0.0f, gundir.x, gundir.y, gundir.z, 0.0f, 1.0f, 0.0f);
+						mtxComputeCameraToWorld(&sp134, 0.0f, 0.0f, 0.0f, sp1bc.x, sp1bc.y, sp1bc.z, 0.0f, 1.0f, 0.0f);
 
 						quaternion0f097044(&sp174, spe4);
 						quaternion0f097044(&sp134, spd4);
@@ -5362,7 +5362,7 @@ void bgunCalculateBotShotSpread(struct coord *arg0, s32 weaponnum, s32 funcnum, 
 	sp48.z = -1.0f;
 
 	guNormalize(&sp48.x, &sp48.y, &sp48.z);
-	mtx00016b58(&mtx, 0.0f, 0.0f, 0.0f, arg0->x, arg0->y, arg0->z, 0.0f, -1.0f, 0.0f);
+	mtxComputeCameraToWorld(&mtx, 0.0f, 0.0f, 0.0f, arg0->x, arg0->y, arg0->z, 0.0f, -1.0f, 0.0f);
 	mtx4RotateVec(&mtx, &sp48, arg0);
 }
 

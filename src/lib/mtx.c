@@ -306,31 +306,39 @@ void mtx00016820(Mtx *src, Mtx *dst)
 	}
 }
 
-void mtx00016874(Mtxf *mtx, f32 posx, f32 posy, f32 posz, f32 lookx, f32 looky, f32 lookz, f32 upx, f32 upy, f32 upz)
+/**
+ * @brief calculates transform matrix to go from world to camera space
+ */
+void mtxComputeLookAt(Mtxf *mtx, f32 posx, f32 posy, f32 posz, f32 lookx, f32 looky, f32 lookz, f32 upx, f32 upy, f32 upz)
 {
 	f32 a;
 	f32 b;
 	f32 c;
 	f32 tmp;
 
+	// normalize look
 	tmp = -1 / sqrtf(lookx * lookx + looky * looky + lookz * lookz);
 	lookx *= tmp;
 	looky *= tmp;
 	lookz *= tmp;
 
+	// compute right vector
 	a = upy * lookz - upz * looky;
 	b = upz * lookx - upx * lookz;
 	c = upx * looky - upy * lookx;
 
+	// normalize
 	tmp = 1 / sqrtf(a * a + b * b + c * c);
 	a *= tmp;
 	b *= tmp;
 	c *= tmp;
 
+	// recompute up vector
 	upx = looky * c - lookz * b;
 	upy = lookz * a - lookx * c;
 	upz = lookx * b - looky * a;
 
+	// normalize 
 	tmp = 1 / sqrtf(upx * upx + upy * upy + upz * upz);
 	upx *= tmp;
 	upy *= tmp;
@@ -359,10 +367,13 @@ void mtx00016874(Mtxf *mtx, f32 posx, f32 posy, f32 posz, f32 lookx, f32 looky, 
 
 void mtx00016ae4(Mtxf *mtx, f32 posx, f32 posy, f32 posz, f32 lookx, f32 looky, f32 lookz, f32 upx, f32 upy, f32 upz)
 {
-	mtx00016874(mtx, posx, posy, posz, lookx - posx, looky - posy, lookz - posz, upx, upy, upz);
+	mtxComputeLookAt(mtx, posx, posy, posz, lookx - posx, looky - posy, lookz - posz, upx, upy, upz);
 }
 
-void mtx00016b58(Mtxf *mtx, f32 posx, f32 posy, f32 posz, f32 lookx, f32 looky, f32 lookz, f32 upx, f32 upy, f32 upz)
+/**
+ * @brief calculates transform matrix to go from camera to world space
+ */
+void mtxComputeCameraToWorld(Mtxf *mtx, f32 posx, f32 posy, f32 posz, f32 lookx, f32 looky, f32 lookz, f32 upx, f32 upy, f32 upz)
 {
 	f32 a;
 	f32 b;
@@ -415,7 +426,7 @@ void mtx00016b58(Mtxf *mtx, f32 posx, f32 posy, f32 posz, f32 lookx, f32 looky, 
 
 void mtx00016d58(Mtxf *mtx, f32 posx, f32 posy, f32 posz, f32 lookx, f32 looky, f32 lookz, f32 upx, f32 upy, f32 upz)
 {
-	mtx00016b58(mtx, posx, posy, posz, lookx - posx, looky - posy, lookz - posz, upx, upy, upz);
+	mtxComputeCameraToWorld(mtx, posx, posy, posz, lookx - posx, looky - posy, lookz - posz, upx, upy, upz);
 }
 
 u32 mtx00016dcc(f32 arg0, f32 arg1)
