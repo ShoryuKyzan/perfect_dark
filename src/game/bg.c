@@ -1069,11 +1069,12 @@ Gfx *bgRenderScene(Gfx *gdl)
 					|| stagenum == STAGE_ATTACKSHIP)) {
 			gdl = text0f153628(gdl);
 
+			// XXX may want to disable this
 			gSPMatrix(gdl++, osVirtualToPhysical(camGetOrthogonalMtxL()), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_PROJECTION);
 
 			gdl = playerLoadMatrix(gdl);
 			gdl = envStopFog(gdl);
-			gdl = starsRender(gdl);
+			gdl = starsRender(gdl); // XXX may need to redo this for vr since its rendered orthographic
 			gdl = text0f153780(gdl);
 			gdl = vi0000ab78(gdl);
 		}

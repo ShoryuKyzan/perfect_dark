@@ -1192,7 +1192,7 @@ Gfx *lvRender(Gfx *gdl)
 				}
 
 				gdl = viRenderViewportEdges(gdl);
-				gdl = skyRender(gdl);
+				gdl = skyRender(gdl); // XXX might be fucking things up
 				bgTick();
 				lightsTick();
 				propsTickPlayer(islastplayer);
@@ -1339,6 +1339,7 @@ Gfx *lvRender(Gfx *gdl)
 				}
 
 				if (var80075d60 == 2) {
+					// XXX might need to redo/disable
 					gdl = playerRenderHud(gdl);
 
 #ifdef DEBUG
@@ -1660,12 +1661,12 @@ Gfx *lvRender(Gfx *gdl)
 #endif
 				}
 
-				gdl = skyRenderOverexposure(gdl);
-				gdl = amRender(gdl);
+				gdl = skyRenderOverexposure(gdl); // XXX candidtate for redo
+				gdl = amRender(gdl); // XXX candidtate for redo
 				mtx00016748(1);
 
 				if (g_Vars.currentplayer->menuisactive) {
-					gdl = menuRender(gdl);
+					gdl = menuRender(gdl); // XXX meby redo/disable
 				}
 
 				mtx00016748(g_Vars.currentplayerstats->scale_bg2gfx);

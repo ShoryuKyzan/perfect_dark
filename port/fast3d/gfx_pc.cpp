@@ -258,7 +258,7 @@ Matrix4 mat4VRProjectionRight;
 Matrix4 mat4VREyePosLeft;
 Matrix4 mat4VREyePosRight;
 float fNearClip = 0.1f;
-float fFarClip = 30.0f;
+float fFarClip = 9000.0f;
 
 uint32_t gfx_msaa_level = 1;
 
