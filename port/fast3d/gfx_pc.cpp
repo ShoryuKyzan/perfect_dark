@@ -30,10 +30,8 @@
 #include "gfx_window_manager_api.h"
 #include "gfx_rendering_api.h"
 #include "gfx_screen_config.h"
+#include "../../port/vr/include/vr.h"
 
-#include "openvr_mingw.hpp"
-
-#include "Matrices.h"
 
 uintptr_t gfxFramebuffer;
 
@@ -115,6 +113,9 @@ static std::map<ColorCombinerKey, struct ColorCombiner> color_combiner_pool;
 static std::map<ColorCombinerKey, struct ColorCombiner>::iterator prev_combiner = color_combiner_pool.end();
 
 static uint8_t *tex_upload_buffer = nullptr;
+
+/** camera position and orientation without projection */
+static float Cam_matrix[4][4];
 
 static struct RSP
 {
@@ -243,22 +244,12 @@ static int game_framebuffer;
 static int game_framebuffer_msaa_resolved;
 
 // VR
-bool vrEnabled;
+extern bool vrEnabled;
+extern uint32_t vrRenderWidth;
+extern uint32_t vrRenderHeight;
 s8 vrRenderEye;
-vr::IVRSystem *m_pHMD;
 static int eye_l_fb;
 static int eye_r_fb;
-uint32_t vrRenderWidth;
-uint32_t vrRenderHeight;
-vr::TrackedDevicePose_t vrTrackedDevicePoses[vr::k_unMaxTrackedDeviceCount];
-Matrix4 mat4DevicePoseList[vr::k_unMaxTrackedDeviceCount];
-Matrix4 mat4HMDPose;
-Matrix4 mat4VRProjectionLeft;
-Matrix4 mat4VRProjectionRight;
-Matrix4 mat4VREyePosLeft;
-Matrix4 mat4VREyePosRight;
-float fNearClip = 0.1f;
-float fFarClip = 9000.0f;
 
 uint32_t gfx_msaa_level = 1;
 
@@ -284,205 +275,7 @@ static bool fbActive = 0;
 static std::map<int, FBInfo>::iterator active_fb;
 static std::map<int, FBInfo> framebuffers;
 
-///////////////////////////////////////////////////
-///////////////////////////////////////////////////
-///////////////////////////////////////////////////
 
-static Matrix4 gfx_vr_steamvrmtx44_to_mat4(const vr::HmdMatrix44_t &mtx)
-{
-    Matrix4 matrixObj(
-        mtx.m[0][0], mtx.m[1][0], mtx.m[2][0], mtx.m[3][0],
-        mtx.m[0][1], mtx.m[1][1], mtx.m[2][1], mtx.m[3][1],
-        mtx.m[0][2], mtx.m[1][2], mtx.m[2][2], mtx.m[3][2],
-        mtx.m[0][3], mtx.m[1][3], mtx.m[2][3], mtx.m[3][3]);
-    return matrixObj;
-}
-//-----------------------------------------------------------------------------
-// Purpose: Converts a SteamVR matrix to our local matrix class
-//-----------------------------------------------------------------------------
-static Matrix4 gfx_vr_steamvrmtx34_to_mat4(const vr::HmdMatrix34_t &matPose)
-{
-    Matrix4 matrixObj(
-        matPose.m[0][0], matPose.m[1][0], matPose.m[2][0], 0.0,
-        matPose.m[0][1], matPose.m[1][1], matPose.m[2][1], 0.0,
-        matPose.m[0][2], matPose.m[1][2], matPose.m[2][2], 0.0,
-        matPose.m[0][3], matPose.m[1][3], matPose.m[2][3], 1.0f);
-    return matrixObj;
-}
-
-static void gfx_vr_mat4_to_float44(float m[4][4], const Matrix4 &mat4)
-{
-    float tmp[4][4];
-
-    tmp[0][0] = mat4[0];
-    tmp[0][1] = mat4[1];
-    tmp[0][2] = mat4[2];
-    tmp[0][3] = mat4[3];
-    tmp[1][0] = mat4[4];
-    tmp[1][1] = mat4[5];
-    tmp[1][2] = mat4[6];
-    tmp[1][3] = mat4[7];
-    tmp[2][0] = mat4[8];
-    tmp[2][1] = mat4[9];
-    tmp[2][2] = mat4[10];
-    tmp[2][3] = mat4[11],
-    tmp[3][0] = mat4[12];
-    tmp[3][1] = mat4[13];
-    tmp[3][2] = mat4[14];
-    tmp[3][3] = mat4[15];
-    memcpy(m, tmp, sizeof(tmp));
-}
-
-static void gfx_vr_get_current_projection_mtx(float dest[4][4], vr::Hmd_Eye nEye)
-{
-    Matrix4 matMVP;
-    if (nEye == vr::Eye_Left)
-    {
-        matMVP = mat4VRProjectionLeft * mat4VREyePosLeft * mat4HMDPose;
-    }
-    else if (nEye == vr::Eye_Right)
-    {
-        matMVP = mat4VRProjectionRight * mat4VREyePosRight * mat4HMDPose;
-    }
-    gfx_vr_mat4_to_float44(dest, matMVP);
-}
-
-static void gfx_vr_log_submit_result(vr::EVRCompositorError error, u8 eye)
-{
-    char eyeName[64];
-    sprintf_s(eyeName, sizeof(eyeName), eye == 0 ? "left" : "right");
-    if (error != vr::VRCompositorError_None)
-    {
-        // Handle error
-        switch (error)
-        {
-        case vr::VRCompositorError_RequestFailed:
-            sysLogPrintf(LOG_ERROR, "%s Eye: Submit failed: RequestFailed", eyeName);
-            break;
-        case vr::VRCompositorError_InvalidTexture:
-            sysLogPrintf(LOG_ERROR, "%s Eye: Submit failed: InvalidTexture", eyeName);
-            break;
-        case vr::VRCompositorError_IsNotSceneApplication:
-            sysLogPrintf(LOG_ERROR, "%s Eye: Submit failed: IsNotSceneApplication", eyeName);
-            break;
-        // Add other error cases as needed
-        default:
-            sysLogPrintf(LOG_ERROR, "%s Eye: Submit failed with error: %d", eyeName, (int)error);
-            break;
-        }
-    }
-    else
-    {
-        sysLogPrintf(LOG_NOTE, "%s Eye: successfully submitted texture", eyeName);
-    }
-}
-
-static bool gfx_init_vr()
-{
-
-    // Loading the SteamVR Runtime
-    vr::EVRInitError eError = vr::VRInitError_None;
-    m_pHMD = vr::VR_Init(&eError, vr::VRApplication_Scene);
-    char buf[1024];
-
-    if (eError != vr::VRInitError_None)
-    {
-        m_pHMD = NULL;
-        sprintf_s(buf, sizeof(buf), "Unable to init VR runtime: %s", vr::VR_GetVRInitErrorAsEnglishDescription(eError));
-        sysLogPrintf(LOG_ERROR, buf);
-        return false;
-    }
-
-    sysLogPrintf(LOG_NOTE, "vr init success");
-
-    if (!vr::VRCompositor())
-    {
-        sysLogPrintf(LOG_ERROR, "vr compositor failed to init");
-        vrEnabled = false;
-        return false;
-    }
-    sysLogPrintf(LOG_NOTE, "vr compositor init success");
-
-    // vr init
-    m_pHMD->GetRecommendedRenderTargetSize(&vrRenderWidth, &vrRenderHeight);
-
-    sprintf_s(buf, sizeof(buf), "vr got recommended sizes w %d h %d", vrRenderWidth, vrRenderHeight);
-    sysLogPrintf(LOG_NOTE, buf);
-
-    // VR framebuffers
-    eye_l_fb = gfx_rapi->create_framebuffer();
-    eye_r_fb = gfx_rapi->create_framebuffer();
-
-    sysLogPrintf(LOG_NOTE, "vr created framebuffers");
-
-    // set sizes
-    gfx_rapi->update_framebuffer_parameters(eye_l_fb, vrRenderWidth, vrRenderHeight, 1, false, true, true, true);
-    gfx_rapi->update_framebuffer_parameters(eye_r_fb, vrRenderWidth, vrRenderHeight, 1, false, true, true, true);
-    sysLogPrintf(LOG_NOTE, "vr set framebuffer params");
-
-    sysLogPrintf(LOG_NOTE, "vr initial waitgetposes");
-
-    // Check if system is still connected
-    bool connected = m_pHMD->IsTrackedDeviceConnected(vr::k_unTrackedDeviceIndex_Hmd);
-    if (!connected)
-    {
-        sysLogPrintf(LOG_NOTE, "vr hmd not connected");
-        return false;
-    }
-    else
-    {
-        sysLogPrintf(LOG_NOTE, "vr hmd connected");
-    }
-    vr::VRCompositor()->WaitGetPoses(vrTrackedDevicePoses, vr::k_unMaxTrackedDeviceCount, NULL, 0);
-
-    sysLogPrintf(LOG_NOTE, "vr get eye proj/position matrices");
-    vr::HmdMatrix44_t projMat = m_pHMD->GetProjectionMatrix(vr::Eye_Left, fNearClip, fFarClip);
-    mat4VRProjectionLeft = gfx_vr_steamvrmtx44_to_mat4(m_pHMD->GetProjectionMatrix(vr::Eye_Left, fNearClip, fFarClip));
-    mat4VRProjectionRight = gfx_vr_steamvrmtx44_to_mat4(m_pHMD->GetProjectionMatrix(vr::Eye_Right, fNearClip, fFarClip));
-
-    sysLogPrintf(LOG_NOTE, "vr get eye position matrices");
-    mat4VREyePosLeft = gfx_vr_steamvrmtx34_to_mat4(m_pHMD->GetEyeToHeadTransform(vr::Eye_Left));
-    mat4VREyePosLeft.invert();
-    mat4VREyePosRight = gfx_vr_steamvrmtx34_to_mat4(m_pHMD->GetEyeToHeadTransform(vr::Eye_Right));
-    mat4VREyePosRight.invert();
-
-    vrEnabled = true;
-
-    return true;
-}
-
-static void gfx_vr_shutdown()
-{
-    if (m_pHMD && vrEnabled)
-    {
-        vr::VR_Shutdown();
-        m_pHMD = NULL;
-        vrEnabled = false;
-        sysLogPrintf(LOG_NOTE, "vr shutdown");
-    }
-}
-
-static void gfx_vr_tick()
-{
-    if (!m_pHMD)
-        return;
-
-    vr::VRCompositor()->WaitGetPoses(vrTrackedDevicePoses, vr::k_unMaxTrackedDeviceCount, NULL, 0);
-
-    for (unsigned int nDevice = 0; nDevice < vr::k_unMaxTrackedDeviceCount; ++nDevice)
-    {
-        if (vrTrackedDevicePoses[nDevice].bPoseIsValid)
-        {
-            mat4DevicePoseList[nDevice] = gfx_vr_steamvrmtx34_to_mat4(vrTrackedDevicePoses[nDevice].mDeviceToAbsoluteTracking);
-        }
-    }
-
-    if (vrTrackedDevicePoses[vr::k_unTrackedDeviceIndex_Hmd].bPoseIsValid)
-    {
-        mat4HMDPose = mat4DevicePoseList[vr::k_unTrackedDeviceIndex_Hmd];
-        mat4HMDPose.invert();
-    }
-}
 
 ///////////////////////////////////////////////////
 ///////////////////////////////////////////////////
@@ -1380,7 +1173,7 @@ static void gfx_sp_matrix(uint8_t parameters, const int32_t *addr)
     if (vrEnabled && vrRenderEye != -1)
     {
         // TODO XXX need to not do this if its not the camera being rendered. need to detect which matrix is involved here.
-        gfx_vr_get_current_projection_mtx(P_mat, (vr::Hmd_Eye)vrRenderEye);
+        vrGetCurrentProjectionMtx(P_mat, (vr::Hmd_Eye)vrRenderEye);
     }
     else
     {
@@ -3033,7 +2826,7 @@ static void gfx_run_dl(Gfx *cmd)
             break;
         }
         case G_SETSCISSOR:
-            gfx_dp_set_scissor(C1(24, 2), C0(12, 12), C0(0, 12), C1(12, 12), C1(0, 12));
+            // XXX disabled in vr gfx_dp_set_scissor(C1(24, 2), C0(12, 12), C0(0, 12), C1(12, 12), C1(0, 12));
             break;
         case G_SETZIMG:
             gfx_dp_set_z_image(seg_addr(cmd->words.w1));
@@ -3110,6 +2903,21 @@ extern "C" void gfx_get_dimensions(uint32_t *width, uint32_t *height, int32_t *p
     gfx_wapi->get_dimensions(width, height, posX, posY);
 }
 
+void gfx_vr_fb_init() {
+    if(vrEnabled){
+        eye_l_fb = gfx_rapi->create_framebuffer();
+        eye_r_fb = gfx_rapi->create_framebuffer();
+
+        sysLogPrintf(LOG_NOTE, "vr created framebuffers");
+
+        // set sizes
+        gfx_rapi->update_framebuffer_parameters(eye_l_fb, vrRenderWidth, vrRenderHeight, 1, false, true, true, true);
+        gfx_rapi->update_framebuffer_parameters(eye_r_fb, vrRenderWidth, vrRenderHeight, 1, false, true, true, true);
+        sysLogPrintf(LOG_NOTE, "vr set framebuffer params");
+
+    }
+}
+
 extern "C" void gfx_init(const GfxInitSettings *settings)
 {
     gfx_wapi = settings->wapi;
@@ -3123,7 +2931,8 @@ extern "C" void gfx_init(const GfxInitSettings *settings)
     game_framebuffer = gfx_rapi->create_framebuffer();
     game_framebuffer_msaa_resolved = gfx_rapi->create_framebuffer();
 
-    gfx_init_vr();
+    vrInit();
+    gfx_vr_fb_init();
 
     if (gfx_msaa_level > 1 && !gfx_framebuffers_enabled)
     {
@@ -3155,7 +2964,7 @@ extern "C" void gfx_destroy(void)
     // Texture cache and loaded textures store references to Resources which need to be unreferenced.
     gfx_texture_cache_clear();
 
-    gfx_vr_shutdown();
+    vrShutdown();
 }
 
 extern "C" struct GfxRenderingAPI *gfx_get_current_rendering_api(void)
@@ -3334,20 +3143,20 @@ extern "C" void gfx_run(Gfx *commands)
             vr::Texture_t leftEyeTexture = {(void *)(uintptr_t)gfxFramebuffer, vr::TextureType_OpenGL, vr::ColorSpace_Gamma};
             vr::EVRCompositorError error = vr::VRCompositor()->Submit(vr::Eye_Left, &leftEyeTexture);
 
-            gfx_vr_log_submit_result(error, vrRenderEye);
+            vrLogSubmitResult(error, vrRenderEye);
         }
         else if (vrRenderEye == vr::Eye_Right)
         {
             vr::Texture_t rightEyeTexture = {(void *)(uintptr_t)gfxFramebuffer, vr::TextureType_OpenGL, vr::ColorSpace_Gamma};
             vr::EVRCompositorError error = vr::VRCompositor()->Submit(vr::Eye_Right, &rightEyeTexture);
-            gfx_vr_log_submit_result(error, vrRenderEye);
+            vrLogSubmitResult(error, vrRenderEye);
         }
     }
     gfx_rapi->end_frame();
     gfx_wapi->swap_buffers_begin();
     if (vrEnabled)
     {
-        gfx_vr_tick();
+        vrTick();
     }
 }
 
@@ -3447,4 +3256,8 @@ extern "C" void gfx_copy_framebuffer(int fb_dst, int fb_src, int left, int top, 
 extern "C" void gfx_reset_framebuffer(void)
 {
     gfx_rapi->start_draw_to_framebuffer(0, (float)gfx_current_dimensions.height / SCREEN_HEIGHT);
+}
+
+extern "C" void gfx_set_camera_mtx(float matrix[4][4]){
+    memcpy(Cam_matrix, matrix, sizeof(Cam_matrix));
 }

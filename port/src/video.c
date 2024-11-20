@@ -304,3 +304,8 @@ PD_CONSTRUCTOR static void videoConfigInit(void)
 	configRegisterInt("Video.TextureFilter2D", &texFilter2D, 0, 1);
 	configRegisterInt("Video.DetailTextures", &texDetail, 0, 1);
 }
+
+void videoSetCameraMatrix(float matrix[4][4])
+{
+	gfx_set_camera_mtx(matrix);
+}

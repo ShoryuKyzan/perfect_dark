@@ -49,5 +49,6 @@ s32 videoFramebuffersSupported(void);
 
 void videoResetTextureCache(void);
 void videoFreeCachedTexture(const void *texptr);
+void videoSetCameraMatrix(float matrix[4][4]);
 
 #endif

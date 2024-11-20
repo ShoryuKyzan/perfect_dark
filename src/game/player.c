@@ -4407,6 +4407,8 @@ void playerAllocateMatrices(struct coord *cam_pos, struct coord *cam_look, struc
 	camSetMtxL173c(g_Vars.currentplayer->mtxl005c);
 	camSetMtxL1738(g_Vars.currentplayer->mtxl0060);
 	camSetWorldToScreenMtxf(g_Vars.currentplayer->mtxLookAt);
+	videoSetCameraMatrix(g_Vars.currentplayer->mtxLookAt->m);
+
 	camSetProjectionMtxF(g_Vars.currentplayer->mtxCamToWorld);
 	camSetLookAt(lookat);
 	cam0f0b5838();
