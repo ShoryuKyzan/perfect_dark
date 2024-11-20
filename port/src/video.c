@@ -12,6 +12,8 @@
 #include "../fast3d/gfx_sdl.h"
 #include "../fast3d/gfx_opengl.h"
 
+#include "../vr/include/vr_c.h"
+
 static struct GfxWindowManagerAPI *wmAPI;
 static struct GfxRenderingAPI *renderingAPI;
 
@@ -307,5 +309,5 @@ PD_CONSTRUCTOR static void videoConfigInit(void)
 
 void videoSetCameraMatrix(float matrix[4][4])
 {
-	gfx_set_camera_mtx(matrix);
+	vrSetCameraMtx(matrix); 
 }

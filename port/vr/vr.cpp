@@ -18,6 +18,7 @@ Matrix4 mat4VRProjectionLeft;
 Matrix4 mat4VRProjectionRight;
 Matrix4 mat4VREyePosLeft;
 Matrix4 mat4VREyePosRight;
+Matrix4 mat4Camera;
 float fNearClip = 0.1f;
 float fFarClip = 9000.0f;
 
@@ -238,4 +239,9 @@ extern "C" void vrGetCurrentProjectionMtx(float dest[4][4], vr::Hmd_Eye nEye)
         matMVP = mat4VRProjectionRight * mat4VREyePosRight * mat4HMDPose;
     }
     vrMat4ToFloat44(dest, matMVP);
+}
+
+extern "C" void vrSetCameraMtx(float matrix[4][4])
+{
+    vrFloat44ToMat4(mat4Camera, matrix);
 }

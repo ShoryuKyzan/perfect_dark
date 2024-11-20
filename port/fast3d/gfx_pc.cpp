@@ -114,9 +114,6 @@ static std::map<ColorCombinerKey, struct ColorCombiner>::iterator prev_combiner 
 
 static uint8_t *tex_upload_buffer = nullptr;
 
-/** camera position and orientation without projection */
-static float Cam_matrix[4][4];
-
 static struct RSP
 {
     float modelview_matrix_stack[11][4][4];
@@ -3256,8 +3253,4 @@ extern "C" void gfx_copy_framebuffer(int fb_dst, int fb_src, int left, int top, 
 extern "C" void gfx_reset_framebuffer(void)
 {
     gfx_rapi->start_draw_to_framebuffer(0, (float)gfx_current_dimensions.height / SCREEN_HEIGHT);
-}
-
-extern "C" void gfx_set_camera_mtx(float matrix[4][4]){
-    memcpy(Cam_matrix, matrix, sizeof(Cam_matrix));
 }
