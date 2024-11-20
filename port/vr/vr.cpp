@@ -45,6 +45,52 @@ extern "C" Matrix4 vrSteamVRMtx34ToMat4(const vr::HmdMatrix34_t &matPose)
 }
 
 
+extern "C" void vrMat4ToFloat44(float m[4][4], const Matrix4 &mat4)
+{
+    float tmp[4][4];
+
+    tmp[0][0] = mat4[0];
+    tmp[0][1] = mat4[1];
+    tmp[0][2] = mat4[2];
+    tmp[0][3] = mat4[3];
+    tmp[1][0] = mat4[4];
+    tmp[1][1] = mat4[5];
+    tmp[1][2] = mat4[6];
+    tmp[1][3] = mat4[7];
+    tmp[2][0] = mat4[8];
+    tmp[2][1] = mat4[9];
+    tmp[2][2] = mat4[10];
+    tmp[2][3] = mat4[11],
+    tmp[3][0] = mat4[12];
+    tmp[3][1] = mat4[13];
+    tmp[3][2] = mat4[14];
+    tmp[3][3] = mat4[15];
+    memcpy(m, tmp, sizeof(tmp));
+}
+
+extern "C" void vrFloat44ToMat4(Matrix4 &destMat4, float srcM[4][4])
+{
+    static float tmp[16];
+    tmp[0] = srcM[0][0];
+    tmp[1] = srcM[0][1];
+    tmp[2] = srcM[0][2];
+    tmp[3] = srcM[0][3];
+    tmp[4] = srcM[1][0];
+    tmp[5] = srcM[1][1];
+    tmp[6] = srcM[1][2];
+    tmp[7] = srcM[1][3];
+    tmp[8] = srcM[2][0];
+    tmp[9] = srcM[2][1];
+    tmp[10] = srcM[2][2];
+    tmp[11] = srcM[2][3];
+    tmp[12] = srcM[3][0];
+    tmp[13] = srcM[3][1];
+    tmp[14] = srcM[3][2];
+    tmp[15] = srcM[3][3];
+    destMat4.set(tmp);
+}
+
+
 extern "C" bool vrInit()
 {
 
@@ -179,28 +225,6 @@ extern "C" void vrLogSubmitResult(vr::EVRCompositorError error, u8 eye)
 ///////////////////////////////////////////////////
 ///////////////////////////////////////////////////
 
-extern "C" void vrMat4ToFloat44(float m[4][4], const Matrix4 &mat4)
-{
-    float tmp[4][4];
-
-    tmp[0][0] = mat4[0];
-    tmp[0][1] = mat4[1];
-    tmp[0][2] = mat4[2];
-    tmp[0][3] = mat4[3];
-    tmp[1][0] = mat4[4];
-    tmp[1][1] = mat4[5];
-    tmp[1][2] = mat4[6];
-    tmp[1][3] = mat4[7];
-    tmp[2][0] = mat4[8];
-    tmp[2][1] = mat4[9];
-    tmp[2][2] = mat4[10];
-    tmp[2][3] = mat4[11],
-    tmp[3][0] = mat4[12];
-    tmp[3][1] = mat4[13];
-    tmp[3][2] = mat4[14];
-    tmp[3][3] = mat4[15];
-    memcpy(m, tmp, sizeof(tmp));
-}
 
 extern "C" void vrGetCurrentProjectionMtx(float dest[4][4], vr::Hmd_Eye nEye)
 {

@@ -18,6 +18,7 @@ void vrShutdown();
 void vrTick();
 void vrLogSubmitResult(vr::EVRCompositorError error, u8 eye);
 void vrMat4ToFloat44(float m[4][4], const Matrix4 &mat4);
+void vrFloat44ToMat4(Matrix4 &destMat4, float srcM[4][4]);
 extern "C" void vrGetCurrentProjectionMtx(float dest[4][4], vr::Hmd_Eye nEye);
 
 #ifdef __cplusplus
