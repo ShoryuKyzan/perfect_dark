@@ -4402,12 +4402,14 @@ void playerAllocateMatrices(struct coord *cam_pos, struct coord *cam_look, struc
 	guMtxF2L(s0->m, s1);
 	camSetOrthogonalMtxL(s1);
 	mtxScaleRows(scale, &sp8c);
+	videoSetCameraMatrix(sp8c.m);
+
 	guMtxF2L(sp8c.m, g_Vars.currentplayer->mtxl005c);
 	mtxL2L(g_Vars.currentplayer->mtxl005c, g_Vars.currentplayer->mtxl0060);
 	camSetMtxL173c(g_Vars.currentplayer->mtxl005c);
 	camSetMtxL1738(g_Vars.currentplayer->mtxl0060);
 	camSetWorldToScreenMtxf(g_Vars.currentplayer->mtxLookAt);
-	videoSetCameraMatrix(g_Vars.currentplayer->mtxLookAt->m);
+	// videoSetCameraMatrix(g_Vars.currentplayer->mtxLookAt->m);
 
 	camSetProjectionMtxF(g_Vars.currentplayer->mtxCamToWorld);
 	camSetLookAt(lookat);
