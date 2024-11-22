@@ -5434,7 +5434,7 @@ s32 playerTickThirdPerson(struct prop *prop)
 					spe8 = player->model00d4->matrices;
 				}
 
-				mtx00015be4(camGetProjectionMtxF(), spe8, &spa8);
+				mtxApplyTransform(camGetProjectionMtxF(), spe8, &spa8);
 
 				sp9c.x = spa8.m[3][0] + spa8.m[1][0] * 7;
 				sp9c.y = spa8.m[3][1] + spa8.m[1][1] * 7;
@@ -5842,7 +5842,7 @@ void player0f0c3320(Mtxf *matrices, s32 count)
 	s32 j;
 
 	for (i = 0, j = 0; i < count; i++, j += sizeof(Mtxf)) {
-		mtx00015be4(camGetProjectionMtxF(), (Mtxf *)((uintptr_t)matrices + j), &sp40);
+		mtxApplyTransform(camGetProjectionMtxF(), (Mtxf *)((uintptr_t)matrices + j), &sp40);
 
 		sp40.m[3][0] -= g_Vars.currentplayer->globaldrawworldoffset.x;
 		sp40.m[3][1] -= g_Vars.currentplayer->globaldrawworldoffset.y;

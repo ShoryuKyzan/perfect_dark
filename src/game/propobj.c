@@ -4083,10 +4083,10 @@ bool objEmbed(struct prop *prop, struct prop *parent, struct model *model, struc
 			mtx4LoadTranslation(&sp28, &sp74);
 			mtx3ToMtx4(obj->realrot, &sp34);
 			mtx4SetTranslation(&prop->pos, &sp34);
-			mtx00015be4(&sp34, &sp74, &sp134);
-			mtx00015be4(camGetProjectionMtxF(), sp24, &spf4);
+			mtxApplyTransform(&sp34, &sp74, &sp134);
+			mtxApplyTransform(camGetProjectionMtxF(), sp24, &spf4);
 			mtx000172f0(spf4.m, spb4.m);
-			mtx00015be4(&spb4, &sp134, &obj->embedment->matrix);
+			mtxApplyTransform(&spb4, &sp134, &obj->embedment->matrix);
 
 			return true;
 		}
@@ -4768,7 +4768,7 @@ void func0f07079c(struct prop *prop, bool fulltick)
 		Mtxf sp30;
 
 		prop->flags |= PROPFLAG_ONTHISSCREENTHISTICK | PROPFLAG_ONANYSCREENTHISTICK;
-		mtx00015be4(mtx, &obj->embedment->matrix, &sp30);
+		mtxApplyTransform(mtx, &obj->embedment->matrix, &sp30);
 
 		renderdata.unk10 = gfxAllocate(model->definition->nummatrices * sizeof(Mtxf));
 		renderdata.unk00 = &sp30;
@@ -5444,13 +5444,13 @@ void hovTick(struct defaultobj *obj, struct hov *hov)
 
 			if (bike->exreal != 0.0f) {
 				mtx4LoadXRotation(bike->exreal, &sp108);
-				mtx00015be4(&sp148, &sp108, &spc8);
+				mtxApplyTransform(&sp148, &sp108, &spc8);
 				mtx4Copy(&spc8, &sp148);
 			}
 
 			if (ezreal != 0.0f) {
 				mtx4LoadZRotation(ezreal, &sp108);
-				mtx00015be4(&sp148, &sp108, &spc8);
+				mtxApplyTransform(&sp148, &sp108, &spc8);
 				mtx4Copy(&spc8, &sp148);
 			}
 		}
@@ -9089,7 +9089,7 @@ void autogunTickShoot(struct prop *autogunprop)
 						gunpos.z = 0.0f;
 					}
 
-					mtx00015be4(camGetProjectionMtxF(), sp108, &spc8);
+					mtxApplyTransform(camGetProjectionMtxF(), sp108, &spc8);
 					mtx4TransformVecInPlace(&spc8, &gunpos);
 
 					if (cdTestLos10(&autogunprop->pos, autogunprop->rooms, &gunpos, gunrooms, CDTYPE_BG, GEOFLAG_BLOCK_SHOOT) == CDRESULT_COLLISION) {
@@ -9423,15 +9423,15 @@ void chopperInitMatrices(struct prop *prop)
 	rodata = modelGetPartRodata(model->definition, MODELPART_CHOPPER_0001);
 	mtx4LoadZRotation(M_BADTAU - chopper->gunrotx, &sp68);
 	mtx4LoadYRotation(chopper->gunroty + 1.5707963705063f, &sp28);
-	mtx00015be4(&sp28, &sp68, &spa8);
+	mtxApplyTransform(&sp28, &sp68, &spa8);
 
 	mtx4SetTranslation(&rodata->position.pos, &spa8);
-	mtx00015be4(matrices, &spa8, &matrices[1]);
+	mtxApplyTransform(matrices, &spa8, &matrices[1]);
 
 	rodata = modelGetPartRodata(model->definition, MODELPART_CHOPPER_0002);
 	mtx4LoadXRotation(chopper->barrelrot, &spa8);
 	mtx4SetTranslation(&rodata->position.pos, &spa8);
-	mtx00015be4(&matrices[1], &spa8, &matrices[2]);
+	mtxApplyTransform(&matrices[1], &spa8, &matrices[2]);
 }
 
 struct prop *chopperGetTargetProp(struct chopperobj *chopper)
@@ -10833,7 +10833,7 @@ void objInitMatrices(struct prop *prop)
 	} else {
 		mtx3ToMtx4(obj->realrot, &mtx);
 		mtx4SetTranslation(&prop->pos, &mtx);
-		mtx00015be4(camGetWorldToScreenMtxf(), &mtx, obj->model->matrices);
+		mtxApplyTransform(camGetWorldToScreenMtxf(), &mtx, obj->model->matrices);
 
 		if (obj->type == OBJTYPE_CCTV) {
 			cctvInitMatrices(prop, &mtx);
@@ -11081,7 +11081,7 @@ s32 objTickPlayer(struct prop *prop)
 					modelSetMatricesWithAnim(&sp476, model);
 
 					if (fulltick) {
-						mtx00015be4(camGetProjectionMtxF(), model->matrices, &sp412);
+						mtxApplyTransform(camGetProjectionMtxF(), model->matrices, &sp412);
 						mtx4ToMtx3(&sp412, obj->realrot);
 
 						sp400.x = sp412.m[3][0];
@@ -11192,7 +11192,7 @@ s32 objTickPlayer(struct prop *prop)
 				if (modelGetCurAnimFrame(model) >= modelGetNumAnimFrames(model) - 1) {
 					modelmgrFreeAnim(model->anim);
 					model->anim = NULL;
-					mtx00015be4(camGetProjectionMtxF(), model->matrices, &sp248);
+					mtxApplyTransform(camGetProjectionMtxF(), model->matrices, &sp248);
 					mtx4ToMtx3(&sp248, obj->realrot);
 					tagnum = objGetTagNum(obj);
 
@@ -14600,7 +14600,7 @@ bool objDrop(struct prop *prop, bool lazy)
 			if (!lazy && (prop->flags & PROPFLAG_ONTHISSCREENTHISTICK)) {
 				// Do collision checks
 				Mtxf *sp48 = modelGetRootMtx(model);
-				mtx00015be4(camGetProjectionMtxF(), sp48, &spf0);
+				mtxApplyTransform(camGetProjectionMtxF(), sp48, &spf0);
 				propSetPerimEnabled(root, false);
 
 				spe4.x = spf0.m[3][0];
@@ -15240,7 +15240,7 @@ void cctvHandleLensShot(struct defaultobj *obj)
 	if (prop->flags & PROPFLAG_ONTHISSCREENTHISTICK) {
 		rodata = modelGetPartRodata(model->definition, MODELPART_CCTV_0002);
 		sp7c = modelFindNodeMtx(model, modelGetPart(model->definition, MODELPART_CCTV_LENS), 0);
-		mtx00015be4(camGetProjectionMtxF(), sp7c, &matrix);
+		mtxApplyTransform(camGetProjectionMtxF(), sp7c, &matrix);
 
 		shardsCreate((struct coord *) matrix.m[3], matrix.m[0], matrix.m[1], matrix.m[2],
 				rodata->bbox.xmin, rodata->bbox.xmax, rodata->bbox.ymin, rodata->bbox.ymax,

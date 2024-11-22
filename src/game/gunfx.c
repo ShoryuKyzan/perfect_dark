@@ -849,7 +849,7 @@ void casingRender(struct casing *casing, Gfx **gdlptr)
 
 	mtxScaleRows(0.1000000089407f, &mtx);
 	mtx4SetTranslation(&casing->pos, &mtx);
-	mtx00015be4(camGetWorldToScreenMtxf(), &mtx, model.matrices);
+	mtxApplyTransform(camGetWorldToScreenMtxf(), &mtx, model.matrices);
 
 	// Check if any coordinate is out of range
 	for (i = 0; i < 3; i++) {

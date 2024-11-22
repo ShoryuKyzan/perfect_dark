@@ -171,7 +171,7 @@ glabel mtx4TransformVec
 glabel mtx00015be0
 	add    $a2, $a1, $zero
 
-glabel mtx00015be4
+glabel mtxApplyTransform
 	mfc1   $t1, $f20
 	mfc1   $t2, $f21
 	mfc1   $t3, $f22

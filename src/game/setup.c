@@ -951,7 +951,7 @@ void setupCreateSingleMonitor(struct singlemonitorobj *monitor, s32 cmdindex)
 			spa4.z = -spa4.z;
 
 			mtx4LoadTranslation(&spa4, &sp24);
-			mtx00015be4(&sp64, &sp24, &monitor->base.embedment->matrix);
+			mtxApplyTransform(&sp64, &sp24, &monitor->base.embedment->matrix);
 		}
 	} else {
 		setupCreateObject(&monitor->base, cmdindex);

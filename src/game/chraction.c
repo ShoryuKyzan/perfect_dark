@@ -9630,13 +9630,13 @@ bool chrGetGunPos(struct chrdata *chr, s32 handnum, struct coord *gunpos)
 				gunpos->y = rodata->pos.y;
 				gunpos->z = rodata->pos.z;
 
-				mtx00015be4(camGetProjectionMtxF(), spac, &sp6c);
+				mtxApplyTransform(camGetProjectionMtxF(), spac, &sp6c);
 				mtx4TransformVecInPlace(&sp6c, gunpos);
 				result = true;
 			} else if ((part1 = modelGetPart(model->definition, MODELPART_0001))) {
 				sp64 = modelFindNodeMtx(model, part1, 0);
 
-				mtx00015be4(camGetProjectionMtxF(), sp64, &sp24);
+				mtxApplyTransform(camGetProjectionMtxF(), sp64, &sp24);
 
 				gunpos->x = sp24.m[3][0];
 				gunpos->y = sp24.m[3][1];

@@ -7748,7 +7748,7 @@ void bgun0f0a5550(s32 handnum)
 	mtx4Copy(&sp2c4, &hand->cammtx);
 	mtx4Copy(&hand->posmtx, &hand->prevmtx);
 
-	mtx00015be4(camGetProjectionMtxF(), &hand->cammtx, &hand->posmtx);
+	mtxApplyTransform(camGetProjectionMtxF(), &hand->cammtx, &hand->posmtx);
 
 	if (hand->visible) {
 		for (j = 0x5a; j < 0x5d; j++) {
@@ -7923,7 +7923,7 @@ void bgun0f0a5550(s32 handnum)
 				spc4 = hand->gunmodel.matrices;
 
 				for (spcc = 0; spcc < hand->gunmodel.definition->nummatrices; spcc++) {
-					mtx00015be4(&sp2c4, spc8, spc4);
+					mtxApplyTransform(&sp2c4, spc8, spc4);
 					spc8++;
 					spc4++;
 				}
