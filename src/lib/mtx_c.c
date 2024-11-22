@@ -99,7 +99,7 @@ void mtx4TransformVec(Mtxf *mtx, struct coord *vec, struct coord *dst)
 	dst->z += mtx->m[3][2];
 }
 
-void mtx00015be0(Mtxf *matrix1, Mtxf *matrix2)
+void mtxApplyTransformInPlace(Mtxf *matrix1, Mtxf *matrix2)
 {
 	mtxApplyTransform(matrix1, matrix2, matrix2);
 }

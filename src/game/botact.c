@@ -392,9 +392,9 @@ void botactThrow(struct chrdata *chr)
 	}
 
 	mtx4LoadXRotation(0.34901028871536f, &sp84);
-	mtx00015be0(&sp84, &sp164);
+	mtxApplyTransformInPlace(&sp84, &sp164);
 	mtx4LoadYRotation(sp80, &sp84);
-	mtx00015be0(&sp84, &sp164);
+	mtxApplyTransformInPlace(&sp84, &sp164);
 
 	bgunCreateThrownProjectile2(chr, &gset, &prop->pos, prop->rooms, &sp164, &sp228);
 
@@ -516,7 +516,7 @@ void botactCreateSlayerRocket(struct chrdata *chr)
 
 		mtx4LoadXRotation(xrot, &sp196);
 		mtx4LoadYRotation(yrot, &sp132);
-		mtx00015be0(&sp132, &sp196);
+		mtxApplyTransformInPlace(&sp132, &sp196);
 		mtx4LoadIdentity(&sp260);
 
 		bgun0f09ebcc(&rocket->base, &chr->prop->pos, chr->prop->rooms, &sp196, &sp100, &sp260, chr->prop, &chr->prop->pos);

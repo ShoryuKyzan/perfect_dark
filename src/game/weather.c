@@ -1083,7 +1083,7 @@ Gfx *weatherRenderRain(Gfx *gdl, struct weatherdata *weather, s32 arg2)
 		numtris = 0;
 
 		mtx4LoadIdentity(&worldtoscreenmtx);
-		mtx00015be0(camGetWorldToScreenMtxf(), &worldtoscreenmtx);
+		mtxApplyTransformInPlace(camGetWorldToScreenMtxf(), &worldtoscreenmtx);
 
 		worldtoscreenmtx.m[3][0] = 0.0f;
 		worldtoscreenmtx.m[3][1] = 0.0f;
@@ -1714,7 +1714,7 @@ glabel var7f1b5790
 /*  f134884:	0fc2d5be */ 	jal	camGetWorldToScreenMtxf
 /*  f134888:	00000000 */ 	nop
 /*  f13488c:	00402025 */ 	or	$a0,$v0,$zero
-/*  f134890:	0c0056f8 */ 	jal	mtx00015be0
+/*  f134890:	0c0056f8 */ 	jal	mtxApplyTransformInPlace
 /*  f134894:	02002825 */ 	or	$a1,$s0,$zero
 /*  f134898:	4480a000 */ 	mtc1	$zero,$f20
 /*  f13489c:	00000000 */ 	nop
@@ -3137,7 +3137,7 @@ Gfx *weatherRenderSnow(Gfx *gdl, struct weatherdata *weather, s32 arg2)
 	sp198 = 0;
 
 	mtx4LoadIdentity(&sp1cc);
-	mtx00015be0(camGetWorldToScreenMtxf(), &sp1cc);
+	mtxApplyTransformInPlace(camGetWorldToScreenMtxf(), &sp1cc);
 
 	sp1cc.m[3][0] = 0.0f;
 	sp1cc.m[3][1] = 0.0f;

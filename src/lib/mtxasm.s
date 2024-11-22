@@ -168,7 +168,7 @@ glabel mtx4TransformVec
 	jr     $ra
 	swc1   $f2, -0x4($a2)
 
-glabel mtx00015be0
+glabel mtxApplyTransformInPlace
 	add    $a2, $a1, $zero
 
 glabel mtxApplyTransform

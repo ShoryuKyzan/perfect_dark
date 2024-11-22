@@ -11,7 +11,7 @@ void mtx4RotateVecInPlace(Mtxf *mtx, struct coord *vec);
 void mtx4RotateVec(Mtxf *mtx, struct coord *vec, struct coord *dst);
 void mtx4TransformVecInPlace(Mtxf *mtx, struct coord *vec);
 void mtx4TransformVec(Mtxf *mtx, struct coord *vec, struct coord *dst);
-void mtx00015be0(Mtxf *matrix1, Mtxf *matrix2);
+void mtxApplyTransformInPlace(Mtxf *matrix1, Mtxf *matrix2);
 void mtxApplyTransform(Mtxf *arg0, Mtxf *arg1, Mtxf *dst);
 void mtx3Copy(f32 src[3][3], f32 dst[3][3]);
 void mtx4Copy(Mtxf *src, Mtxf *dst);

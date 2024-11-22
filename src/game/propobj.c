@@ -5433,9 +5433,9 @@ void hovTick(struct defaultobj *obj, struct hov *hov)
 		}
 
 		mtx4LoadXRotation(xrot, &sp108);
-		mtx00015be0(&sp108, &sp148);
+		mtxApplyTransformInPlace(&sp108, &sp148);
 		mtx4LoadYRotation(hov->yrot, &sp108);
-		mtx00015be0(&sp108, &sp148);
+		mtxApplyTransformInPlace(&sp108, &sp148);
 		mtxScaleRows(obj->model->scale, &sp148);
 
 		if (obj->type == OBJTYPE_HOVERBIKE) {
@@ -7767,7 +7767,7 @@ void doorInitMatrices(struct prop *prop)
 	Mtxf *matrices = model->matrices;
 
 	func0f08c424(door, matrices);
-	mtx00015be0(camGetWorldToScreenMtxf(), matrices);
+	mtxApplyTransformInPlace(camGetWorldToScreenMtxf(), matrices);
 
 	if (model->definition->skel == &g_Skel11) {
 		union modelrodata *rodata;
@@ -8406,7 +8406,7 @@ void cctvInitMatrices(struct prop *prop, Mtxf *mtx)
 
 	mtx4TransformVecInPlace(mtx, &sp64);
 	mtx4SetTranslation(&sp64, &matrices[1]);
-	mtx00015be0(camGetWorldToScreenMtxf(), &matrices[1]);
+	mtxApplyTransformInPlace(camGetWorldToScreenMtxf(), &matrices[1]);
 }
 
 void fanTick(struct prop *prop)
@@ -8959,20 +8959,20 @@ void autogunInitMatrices(struct prop *prop, Mtxf *mtx)
 	mtx4LoadYRotation(yrot, &matrices[1]);
 	mtx4SetTranslation(&sp4c, &matrices[1]);
 	mtxScaleRows(autogun->base.model->scale, &matrices[1]);
-	mtx00015be0(camGetWorldToScreenMtxf(), &matrices[1]);
+	mtxApplyTransformInPlace(camGetWorldToScreenMtxf(), &matrices[1]);
 
 	node2 = modelGetPart(model->definition, MODELPART_AUTOGUN_0002);
 	rodata = node2->rodata;
 	mtx4LoadZRotation(xrot, &matrices[2]);
 	mtx4SetTranslation(&rodata->position.pos, &matrices[2]);
-	mtx00015be0(&matrices[1], &matrices[2]);
+	mtxApplyTransformInPlace(&matrices[1], &matrices[2]);
 
 	tmp = modelFindNodeMtx(model, node2, 0x100);
 
 	if (tmp != NULL) {
 		mtx4LoadZRotation(xrot * 0.5f, tmp);
 		mtx4SetTranslation(&rodata->position.pos, tmp);
-		mtx00015be0(&matrices[1], tmp);
+		mtxApplyTransformInPlace(&matrices[1], tmp);
 	}
 
 	node3 = modelGetPart(model->definition, MODELPART_AUTOGUN_0003);
@@ -8982,7 +8982,7 @@ void autogunInitMatrices(struct prop *prop, Mtxf *mtx)
 		rodata = node3->rodata;
 		mtx4LoadXRotation(autogun->barrelrot, tmp);
 		mtx4SetTranslation(&rodata->position.pos, tmp);
-		mtx00015be0(&matrices[2], tmp);
+		mtxApplyTransformInPlace(&matrices[2], tmp);
 	}
 
 	node4 = modelGetPart(model->definition, MODELPART_AUTOGUN_0004);
@@ -8991,7 +8991,7 @@ void autogunInitMatrices(struct prop *prop, Mtxf *mtx)
 		tmp = modelFindNodeMtx(model, node4, 0);
 		rodata = node4->rodata;
 		mtx4LoadTranslation(&rodata->position.pos, tmp);
-		mtx00015be0(&matrices[2], tmp);
+		mtxApplyTransformInPlace(&matrices[2], tmp);
 	}
 
 	node6 = modelGetPart(model->definition, MODELPART_AUTOGUN_0006);
@@ -9001,7 +9001,7 @@ void autogunInitMatrices(struct prop *prop, Mtxf *mtx)
 		rodata = node6->rodata;
 		mtx4LoadXRotation(autogun->barrelrot, tmp);
 		mtx4SetTranslation(&rodata->position.pos, tmp);
-		mtx00015be0(&matrices[2], tmp);
+		mtxApplyTransformInPlace(&matrices[2], tmp);
 	}
 }
 
@@ -10808,19 +10808,19 @@ void hangingmonitorInitMatrices(struct prop *prop)
 
 	rodata = modelGetPartRodata(model->definition, MODELPART_0000);
 	mtx4LoadTranslation(&rodata->position.pos, &matrices[1]);
-	mtx00015be0(matrices, &matrices[1]);
+	mtxApplyTransformInPlace(matrices, &matrices[1]);
 
 	rodata = modelGetPartRodata(model->definition, MODELPART_0001);
 	mtx4LoadTranslation(&rodata->position.pos, &matrices[2]);
-	mtx00015be0(matrices, &matrices[2]);
+	mtxApplyTransformInPlace(matrices, &matrices[2]);
 
 	rodata = modelGetPartRodata(model->definition, MODELPART_0002);
 	mtx4LoadTranslation(&rodata->position.pos, &matrices[3]);
-	mtx00015be0(matrices, &matrices[3]);
+	mtxApplyTransformInPlace(matrices, &matrices[3]);
 
 	rodata = modelGetPartRodata(model->definition, MODELPART_0003);
 	mtx4LoadTranslation(&rodata->position.pos, &matrices[4]);
-	mtx00015be0(matrices, &matrices[4]);
+	mtxApplyTransformInPlace(matrices, &matrices[4]);
 }
 
 void objInitMatrices(struct prop *prop)
@@ -21295,7 +21295,7 @@ void projectileCreate(struct prop *fromprop, struct fireslotthing *arg1, struct 
 					mtx4LoadIdentity(&sp13c);
 					mtx4LoadXRotation(rotx, &spe0);
 					mtx4LoadYRotation(roty, &spa0);
-					mtx00015be0(&spa0, &spe0);
+					mtxApplyTransformInPlace(&spa0, &spe0);
 
 					sp120.x = dir->x * 0.27777776f;
 					sp120.y = dir->y * 0.27777776f;

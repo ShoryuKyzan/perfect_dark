@@ -6687,7 +6687,7 @@ void bgunUpdateGangsta(struct hand *hand, s32 handnum, struct coord *arg2, struc
 	sp38.z = (tmp * 66.6f * 0.017453292f) * (handnum != HAND_RIGHT ? 1.0f : -1.0f);
 
 	mtx4LoadRotation(&sp38, arg4);
-	mtx00015be0(arg4, arg5);
+	mtxApplyTransformInPlace(arg4, arg5);
 
 	arg2->y += 4.0f * hand->gangstarot;
 	arg2->x += 2.0f * hand->gangstarot * (handnum != HAND_RIGHT ? 1.0f : -1.0f);
@@ -7705,7 +7705,7 @@ void bgun0f0a5550(s32 handnum)
 		sp274.f[1] += hand->posrotmtx.m[3][1];
 		sp274.f[2] += hand->posrotmtx.m[3][2];
 
-		mtx00015be0(&hand->posrotmtx, &sp234);
+		mtxApplyTransformInPlace(&hand->posrotmtx, &sp234);
 
 		sp234.m[3][0] = 0.0f;
 		sp234.m[3][1] = 0.0f;
@@ -7721,7 +7721,7 @@ void bgun0f0a5550(s32 handnum)
 			hand->damplook.x, hand->damplook.y, hand->damplook.z,
 			hand->dampup.x, hand->dampup.y, hand->dampup.z);
 
-	mtx00015be0(&sp284, &sp234);
+	mtxApplyTransformInPlace(&sp284, &sp234);
 
 	sp1a4.x = 0.0f;
 	sp1a4.y = M_PI;

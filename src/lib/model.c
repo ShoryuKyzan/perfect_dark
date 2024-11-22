@@ -794,7 +794,7 @@ void modelUpdateChrNodeMtx(struct modelrenderdata *arg0, struct model *model, st
 		if ((g_Anims[anim->animnum].flags & ANIMFLAG_ABSOLUTETRANSLATION) && (g_Anims[anim->animnum2].flags & ANIMFLAG_ABSOLUTETRANSLATION) == 0) {
 			mtx4LoadYRotation(rwdata->chrinfo.yrot, &sp78);
 			mtx4LoadRotation(&rot3, &sp38);
-			mtx00015be0(&sp78, &sp38);
+			mtxApplyTransformInPlace(&sp78, &sp38);
 			quaternion0f097044(&sp38, spec);
 		} else {
 			quaternion0f096ca0(&rot3, spec);

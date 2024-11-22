@@ -1619,7 +1619,7 @@ void chrHandleJointPositioned(s32 joint, Mtxf *mtx)
 			return;
 		}
 
-		mtx00015be0(camGetProjectionMtxF(), mtx);
+		mtxApplyTransformInPlace(camGetProjectionMtxF(), mtx);
 
 		sp138.x = mtx->m[3][0];
 		sp138.y = mtx->m[3][1];
@@ -1644,9 +1644,9 @@ void chrHandleJointPositioned(s32 joint, Mtxf *mtx)
 		}
 
 		mtx4LoadYRotation(gunrot, &spb8);
-		mtx00015be0(&spb8, mtx);
+		mtxApplyTransformInPlace(&spb8, mtx);
 		mtx4LoadXRotation(gunrotx, &spf8);
-		mtx00015be0(&spf8, mtx);
+		mtxApplyTransformInPlace(&spf8, mtx);
 
 		gunrot = gunroty + theta;
 
@@ -1655,7 +1655,7 @@ void chrHandleJointPositioned(s32 joint, Mtxf *mtx)
 		}
 
 		mtx4LoadYRotation(gunrot, &spb8);
-		mtx00015be0(&spb8, mtx);
+		mtxApplyTransformInPlace(&spb8, mtx);
 
 		if (scale != 1.0f) {
 			mtxScaleRows(scale, mtx);
@@ -1665,7 +1665,7 @@ void chrHandleJointPositioned(s32 joint, Mtxf *mtx)
 		mtx->m[3][1] = sp138.y;
 		mtx->m[3][2] = sp138.z;
 
-		mtx00015be0(camGetWorldToScreenMtxf(), mtx);
+		mtxApplyTransformInPlace(camGetWorldToScreenMtxf(), mtx);
 	} else {
 		if (g_CurModelChr->model->definition->skel == &g_SkelChr) {
 			lshoulderjoint = 2;
@@ -1828,7 +1828,7 @@ void chrHandleJointPositioned(s32 joint, Mtxf *mtx)
 					yrot += M_BADTAU;
 				}
 
-				mtx00015be0(camGetProjectionMtxF(), mtx);
+				mtxApplyTransformInPlace(camGetProjectionMtxF(), mtx);
 
 				sp70.x = mtx->m[3][0];
 				sp70.y = mtx->m[3][1];
@@ -1846,23 +1846,23 @@ void chrHandleJointPositioned(s32 joint, Mtxf *mtx)
 					}
 
 					mtx4LoadYRotation(yrot, &tmpmtx);
-					mtx00015be0(&tmpmtx, mtx);
+					mtxApplyTransformInPlace(&tmpmtx, mtx);
 
 					if (xrot != 0.0f) {
 						mtx4LoadXRotation(xrot, &tmpmtx);
-						mtx00015be0(&tmpmtx, mtx);
+						mtxApplyTransformInPlace(&tmpmtx, mtx);
 					}
 
 					if (zrot != 0.0f) {
 						mtx4LoadZRotation(zrot, &tmpmtx);
-						mtx00015be0(&tmpmtx, mtx);
+						mtxApplyTransformInPlace(&tmpmtx, mtx);
 					}
 
 					mtx4LoadYRotation(aimangle, &tmpmtx);
-					mtx00015be0(&tmpmtx, mtx);
+					mtxApplyTransformInPlace(&tmpmtx, mtx);
 				} else {
 					mtx4LoadYRotation(yrot, &tmpmtx);
-					mtx00015be0(&tmpmtx, mtx);
+					mtxApplyTransformInPlace(&tmpmtx, mtx);
 				}
 
 				if (scale != 1.0f) {
@@ -1873,7 +1873,7 @@ void chrHandleJointPositioned(s32 joint, Mtxf *mtx)
 				mtx->m[3][1] = sp70.y;
 				mtx->m[3][2] = sp70.z;
 
-				mtx00015be0(camGetWorldToScreenMtxf(), mtx);
+				mtxApplyTransformInPlace(camGetWorldToScreenMtxf(), mtx);
 			}
 		}
 	}

@@ -51,6 +51,6 @@ void func0f096698(Mtxf *arg0, Mtxf *arg1, s32 count)
 	s32 i;
 
 	for (i = 0; i < count; i++) {
-		mtx00015be0(arg1, arg0);
+		mtxApplyTransformInPlace(arg1, arg0);
 	}
 }
