@@ -2051,9 +2051,9 @@ void titleTickRareLogo(void)
 	}
 }
 
-f32 clamp270to90(f32 arg0)
+f32 clamp270to90(f32 percentage)
 {
-	return ((1.0f - arg0) + (1.0f - arg0)) * M_PI - DEG2RAD(90);
+	return ((1.0f - percentage) + (1.0f - percentage)) * M_PI - DEG2RAD(90);
 }
 
 Gfx *titleRenderRareLogo(Gfx *gdl)
