@@ -2051,7 +2051,7 @@ void titleTickRareLogo(void)
 	}
 }
 
-f32 func0f019d0c(f32 arg0)
+f32 clamp270to90(f32 arg0)
 {
 	return ((1.0f - arg0) + (1.0f - arg0)) * M_PI - DEG2RAD(90);
 }
@@ -2080,8 +2080,8 @@ Gfx *titleRenderRareLogo(Gfx *gdl)
 		struct coord spb4;
 		struct modelrwdata_toggle *rwdata;
 
-		lightdir.z = sinf(func0f019d0c(fracdone));
-		lightdir.x = cosf(func0f019d0c(fracdone));
+		lightdir.z = sinf(clamp270to90(fracdone));
+		lightdir.x = cosf(clamp270to90(fracdone));
 
 		guNormalize(&lightdir.x, &lightdir.y, &lightdir.z);
 
@@ -2112,8 +2112,8 @@ Gfx *titleRenderRareLogo(Gfx *gdl)
 		s0 = s0 * 192 / 255;
 
 		if (fracdone < 0.5f) {
-			lightdir.z = sinf(func0f019d0c(0.5f));
-			lightdir.x = cosf(func0f019d0c(0.5f));
+			lightdir.z = sinf(clamp270to90(0.5f));
+			lightdir.x = cosf(clamp270to90(0.5f));
 			guNormalize(&lightdir.x, &lightdir.y, &lightdir.z);
 			titleSetLight(&var800625a8, s0, s0, s0, 0, &lightdir);
 		} else {

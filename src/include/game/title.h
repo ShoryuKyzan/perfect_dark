@@ -43,7 +43,7 @@ Gfx *titleRenderNintendoLogo(Gfx *gdl);
 void titleInitRareLogo(void);
 void titleExitRareLogo(void);
 void titleTickRareLogo(void);
-f32 func0f019d0c(f32 arg0);
+f32 clamp270to90(f32 percentage);
 Gfx *titleRenderRareLogo(Gfx *gdl);
 void titleInitSkip(void);
 void titleInitNoController(void);
