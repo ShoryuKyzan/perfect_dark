@@ -577,7 +577,7 @@ void setupCreateObject(struct defaultobj *obj, s32 cmdindex)
 
 					mtx00015e24(xscale, &mtx);
 					mtx00015e80(yscale, &mtx);
-					mtx00015edc(zscale, &mtx);
+					mtxScaleZ(zscale, &mtx);
 
 					modelSetScale(obj->model, obj->model->scale * maxscale);
 				}
@@ -1116,7 +1116,7 @@ void setupCreateDoor(struct doorobj *door, s32 cmdindex)
 
 		mtx00015e24(xscale, &finalmtx);
 		mtx00015e80(yscale, &finalmtx);
-		mtx00015edc(zscale, &finalmtx);
+		mtxScaleZ(zscale, &finalmtx);
 
 		pos.x = pad.pos.x;
 		pos.y = pad.pos.y;

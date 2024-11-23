@@ -935,7 +935,7 @@ void modelPositionJointUsingVecRot(struct modelrenderdata *renderdata, struct mo
 			roty = 1.5f;
 		}
 
-		mtx00015edc(roty, finalmtx);
+		mtxScaleZ(roty, finalmtx);
 		mtx4SetTranslation(pos, finalmtx);
 
 		if (rendermtx != NULL) {
@@ -1039,7 +1039,7 @@ void modelPositionJointUsingQuatRot(struct modelrenderdata *renderdata, struct m
 			roty = 1.5f;
 		}
 
-		mtx00015edc(roty, finalmtx);
+		mtxScaleZ(roty, finalmtx);
 		mtx4SetTranslation(pos, finalmtx);
 
 		if (rendermtx != NULL) {

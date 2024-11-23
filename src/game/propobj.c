@@ -7451,7 +7451,7 @@ s32 projectileTick(struct defaultobj *obj, bool *embedded)
 					quaternionToMtx(quaternion, &spac);
 					mtx00015e24(projectile->unk0b8[0], &spac);
 					mtx00015e80(projectile->unk0b8[1], &spac);
-					mtx00015edc(projectile->unk0b8[2], &spac);
+					mtxScaleZ(projectile->unk0b8[2], &spac);
 					mtx4ToMtx3(&spac, obj->realrot);
 					stop = false;
 				}
@@ -19119,7 +19119,7 @@ void func0f08c424(struct doorobj *door, Mtxf *matrix)
 	mtx4SetTranslation(&door->base.prop->pos, matrix);
 
 	if (door->doorflags & DOORFLAG_FLIP) {
-		mtx00015edc(-1, matrix);
+		mtxScaleZ(-1, matrix);
 	}
 }
 

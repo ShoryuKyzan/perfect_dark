@@ -2833,7 +2833,7 @@ s32 chrTick(struct prop *prop)
 					mtx4LoadTranslation(&hatpos, &sp9c);
 					mtx00015e24(spe4, &sp9c);
 					mtx00015e80(spe0, &sp9c);
-					mtx00015edc(spdc, &sp9c);
+					mtxScaleZ(spdc, &sp9c);
 					mtxApplyTransform(hatmodel->matrices, &sp9c, &sp5c);
 					mtx4Copy(&sp5c, hatmodel->matrices);
 

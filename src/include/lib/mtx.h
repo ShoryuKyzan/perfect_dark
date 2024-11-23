@@ -23,7 +23,7 @@ void mtx00015e24(f32 mult, Mtxf *mtx);
 void mtx00015e4c(f32 arg0, Mtxf *mtx);
 void mtx00015e80(f32 mult, Mtxf *mtx);
 void mtx00015ea8(f32 arg0, Mtxf *mtx);
-void mtx00015edc(f32 mult, Mtxf *mtx);
+void mtxScaleZ(f32 mult, Mtxf *mtx);
 void mtxScaleRows(f32 scale, Mtxf *arg1);
 void mtx00015f4c(f32 scale, Mtxf *arg1);
 void mtx00015f88(f32 arg0, Mtxf *arg1);

@@ -388,7 +388,7 @@ glabel mtx00015ea8
 	jr     $ra
 	swc1   $f6, 0x2c($a1)
 
-glabel mtx00015edc
+glabel mtxScaleZ
 	lwc1   $f4, 0x20($a1)
 	lwc1   $f6, 0x24($a1)
 	mul.s  $f8, $f4, $f12

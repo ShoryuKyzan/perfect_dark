@@ -251,7 +251,7 @@ void mtx00015ea8(f32 mult, Mtxf *mtx)
 	mtx->m[2][3] *= mult;
 }
 
-void mtx00015edc(f32 mult, Mtxf *mtx)
+void mtxScaleZ(f32 mult, Mtxf *mtx)
 {
 	mtx->m[2][0] *= mult;
 	mtx->m[2][1] *= mult;
