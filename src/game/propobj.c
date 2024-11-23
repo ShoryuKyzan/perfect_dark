@@ -7766,7 +7766,7 @@ void doorInitMatrices(struct prop *prop)
 	struct model *model = door->base.model;
 	Mtxf *matrices = model->matrices;
 
-	func0f08c424(door, matrices);
+	doorGetTransform(door, matrices);
 	mtxApplyTransformInPlace(camGetWorldToScreenMtxf(), matrices);
 
 	if (model->definition->skel == &g_Skel11) {
@@ -15217,7 +15217,7 @@ void doorDestroyGlass(struct doorobj *door)
 		}
 	}
 
-	func0f08c424(door, &matrix);
+	doorGetTransform(door, &matrix);
 	shardsCreate((struct coord *) &matrix.m[3][0], &matrix.m[0][0], &matrix.m[1][0], &matrix.m[2][0],
 			rodata->bbox.xmin, rodata->bbox.xmax, rodata->bbox.ymin, rodata->bbox.ymax,
 			SHARDTYPE_GLASS, prop);
@@ -19113,7 +19113,7 @@ void doorsCheckAutomatic(void)
 	}
 }
 
-void func0f08c424(struct doorobj *door, Mtxf *matrix)
+void doorGetTransform(struct doorobj *door, Mtxf *matrix)
 {
 	mtx3ToMtx4(door->base.realrot, matrix);
 	mtx4SetTranslation(&door->base.prop->pos, matrix);
@@ -19232,7 +19232,7 @@ void doorUpdateTiles(struct doorobj *door)
 	door->base.hidden &= ~OBJHFLAG_DOORPERIMDISABLED;
 
 	if ((door->doorflags & DOORFLAG_0020) == 0) {
-		func0f08c424(door, &spdc);
+		doorGetTransform(door, &spdc);
 		objCalculateGeoBlockFromBboxAndMtx(&bbox, &spdc, geo);
 
 		if (door->doortype == DOORTYPE_VERTICAL) {
@@ -20617,7 +20617,7 @@ bool doorTestForInteract(struct prop *prop)
 				Mtxf matrix;
 
 				doorGetBbox(door, &bbox);
-				func0f08c424(door, &matrix);
+				doorGetTransform(door, &matrix);
 
 				if (func0f0675c8(&playerprop->pos, 150, &bbox, &matrix)) {
 					maybe = true;

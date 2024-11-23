@@ -298,7 +298,7 @@ bool doorIsObjInRange(struct doorobj *door, struct defaultobj *obj, bool isbike)
 bool vectorIsInFrontOfDoor(struct doorobj *door, struct coord *vector);
 bool doorIsRangeEmpty(struct doorobj *door);
 void doorsCheckAutomatic(void);
-void func0f08c424(struct doorobj *door, Mtxf *matrix);
+void doorGetTransform(struct doorobj *door, Mtxf *matrix);
 void doorGetBbox(struct doorobj *door, struct modelrodata_bbox *dst);
 void doorUpdateTiles(struct doorobj *door);
 void door0f08cb20(struct doorobj *door, Vtx *src, Vtx *dst, s32 numvertices);
