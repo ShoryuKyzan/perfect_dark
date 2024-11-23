@@ -1483,19 +1483,32 @@ static void gfx_sp_tri1(uint8_t vtx1_idx, uint8_t vtx2_idx, uint8_t vtx3_idx, bo
 
     if (rdp.viewport_or_scissor_changed)
     {
-        if (memcmp(&rdp.viewport, &rendering_state.viewport, sizeof(rdp.viewport)) != 0)
-        {
+        if(vrEnabled && vrRenderEye != -1){
             gfx_flush();
-            gfx_rapi->set_viewport(rdp.viewport.x, rdp.viewport.y, rdp.viewport.width, rdp.viewport.height);
-            rendering_state.viewport = rdp.viewport;
+            gfx_rapi->set_viewport(0, 0, vrRenderWidth, vrRenderHeight);
+            gfx_rapi->set_scissor(0, 0, vrRenderWidth, vrRenderHeight);
+
+            if(vrRenderEye == 1){
+                rdp.viewport_or_scissor_changed = false;
+            }
+        } else {
+            if (memcmp(&rdp.viewport, &rendering_state.viewport, sizeof(rdp.viewport)) != 0)
+            {
+                gfx_flush();
+                gfx_rapi->set_viewport(rdp.viewport.x, rdp.viewport.y, rdp.viewport.width, rdp.viewport.height);
+                rendering_state.viewport = rdp.viewport;
+            }
+            if (memcmp(&rdp.scissor, &rendering_state.scissor, sizeof(rdp.scissor)) != 0)
+            {
+                gfx_flush();
+                gfx_rapi->set_scissor(rdp.scissor.x, rdp.scissor.y, rdp.scissor.width, rdp.scissor.height);
+                rendering_state.scissor = rdp.scissor;
+            }
         }
-        if (memcmp(&rdp.scissor, &rendering_state.scissor, sizeof(rdp.scissor)) != 0)
-        {
-            gfx_flush();
-            gfx_rapi->set_scissor(rdp.scissor.x, rdp.scissor.y, rdp.scissor.width, rdp.scissor.height);
-            rendering_state.scissor = rdp.scissor;
+        // vr waits until last eye rendered to unset this.
+        if(!vrEnabled){
+            rdp.viewport_or_scissor_changed = false;
         }
-        rdp.viewport_or_scissor_changed = false;
     }
 
     uint64_t cc_options = 0;
@@ -1991,6 +2004,7 @@ static void gfx_calc_and_set_viewport(const Vp_t *viewport)
     rdp.viewport.y = y;
     rdp.viewport.width = width;
     rdp.viewport.height = height;
+    // XXX sysLogPrintf(LOG_NOTE, "viewport set %d %d %d %d", x, y, width, height); // XXX
 
     gfx_adjust_viewport_or_scissor(&rdp.viewport);
 
