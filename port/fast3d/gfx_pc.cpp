@@ -1115,6 +1115,18 @@ static void gfx_matrix_mul(float res[4][4], const float a[4][4], const float b[4
     memcpy(res, tmp, sizeof(tmp));
 }
 
+static void gfx_get_render_p_mtx(float dest[4][4]){
+    if (vrEnabled && vrRenderEye != -1)
+    {
+        // TODO XXX need to not do this if its not the camera being rendered. need to detect which matrix is involved here.
+        vrGetCurrentProjectionMtx(dest, (vr::Hmd_Eye)vrRenderEye);
+    }
+    else
+    {
+        memcpy(dest, rsp.P_matrix, sizeof(rsp.P_matrix));
+    }
+}
+
 static void gfx_sp_matrix(uint8_t parameters, const int32_t *addr)
 {
     float matrix[4][4];
@@ -1167,20 +1179,14 @@ static void gfx_sp_matrix(uint8_t parameters, const int32_t *addr)
         rsp.lights_changed = 1;
     }
     float P_mat[4][4];
-    if (vrEnabled && vrRenderEye != -1)
-    {
-        // TODO XXX need to not do this if its not the camera being rendered. need to detect which matrix is involved here.
-        vrGetCurrentProjectionMtx(P_mat, (vr::Hmd_Eye)vrRenderEye);
-    }
-    else
-    {
-        memcpy(P_mat, rsp.P_matrix, sizeof(P_mat));
-    }
+    gfx_get_render_p_mtx(P_mat);
     gfx_matrix_mul(rsp.MP_matrix, rsp.modelview_matrix_stack[rsp.modelview_matrix_stack_size - 1], P_mat);
 }
 
 static void gfx_sp_pop_matrix(uint32_t count)
 {
+    float P_mat[4][4];
+    gfx_get_render_p_mtx(P_mat);
     while (count--)
     {
         if (rsp.modelview_matrix_stack_size > 0)
@@ -1189,7 +1195,7 @@ static void gfx_sp_pop_matrix(uint32_t count)
             if (rsp.modelview_matrix_stack_size > 0)
             {
                 gfx_matrix_mul(rsp.MP_matrix, rsp.modelview_matrix_stack[rsp.modelview_matrix_stack_size - 1],
-                               rsp.P_matrix);
+                               P_mat);
             }
         }
     }
