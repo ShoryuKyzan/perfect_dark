@@ -4341,7 +4341,7 @@ void playerAllocateMatrices(struct coord *cam_pos, struct coord *cam_look, struc
 	struct coord sp80;
 	struct coord sp74;
 	f32 scale;
-	Mtxf *s0;
+	// Mtxf *s0;
 	Mtx *s1;
 	s32 i;
 	s32 j;
@@ -4385,21 +4385,21 @@ void playerAllocateMatrices(struct coord *cam_pos, struct coord *cam_look, struc
 			cam_up->x, cam_up->y, cam_up->z);
 
 	s1 = gfxAllocateMatrix();
-	s0 = gfxAllocateMatrix();
-	mtx4MultMtx4(camGetMtxF1754(), &sp8c, s0);
+	// s0 = gfxAllocateMatrix();
+	// mtx4MultMtx4(camGetMtxF1754(), &sp8c, s0);
 
-	for (i = 0; i < 4; i++) {
-		for (j = 0; j < 4; j++) {
-			if (s0->m[i][j] > 32000.0f) {
-				s0->m[i][j] = 32000.0f;
-			} else if (s0->m[i][j] < -32000.0f) {
-				s0->m[i][j] = -32000.0f;
-			}
-		}
-	}
+	// for (i = 0; i < 4; i++) {
+	// 	for (j = 0; j < 4; j++) {
+	// 		if (s0->m[i][j] > 32000.0f) {
+	// 			s0->m[i][j] = 32000.0f;
+	// 		} else if (s0->m[i][j] < -32000.0f) {
+	// 			s0->m[i][j] = -32000.0f;
+	// 		}
+	// 	}
+	// }
 
-	camSetMtxF006c(s0);
-	guMtxF2L(s0->m, s1);
+	camSetMtxF006c(camGetMtxF1754());
+	guMtxF2L(camGetMtxF1754()->m, s1);
 	camSetOrthogonalMtxL(s1);
 	mtxScaleRows(scale, &sp8c);
 	videoSetCameraMatrix(sp8c.m);

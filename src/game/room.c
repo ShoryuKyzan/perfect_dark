@@ -5,7 +5,7 @@
 #include "lib/mtx.h"
 #include "data.h"
 #include "types.h"
-
+#include "game/camera.h"
 /**
  * Room matrices
  *
@@ -177,6 +177,7 @@ Gfx *roomApplyMtx(Gfx *gdl, s32 roomnum)
 	s32 index = roomTouchMtx(roomnum);
 
 	gSPMatrix(gdl++, &g_RoomMtxMatrices[index], G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
+	gSPMatrix(gdl++, camGetMtxL173c(), G_MTX_MUL | G_MTX_MODELVIEW);
 
 	return gdl;
 }

@@ -913,7 +913,7 @@ Gfx *bgRenderSceneInXray(Gfx *gdl)
 	gDPSetTextureFilter(gdl++, G_TF_BILERP);
 	gDPSetCycleType(gdl++, G_CYC_1CYCLE);
 	gDPSetRenderMode(gdl++, G_RM_AA_XLU_SURF, G_RM_AA_XLU_SURF2);
-	gSPMatrix(gdl++, osVirtualToPhysical(camGetOrthogonalMtxL()), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_PROJECTION);
+	gSPMatrix(gdl++, osVirtualToPhysical(camGetPerspectiveMtxL()), G_MTX_PUSH | G_MTX_MODELVIEW);
 
 	texSelect(&gdl, NULL, 2, 0, 2, 1, NULL);
 
@@ -935,7 +935,7 @@ Gfx *bgRenderSceneInXray(Gfx *gdl)
 	// Render props
 	gdl = bgScissorToViewport(gdl);
 
-	gSPMatrix(gdl++, osVirtualToPhysical(camGetOrthogonalMtxL()), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_PROJECTION);
+	gSPMatrix(gdl++, osVirtualToPhysical(camGetPerspectiveMtxL()), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_PROJECTION);
 
 	if (g_BgMinDrawOrder); \
 	if (g_BgNumDrawSlots); \
@@ -944,7 +944,7 @@ Gfx *bgRenderSceneInXray(Gfx *gdl)
 			struct drawslot *thing = &g_BgDrawSlots[k];
 
 			if (thing->draworder == i) {
-				gSPMatrix(gdl++, osVirtualToPhysical(camGetOrthogonalMtxL()), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_PROJECTION);
+				gSPMatrix(gdl++, osVirtualToPhysical(camGetPerspectiveMtxL()), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_PROJECTION);
 
 				gdl = bgScissorWithinViewportF(gdl, thing->box.xmin, thing->box.ymin, thing->box.xmax, thing->box.ymax);
 
@@ -1070,7 +1070,7 @@ Gfx *bgRenderScene(Gfx *gdl)
 			gdl = text0f153628(gdl);
 
 			// XXX may want to disable this
-			gSPMatrix(gdl++, osVirtualToPhysical(camGetOrthogonalMtxL()), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_PROJECTION);
+			gSPMatrix(gdl++, osVirtualToPhysical(camGetPerspectiveMtxL()), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_PROJECTION);
 
 			gdl = playerLoadMatrix(gdl);
 			gdl = envStopFog(gdl);
@@ -1141,7 +1141,7 @@ Gfx *bgRenderScene(Gfx *gdl)
 		}
 
 		// Render BG opaque components
-		gSPMatrix(gdl++, osVirtualToPhysical(camGetOrthogonalMtxL()), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_PROJECTION);
+		gSPMatrix(gdl++, osVirtualToPhysical(camGetPerspectiveMtxL()), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_PROJECTION);
 
 		gdl = bgScissorWithinViewportF(gdl, thing->box.xmin, thing->box.ymin, thing->box.xmax, thing->box.ymax);
 		gdl = envStartFog(gdl, false);
@@ -1168,9 +1168,14 @@ Gfx *bgRenderScene(Gfx *gdl)
 
 	gdl = envStopFog(gdl);
 	gdl = bgScissorToViewport(gdl);
+	gdl = bgScissorToViewport(gdl); // XXX
+	gdl = bgScissorToViewport(gdl); // XXX
+	gdl = bgScissorToViewport(gdl); // XXX
+	gdl = bgScissorToViewport(gdl); // XXX
+	gdl = bgScissorToViewport(gdl); // XXX
 
 	// Render wall hits
-	gSPMatrix(gdl++, osVirtualToPhysical(camGetOrthogonalMtxL()), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_PROJECTION);
+	gSPMatrix(gdl++, osVirtualToPhysical(camGetPerspectiveMtxL()), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_PROJECTION);
 
 	if (getVar80084040() && g_Vars.currentplayer->visionmode != VISIONMODE_XRAY) {
 		for (i = 0; i < g_BgNumDrawSlots; i++) {
@@ -1184,7 +1189,7 @@ Gfx *bgRenderScene(Gfx *gdl)
 	for (i = g_BgNumDrawSlots - 1; i >= 0; i--) {
 		roomnum = roomnums[i];
 
-		gSPMatrix(gdl++, osVirtualToPhysical(camGetOrthogonalMtxL()), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_PROJECTION);
+		gSPMatrix(gdl++, osVirtualToPhysical(camGetPerspectiveMtxL()), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_PROJECTION);
 
 		thing = &g_BgDrawSlots[roomnum];
 
