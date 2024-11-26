@@ -224,7 +224,7 @@ Gfx *shardsRenderWood(Gfx *gdl)
 		gDPSetTextureFilter(gdl++, G_TF_BILERP);
 		gDPSetCycleType(gdl++, G_CYC_2CYCLE);
 		gDPSetTextureLOD(gdl++, G_TL_LOD);
-		gSPMatrix(gdl++, osVirtualToPhysical(camGetOrthogonalMtxL()), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_PROJECTION);
+		gSPMatrix(gdl++, osVirtualToPhysical(camGetViewProjectionMtxL()), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_PROJECTION);
 
 		for (i = 0; i < g_MaxShards; i++) {
 			if (g_Shards[i].age60 > 0 && g_Shards[i].type == SHARDTYPE_WOOD) {
@@ -346,7 +346,7 @@ Gfx *shardsRenderGlass(Gfx *gdl)
 			gSPSetGeometryMode(gdl++, G_LIGHTING | G_TEXTURE_GEN);
 		}
 
-		gSPMatrix(gdl++, osVirtualToPhysical(camGetOrthogonalMtxL()), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_PROJECTION);
+		gSPMatrix(gdl++, osVirtualToPhysical(camGetViewProjectionMtxL()), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_PROJECTION);
 
 		for (i = 0; i < g_MaxShards; i++) {
 			if (g_Shards[i].age60 > 0 && g_Shards[i].type != SHARDTYPE_WOOD) {

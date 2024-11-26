@@ -781,7 +781,7 @@ Gfx *skyRender(Gfx *gdl)
 		struct skyvtx2d watervertices2d[5];
 		s32 i;
 
-		mtx4MultMtx4(camGetMtxF1754(), camGetWorldToScreenMtxf(), &sp3cc);
+		mtx4MultMtx4(camGetPerspectiveMtxF(), camGetWorldToScreenMtxf(), &sp3cc);
 		guScaleF(g_SkyMtx.m, 1.0f / scale, 1.0f / scale, 1.0f / scale);
 		mtx4MultMtx4(&sp3cc, &g_SkyMtx, &sp38c);
 
@@ -1287,7 +1287,7 @@ Gfx *skyRender(Gfx *gdl)
 		struct skyvtx2d skyvertices2d[5];
 		s32 i;
 
-		mtx4MultMtx4(camGetMtxF1754(), camGetWorldToScreenMtxf(), &sp1ec);
+		mtx4MultMtx4(camGetPerspectiveMtxF(), camGetWorldToScreenMtxf(), &sp1ec);
 		guScaleF(g_SkyMtx.m, 1.0f / scale, 1.0f / scale, 1.0f / scale);
 		mtx4MultMtx4(&sp1ec, &g_SkyMtx, &sp1ac);
 
@@ -2566,7 +2566,7 @@ Gfx *skyRenderSuns(Gfx *gdl, bool xray)
 	f32 radius;
 
 	sp16c = camGetWorldToScreenMtxf();
-	sp168 = camGetMtxF1754();
+	sp168 = camGetPerspectiveMtxF();
 	env = envGetCurrent();
 
 	xscale = 1;
@@ -2922,7 +2922,7 @@ Gfx *skyRenderTeleportFlare(Gfx *gdl, f32 x, f32 y, f32 z, f32 size, f32 intensi
 	sp64.z = z;
 
 	mtx4TransformVecInPlace(camGetWorldToScreenMtxf(), &sp64);
-	mtx4TransformVecInPlace(camGetMtxF1754(), &sp64);
+	mtx4TransformVecInPlace(camGetPerspectiveMtxF(), &sp64);
 
 	if (sp64.z > 1.0f) {
 		f32 xpos;

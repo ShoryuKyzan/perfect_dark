@@ -2780,10 +2780,13 @@ struct player
 	/*0x173c*/ Mtx *mtxl173c;
 	/*0x1740*/ Mtxf *worldtoscreenmtx;
 	/*0x1744*/ s32 c_viewfmdynticknum;
-	/*0x1748*/ Mtxf *mtxf1748;
+	/** unused matrix */
+	/*0x1748*/ Mtxf *mtxf1748unused;
 	/*0x174c*/ Mtxf *projectionmtx;
+	/** long (fixed point) persp matrix */
 	/*0x1750*/ Mtx *perspmtxl;
-	/*0x1754*/ Mtxf *mtxf1754;
+	/** floating point persp matrix */
+	/*0x1754*/ Mtxf *perspmtxf;
 	/*0x1758*/ Mtx *orthomtxl;
 	/*0x175c*/ LookAt *lookat;
 	/*0x1760*/ Mtxf *prevworldtoscreenmtx;

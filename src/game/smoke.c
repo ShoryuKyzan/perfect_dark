@@ -653,7 +653,7 @@ Gfx *smokeRender(struct prop *prop, Gfx *gdl, bool xlupass)
 		}
 
 		gSPClearGeometryMode(gdl++, G_CULL_BOTH | G_FOG);
-		gSPMatrix(gdl++, osVirtualToPhysical(camGetOrthogonalMtxL()), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_PROJECTION);
+		gSPMatrix(gdl++, osVirtualToPhysical(camGetViewProjectionMtxL()), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_PROJECTION);
 
 		gdl = roomApplyMtx(gdl, roomnum);
 

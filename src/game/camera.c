@@ -220,12 +220,12 @@ Mtx *camGetPerspectiveMtxL(void)
 	return g_Vars.currentplayer->perspmtxl;
 }
 
-void camSetOrthogonalMtxL(Mtx *mtx)
+void camSetViewProjectionMtxL(Mtx *mtx)
 {
 	g_Vars.currentplayer->orthomtxl = mtx;
 }
 
-Mtx *camGetOrthogonalMtxL(void)
+Mtx *camGetViewProjectionMtxL(void)
 {
 	return g_Vars.currentplayer->orthomtxl;
 }
@@ -318,14 +318,14 @@ Mtxf *camGetWorldToScreenMtxf(void)
 	return g_Vars.currentplayer->worldtoscreenmtx;
 }
 
-void camSetMtxF1754(Mtxf *mtx)
+void camSetPerspectiveMtxF(Mtxf *mtx)
 {
-	g_Vars.currentplayer->mtxf1754 = mtx;
+	g_Vars.currentplayer->perspmtxf = mtx;
 }
 
-Mtxf *camGetMtxF1754(void)
+Mtxf *camGetPerspectiveMtxF(void)
 {
-	return g_Vars.currentplayer->mtxf1754;
+	return g_Vars.currentplayer->perspmtxf;
 }
 
 Mtxf *camGetPrevWorldToScreenMtxf(void)
@@ -333,14 +333,14 @@ Mtxf *camGetPrevWorldToScreenMtxf(void)
 	return g_Vars.currentplayer->prevworldtoscreenmtx;
 }
 
-void camSetMtxF1748(Mtxf *mtx)
+void camSetMtxF1748Unused(Mtxf *mtx)
 {
-	g_Vars.currentplayer->mtxf1748 = mtx;
+	g_Vars.currentplayer->mtxf1748unused = mtx;
 }
 
-Mtxf *camGetMtxF1748(void)
+Mtxf *camGetMtxF1748Unused(void)
 {
-	return g_Vars.currentplayer->mtxf1748;
+	return g_Vars.currentplayer->mtxf1748unused;
 }
 
 void camSetProjectionMtxF(Mtxf *mtx)

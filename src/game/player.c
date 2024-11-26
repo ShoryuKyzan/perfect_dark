@@ -4386,7 +4386,7 @@ void playerAllocateMatrices(struct coord *cam_pos, struct coord *cam_look, struc
 
 	s1 = gfxAllocateMatrix();
 	// s0 = gfxAllocateMatrix();
-	// mtx4MultMtx4(camGetMtxF1754(), &sp8c, s0);
+	// mtx4MultMtx4(camGetPerspectiveMtxF(), &sp8c, s0);
 
 	// for (i = 0; i < 4; i++) {
 	// 	for (j = 0; j < 4; j++) {
@@ -4398,8 +4398,8 @@ void playerAllocateMatrices(struct coord *cam_pos, struct coord *cam_look, struc
 	// 	}
 	// }
 
-	camSetMtxF006c(camGetMtxF1754());
-	guMtxF2L(camGetMtxF1754()->m, s1);
+	camSetMtxF006c(camGetPerspectiveMtxF());
+	guMtxF2L(camGetPerspectiveMtxF()->m, s1);
 	camSetOrthogonalMtxL(s1);
 	mtxScaleRows(scale, &sp8c);
 	videoSetCameraMatrix(sp8c.m);

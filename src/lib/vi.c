@@ -584,7 +584,7 @@ Gfx *vi0000ad5c(Gfx *gdl, Vp *vp)
 	gSPPerspNormalize(gdl++, g_ViPerspScale);
 
 	camSetPerspectiveMtxL(var80092870);
-	camSetMtxF1754(&var80092830);
+	camSetPerspectiveMtxF(&var80092830);
 
 	return gdl;
 }
@@ -613,7 +613,7 @@ Gfx *vi0000af00(Gfx *gdl, Vp *vp)
 	gSPPerspNormalize(gdl++, g_ViPerspScale);
 
 	camSetPerspectiveMtxL(var80092870);
-	camSetMtxF1754(&var80092830);
+	camSetPerspectiveMtxF(&var80092830);
 
 	return gdl;
 }

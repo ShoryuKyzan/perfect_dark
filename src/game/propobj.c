@@ -13395,7 +13395,7 @@ void objRenderProp(struct prop *prop, struct modelrenderdata *renderdata, bool x
 		s32 sp60;
 
 		orthogonal = 0;
-		orthogonal += (obj->flags & OBJFLAG_ORTHOGONAL) && camGetOrthogonalMtxL();
+		orthogonal += (obj->flags & OBJFLAG_ORTHOGONAL) && camGetViewProjectionMtxL();
 
 		gdl = renderdata->gdl;
 
@@ -13481,7 +13481,7 @@ void objRenderProp(struct prop *prop, struct modelrenderdata *renderdata, bool x
 		}
 
 		if (orthogonal) {
-			gSPMatrix(gdl++, camGetOrthogonalMtxL(), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_PROJECTION);
+			gSPMatrix(gdl++, camGetViewProjectionMtxL(), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_PROJECTION);
 		}
 
 		renderdata->gdl = gdl;
