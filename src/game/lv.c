@@ -115,7 +115,7 @@ s32 g_MpTeamScoreLimit = 20;
 struct sndstate *g_MiscAudioHandle = NULL;
 s32 g_NumReasonsToEndMpMatch = 0;
 f32 g_StageTimeElapsed1f = 0;
-bool var80084040 = true;
+bool lvBgRenderingEnabled = true;
 
 u32 g_MiscSfxSounds[] = {
 	SFX_HEARTBEAT,
@@ -131,14 +131,14 @@ u32 g_FadePrevColour = 0;
 u32 g_FadeColour = 0;
 s16 g_FadeDelay = 0;
 
-u32 getVar80084040(void)
+u32 lvGetBgRenderingEnabled(void)
 {
-	return var80084040;
+	return lvBgRenderingEnabled;
 }
 
-void setVar80084040(u32 value)
+void lvSetBgRenderingEnabled(u32 value)
 {
-	var80084040 = value;
+	lvBgRenderingEnabled = value;
 }
 
 void lvInit(void)
@@ -258,7 +258,7 @@ void lvReset(s32 stagenum)
 
 	cheatsReset();
 
-	var80084040 = true;
+	lvBgRenderingEnabled = true;
 	g_Vars.lvframenum = 0;
 	var80084050 = 0;
 
