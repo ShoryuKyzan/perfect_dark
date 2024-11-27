@@ -4400,7 +4400,7 @@ void playerAllocateMatrices(struct coord *cam_pos, struct coord *cam_look, struc
 
 	camSetMtxF006c(camGetPerspectiveMtxF());
 	guMtxF2L(camGetPerspectiveMtxF()->m, s1);
-	camSetOrthogonalMtxL(s1);
+	camSetViewProjectionMtxL(s1);
 	mtxScaleRows(scale, &sp8c);
 	videoSetCameraMatrix(sp8c.m);
 
