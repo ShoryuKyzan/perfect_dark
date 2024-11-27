@@ -13497,6 +13497,7 @@ void objRenderProp(struct prop *prop, struct modelrenderdata *renderdata, bool x
 		}
 
 		if (orthogonal) {
+			// this used to cause transform to camera space. so any globaldrawoffset transforms applied will mess things up from here.
 			gSPMatrix(gdl++, camGetPerspectiveMtxL(), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_PROJECTION);
 		}
 
@@ -13510,11 +13511,7 @@ void objRenderProp(struct prop *prop, struct modelrenderdata *renderdata, bool x
 		}
 
 		if (xlupass) {
-			if (orthogonal) {
-				player0f0c3320(model->matrices, model->definition->nummatrices);
-			} else {
-				mtxF2LBulk(model->matrices, model->definition->nummatrices);
-			}
+			mtxF2LBulk(model->matrices, model->definition->nummatrices);
 
 			if ((obj->flags3 & (OBJFLAG3_SHOWSHIELD | OBJFLAG3_SHIELDHIT)) && objIsHealthy(obj)) {
 				gSPSetGeometryMode(renderdata->gdl++, G_CULL_BACK);

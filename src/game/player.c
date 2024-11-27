@@ -5834,20 +5834,3 @@ Gfx *playerLoadMatrix(Gfx *gdl)
 	gSPMatrix(gdl++, g_Vars.currentplayer->mtxCameraL, G_MTX_LOAD);
 	return gdl;
 }
-
-void player0f0c3320(Mtxf *matrices, s32 count)
-{
-	Mtxf sp40;
-	s32 i;
-	s32 j;
-
-	for (i = 0, j = 0; i < count; i++, j += sizeof(Mtxf)) {
-		mtxApplyTransform(camGetProjectionMtxF(), (Mtxf *)((uintptr_t)matrices + j), &sp40);
-
-		sp40.m[3][0] -= g_Vars.currentplayer->globaldrawworldoffset.x;
-		sp40.m[3][1] -= g_Vars.currentplayer->globaldrawworldoffset.y;
-		sp40.m[3][2] -= g_Vars.currentplayer->globaldrawworldoffset.z;
-
-		mtxF2L(&sp40, matrices + i);
-	}
-}
