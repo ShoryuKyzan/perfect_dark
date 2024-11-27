@@ -4349,8 +4349,8 @@ void playerAllocateMatrices(struct coord *cam_pos, struct coord *cam_look, struc
 	scale = bgGetScaleBg2Gfx();
 	playerSetGlobalDrawWorldOffset(g_Vars.currentplayer->cam_room);
 
-	g_Vars.currentplayer->mtxl005c = gfxAllocateMatrix();
-	g_Vars.currentplayer->mtxl0060 = gfxAllocateMatrix();
+	g_Vars.currentplayer->mtxCameraL = gfxAllocateMatrix();
+	g_Vars.currentplayer->mtxCameraPackedL = gfxAllocateMatrix();
 	g_Vars.currentplayer->mtxLookAt = gfxAllocateMatrix();
 	g_Vars.currentplayer->mtxCamToWorld = gfxAllocateMatrix();
 
@@ -4404,10 +4404,10 @@ void playerAllocateMatrices(struct coord *cam_pos, struct coord *cam_look, struc
 	mtxScaleRows(scale, &sp8c);
 	videoSetCameraMatrix(sp8c.m);
 
-	guMtxF2L(sp8c.m, g_Vars.currentplayer->mtxl005c);
-	mtxL2L(g_Vars.currentplayer->mtxl005c, g_Vars.currentplayer->mtxl0060);
-	camSetMtxL173c(g_Vars.currentplayer->mtxl005c);
-	camSetMtxL1738(g_Vars.currentplayer->mtxl0060);
+	guMtxF2L(sp8c.m, g_Vars.currentplayer->mtxCameraL);
+	mtxL2L(g_Vars.currentplayer->mtxCameraL, g_Vars.currentplayer->mtxCameraPackedL);
+	camSetMtxCameraL(g_Vars.currentplayer->mtxCameraL);
+	camSetMtxCameraPackedL(g_Vars.currentplayer->mtxCameraPackedL);
 	camSetWorldToScreenMtxf(g_Vars.currentplayer->mtxLookAt);
 	// videoSetCameraMatrix(g_Vars.currentplayer->mtxLookAt->m);
 
@@ -5831,7 +5831,7 @@ Gfx *playerRender(struct prop *prop, Gfx *gdl, bool xlupass)
 
 Gfx *playerLoadMatrix(Gfx *gdl)
 {
-	gSPMatrix(gdl++, g_Vars.currentplayer->mtxl005c, G_MTX_LOAD);
+	gSPMatrix(gdl++, g_Vars.currentplayer->mtxCameraL, G_MTX_LOAD);
 	return gdl;
 }
 

@@ -180,22 +180,22 @@ void cam0f0b4eb8(struct coord *arg0, f32 arg1[2], f32 zoom, f32 aspect)
 	arg1[0] = player->c_screenleft + player->c_halfwidth - f14 * arg0->f[0];
 }
 
-void camSetMtxL1738(Mtx *mtx)
+void camSetMtxCameraPackedL(Mtx *mtx)
 {
 	g_Vars.currentplayer->mtxl1738 = mtx;
 }
 
-Mtx *camGetMtxL1738(void)
+Mtx *camGetMtxCameraPackedL(void)
 {
 	return g_Vars.currentplayer->mtxl1738;
 }
 
-void camSetMtxL173c(Mtx *mtx)
+void camSetMtxCameraL(Mtx *mtx)
 {
 	g_Vars.currentplayer->mtxl173c = mtx;
 }
 
-Mtx *camGetMtxL173c(void)
+Mtx *camGetMtxCameraL(void)
 {
 	return g_Vars.currentplayer->mtxl173c;
 }

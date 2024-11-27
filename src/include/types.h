@@ -2546,8 +2546,8 @@ struct player
 	/*0x0038*/ struct coord globaldrawworldoffset;
 	/*0x0044*/ struct coord globaldrawcameraoffset;
 	/*0x0050*/ struct coord globaldrawworldbgoffset;
-	/*0x005c*/ Mtx *mtxl005c;
-	/*0x0060*/ Mtx *mtxl0060;
+	/*0x005c*/ Mtx *mtxCameraL;
+	/*0x0060*/ Mtx *mtxCameraPackedL;
 	/*0x0064*/ Mtxf *mtxLookAt;
 	/*0x0068*/ Mtxf *mtxCamToWorld;
 	/*0x006c*/ Mtxf *mtxf006c;
