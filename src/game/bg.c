@@ -1168,11 +1168,6 @@ Gfx *bgRenderScene(Gfx *gdl)
 
 	gdl = envStopFog(gdl);
 	gdl = bgScissorToViewport(gdl);
-	gdl = bgScissorToViewport(gdl); // XXX
-	gdl = bgScissorToViewport(gdl); // XXX
-	gdl = bgScissorToViewport(gdl); // XXX
-	gdl = bgScissorToViewport(gdl); // XXX
-	gdl = bgScissorToViewport(gdl); // XXX
 
 	// Render wall hits
 	gSPMatrix(gdl++, osVirtualToPhysical(camGetPerspectiveMtxL()), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_PROJECTION);
