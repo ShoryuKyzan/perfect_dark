@@ -556,7 +556,8 @@ Gfx *artifactsRenderGlaresForRoom(Gfx *gdl, s32 roomnum)
 
 					mtx4RotateVecInPlace(camGetWorldToScreenMtxf(), &lightscreenpos);
 
-					cam0f0b4d04(&lightscreenpos, spdc);
+					// get screen position
+					camProject3DToScreen2D(&lightscreenpos, spdc);
 
 					brightness *= 27500.0f / (-lightscreenpos.z < 1.0f ? 1.0f : -lightscreenpos.z);
 
@@ -609,7 +610,7 @@ Gfx *artifactsRenderGlaresForRoom(Gfx *gdl, s32 roomnum)
 						spd4[0] = f24;
 						spd4[1] = f26;
 
-						func0f0b2740(&gdl, spdc, spd4, 64, 64, false, false, false, 1);
+						renderTexturedQuad2DTile(&gdl, spdc, spd4, 64, 64, false, false, false, 1);
 
 						if (extra) {
 							colour[0] = 0xff;
@@ -623,7 +624,7 @@ Gfx *artifactsRenderGlaresForRoom(Gfx *gdl, s32 roomnum)
 							spd4[0] = f24 * 0.4f;
 							spd4[1] = f26 * 0.4f;
 
-							func0f0b2740(&gdl, spdc, spd4, 64, 64, false, false, false, 1);
+							renderTexturedQuad2DTile(&gdl, spdc, spd4, 64, 64, false, false, false, 1);
 						}
 					}
 				}

@@ -10,7 +10,7 @@
  * With this function stubbed, light glares do not render,
  * nor do suns or their lens flares.
  */
-void func0f0b2150(Gfx **gdlptr, f32 *arg1, f32 *arg2, s32 width, s32 height, s32 arg5, s32 arg6, s32 arg7, s32 arg8, s32 tile, s32 arg10)
+void renderTexturedQuad2D(Gfx **gdlptr, f32 *arg1, f32 *arg2, s32 width, s32 height, s32 arg5, s32 arg6, s32 arg7, s32 arg8, s32 tile, s32 arg10)
 {
 	if (arg2[0] > 0.0f && arg2[1] > 0.0f) {
 		Gfx *gdl = *gdlptr;
@@ -128,12 +128,12 @@ void func0f0b2150(Gfx **gdlptr, f32 *arg1, f32 *arg2, s32 width, s32 height, s32
 
 void func0f0b26f0(Gfx **gdl, f32 *arg1, f32 *arg2, s32 width, s32 height, bool arg5, bool arg6, bool arg7, bool arg8, s32 tile)
 {
-	func0f0b2150(gdl, arg1, arg2, width, height, arg5, arg6, arg7, arg8, tile, false);
+	renderTexturedQuad2D(gdl, arg1, arg2, width, height, arg5, arg6, arg7, arg8, tile, false);
 }
 
-void func0f0b2740(Gfx **gdl, f32 *arg1, f32 *arg2, s32 width, s32 height, bool arg5, bool arg6, bool arg7, u32 arg8)
+void renderTexturedQuad2DTile(Gfx **gdl, f32 *arg1, f32 *arg2, s32 width, s32 height, bool arg5, bool arg6, bool arg7, u32 arg8)
 {
-	func0f0b2150(gdl, arg1, arg2, width, height, arg5, arg6, arg7, arg8, G_TX_RENDERTILE, false);
+	renderTexturedQuad2D(gdl, arg1, arg2, width, height, arg5, arg6, arg7, arg8, G_TX_RENDERTILE, false);
 }
 
 void func0f0b278c(Gfx **gdlptr, f32 *arg1, f32 *arg2, s32 twidth, u32 theight, u32 arg5, u32 arg6, u32 arg7, u32 r, u32 g, u32 b, u32 alpha, u32 arg12, u32 arg13)
@@ -153,6 +153,6 @@ void func0f0b278c(Gfx **gdlptr, f32 *arg1, f32 *arg2, s32 twidth, u32 theight, u
 
 		*gdlptr = gdl;
 
-		func0f0b2150(gdlptr, arg1, arg2, twidth, theight, arg5, arg6, arg7, false, G_TX_RENDERTILE, false);
+		renderTexturedQuad2D(gdlptr, arg1, arg2, twidth, theight, arg5, arg6, arg7, false, G_TX_RENDERTILE, false);
 	}
 }
