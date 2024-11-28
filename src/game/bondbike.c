@@ -307,7 +307,7 @@ void bbikeApplyMoveData(struct movedata *data)
 		sp30.f[1] = -sinf(sp3c);
 		sp30.f[2] = cosf(sp3c);
 
-		cam0f0b4d04(&sp30, sp28);
+		camProject3DToScreen2D(&sp30, sp28);
 
 		g_Vars.currentplayer->gunextraaimy = -((sp28[1] - camGetScreenTop()) * 2.0f / camGetScreenHeight() - 1.0f) * 0.75f;
 	}

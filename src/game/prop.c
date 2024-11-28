@@ -2536,23 +2536,23 @@ f32 func0f06438c(struct prop *prop, struct coord *arg1, f32 *arg2, f32 *arg3, f3
 		return -1;
 	}
 
-	cam0f0b4d04(arg1, spa0);
+	camProject3DToScreen2D(arg1, spa0);
 	sp94.x = arg2[0];
 	sp94.y = arg1->y;
 	sp94.z = arg1->z;
-	cam0f0b4d04(&sp94, sp8c);
+	camProject3DToScreen2D(&sp94, sp8c);
 	sp94.x = arg2[1];
 	sp94.y = arg1->y;
 	sp94.z = arg1->z;
-	cam0f0b4d04(&sp94, sp84);
+	camProject3DToScreen2D(&sp94, sp84);
 	sp94.x = arg1->x;
 	sp94.y = arg3[1];
 	sp94.z = arg1->z;
-	cam0f0b4d04(&sp94, sp7c);
+	camProject3DToScreen2D(&sp94, sp7c);
 	sp94.x = arg1->x;
 	sp94.y = arg3[0];
 	sp94.z = arg1->z;
-	cam0f0b4d04(&sp94, sp74);
+	camProject3DToScreen2D(&sp94, sp74);
 
 	if (sp74[1] >= top && bottom >= sp7c[1]) {
 		sp4c = false;
@@ -2746,7 +2746,7 @@ void autoaimTick(void)
 						if (spac.z < 0) {
 							spac.x = mtx->m[3][0];
 							spac.y = mtx->m[3][1];
-							cam0f0b4d04(&spac, aimpos);
+							camProject3DToScreen2D(&spac, aimpos);
 						}
 					}
 				} else {

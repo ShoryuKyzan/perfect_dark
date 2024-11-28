@@ -2396,7 +2396,7 @@ Gfx *menuRenderModel(Gfx *gdl, struct menumodel *menumodel, s32 modeltype)
 					pos.y = matrices[mtxindex].m[3][1];
 					pos.z = matrices[mtxindex].m[3][2];
 
-					cam0f0b4d04(&pos, screenpos);
+					camProject3DToScreen2D(&pos, screenpos);
 
 					g_MenuProjectFromX = ((s32)screenpos[0] - viGetWidth() / 2) / g_ScaleX;
 					g_MenuProjectFromY = (s32)screenpos[1] - viGetHeight() / 2;
@@ -6191,7 +6191,7 @@ void func0f0fd494(struct coord *pos)
 	matrix = camGetWorldToScreenMtxf();
 
 	mtx4TransformVec(matrix, pos, &coord);
-	cam0f0b4d04(&coord, xy);
+	camProject3DToScreen2D(&coord, xy);
 
 	g_MenuData.unk670 = (s32)xy[0] - viGetWidth() / 2;
 	g_MenuData.unk674 = (s32)xy[1] - viGetHeight() / 2;

@@ -124,7 +124,7 @@ void cam0f0b4c3c(f32 pos2d[2], struct coord *dir2d, f32 arg2)
 	dir2d->z = sp18 * f2;
 }
 
-void cam0f0b4d04(struct coord *in, f32 *out)
+void camProject3DToScreen2D(struct coord *in, f32 *out)
 {
 	struct player *player = g_Vars.currentplayer;
 	f32 value = 1.0f / in->z;

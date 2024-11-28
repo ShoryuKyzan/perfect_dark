@@ -5115,7 +5115,7 @@ void bgunSwivel(f32 screenx, f32 screeny, f32 crossdamp, f32 aimdamp)
 
 				if (!(sp94.z < 0.0000001f) || !(sp94.z > -0.0000001f)) {
 					if (sp94.z > -6000.0f) {
-						cam0f0b4d04(&sp94, sp8c);
+						camProject3DToScreen2D(&sp94, sp8c);
 
 						x[h] = sp8c[0];
 						y[h] = sp8c[1];
