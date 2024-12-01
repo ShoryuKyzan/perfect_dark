@@ -312,7 +312,12 @@ $(G_DIR)/tiles/%.h: $(A_DIR)/tiles/%.json
 ################################################################################
 # Generic compilation rules
 
-$(BIN): $(O_FILES)
+VR_JSONS := $(wildcard src/vrbindings/*.json)
+PDVR_JSONS := $(patsubst src/vrbindings/%.json,$(B_DIR)/%.json,$(VR_JSONS))
+
+copy_vrbindings_json: $(PDVR_JSONS)
+
+$(BIN): $(O_FILES) | copy_vrbindings_json
 	$(LD) $(COMMON_CFLAGS) $(OPT_LVL) -o $(BIN) $^ $(LDFLAGS)
 ifneq ($(CV2PDB),)
 	$(CV2PDB) $(BIN)
@@ -328,6 +333,11 @@ $(B_DIR)/%.o: %.cpp $(JSON_HEADERS)
 
 $(B_DIR)/%.res: dist/windows/%.rc
 	windres $< -O coff -o $@
+
+
+$(B_DIR)/%.json: src/vrbindings/%.json
+	@mkdir -p $(dir $@)
+	cp $< $@
 
 ################################################################################
 # Clean rules
