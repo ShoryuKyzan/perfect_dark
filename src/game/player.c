@@ -4384,8 +4384,9 @@ void playerAllocateMatrices(struct coord *cam_pos, struct coord *cam_look, struc
 			cam_look->x, cam_look->y, cam_look->z,
 			cam_up->x, cam_up->y, cam_up->z);
 
-	s1 = gfxAllocateMatrix();
+	// old: implementation for OrthographicMtx(camSetViewProjectionMtxL) and camGetorthomtxf (camSetViewProjectionMtxF)
 	// s0 = gfxAllocateMatrix();
+	// s1 = gfxAllocateMatrix();
 	// mtx4MultMtx4(camGetPerspectiveMtxF(), &sp8c, s0);
 
 	// for (i = 0; i < 4; i++) {
@@ -4398,9 +4399,19 @@ void playerAllocateMatrices(struct coord *cam_pos, struct coord *cam_look, struc
 	// 	}
 	// }
 
-	camSetMtxF006c(camGetPerspectiveMtxF());
+	// camSetViewProjectionMtxF(s0);
+	// guMtxF2L(s0->m, s1);
+	// camSetViewProjectionMtxL(s1);
+	// end: old implementation
+
+	// new implementation.
+	// TODO: remove use of this entirely and just replace with PerspectiveMtx
+	s1 = gfxAllocateMatrix();
+	camSetViewProjectionMtxF(camGetPerspectiveMtxF());
 	guMtxF2L(camGetPerspectiveMtxF()->m, s1);
 	camSetViewProjectionMtxL(s1);
+	// end new implementation
+
 	mtxScaleRows(scale, &sp8c);
 	videoSetCameraMatrix(sp8c.m);
 

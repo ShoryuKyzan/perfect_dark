@@ -2550,7 +2550,7 @@ struct player
 	/*0x0060*/ Mtx *mtxCameraPackedL;
 	/*0x0064*/ Mtxf *mtxLookAt;
 	/*0x0068*/ Mtxf *mtxCamToWorld;
-	/*0x006c*/ Mtxf *mtxf006c;
+	/*0x006c*/ Mtxf *orthomtxf;
 	/*0x0070*/ f32 sumground;
 	/*0x0074*/ f32 vv_manground;	   // Feet Y value in absolute coordinates
 	/*0x0078*/ f32 vv_ground;		   // Ground Y value in absolute coordinates

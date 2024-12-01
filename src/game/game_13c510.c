@@ -177,7 +177,7 @@ void artifactsCalculateGlaresForRoom(s32 roomnum)
 
 			roomPopulateMtx(&sp138, roomnum);
 			mtx00015f88(bgGetScaleBg2Gfx(), &sp138);
-			mtx4MultMtx4(camGetMtxF006c(), &sp138, &spf8);
+			mtx4MultMtx4(camGetViewProjectionMtxF(), &sp138, &spf8);
 
 			viewwidth = viGetViewWidth();
 			viewheight = viGetViewHeight();

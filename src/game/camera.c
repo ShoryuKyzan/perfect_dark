@@ -200,14 +200,14 @@ Mtx *camGetMtxCameraL(void)
 	return g_Vars.currentplayer->mtxl173c;
 }
 
-void camSetMtxF006c(Mtxf *mtx)
+void camSetViewProjectionMtxF(Mtxf *mtx)
 {
-	g_Vars.currentplayer->mtxf006c = mtx;
+	g_Vars.currentplayer->orthomtxf = mtx;
 }
 
-Mtxf *camGetMtxF006c(void)
+Mtxf *camGetViewProjectionMtxF(void)
 {
-	return g_Vars.currentplayer->mtxf006c;
+	return g_Vars.currentplayer->orthomtxf;
 }
 
 void camSetPerspectiveMtxL(Mtx *mtx)
