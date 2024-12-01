@@ -19,6 +19,8 @@ Matrix4 mat4VRProjectionRight;
 Matrix4 mat4VREyePosLeft;
 Matrix4 mat4VREyePosRight;
 Matrix4 mat4Camera;
+Vector3 vecHMDPositionLast;
+Vector3 vecHMDPositionDiff;
 float fNearClip = 0.1f;
 float fFarClip = 9000.0f;
 
@@ -150,6 +152,11 @@ extern "C" bool vrInit()
     mat4VREyePosRight = vrSteamVRMtx34ToMat4(m_pHMD->GetEyeToHeadTransform(vr::Eye_Right));
     mat4VREyePosRight.invert();
 
+
+    // init input bindings
+    vr::VRInput()->SetActionManifestPath("pdvr_actions.json");
+
+
     vrEnabled = true;
 
     // after this it will do the framebuffer creation
@@ -170,6 +177,8 @@ extern "C" void vrShutdown()
 
 extern "C" void vrTick()
 {
+    static bool firstTick = false;
+    Vector3 vecHMDPosNext;
     if (!m_pHMD)
         return;
 
@@ -187,9 +196,24 @@ extern "C" void vrTick()
     {
         mat4HMDPose = mat4DevicePoseList[vr::k_unTrackedDeviceIndex_Hmd];
         mat4HMDPose.invert();
+
+        // track difference between this and last frame for HMD pose translation
+        if(firstTick){
+            vecHMDPositionLast.x = 0;
+            vecHMDPositionLast.y = 0;
+            vecHMDPositionLast.z = 0;
+            vecHMDPositionLast = vecHMDPositionLast * mat4HMDPose;
+            firstTick = false;
+        }else{
+            vecHMDPosNext = mat4HMDPose * vecHMDPosNext;
+            vecHMDPositionDiff = vecHMDPositionLast - vecHMDPosNext;
+        }
     }
 }
 
+extern "C" Vector3 vrGetHMDMovementDiff(){
+    return vecHMDPositionDiff;
+}
 
 extern "C" void vrLogSubmitResult(vr::EVRCompositorError error, u8 eye)
 {
