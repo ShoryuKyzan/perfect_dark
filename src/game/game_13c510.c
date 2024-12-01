@@ -177,6 +177,8 @@ void artifactsCalculateGlaresForRoom(s32 roomnum)
 
 			roomPopulateMtx(&sp138, roomnum);
 			mtx00015f88(bgGetScaleBg2Gfx(), &sp138);
+			// this is the correct matrix to use here, because ultimately these are rendered in 2d on the screen. Need to change these to be a 3d presentation eventually though.
+			// TODO: change presentation for vr to not be rendered as 2D
 			mtx4MultMtx4(camGetViewProjectionMtxF(), &sp138, &spf8);
 
 			viewwidth = viGetViewWidth();
