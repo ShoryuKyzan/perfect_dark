@@ -4341,7 +4341,7 @@ void playerAllocateMatrices(struct coord *cam_pos, struct coord *cam_look, struc
 	struct coord sp80;
 	struct coord sp74;
 	f32 scale;
-	// Mtxf *s0;
+	Mtxf *s0;
 	Mtx *s1;
 	s32 i;
 	s32 j;
@@ -4385,31 +4385,31 @@ void playerAllocateMatrices(struct coord *cam_pos, struct coord *cam_look, struc
 			cam_up->x, cam_up->y, cam_up->z);
 
 	// old: implementation for OrthographicMtx(camSetViewProjectionMtxL) and camGetorthomtxf (camSetViewProjectionMtxF)
-	// s0 = gfxAllocateMatrix();
-	// s1 = gfxAllocateMatrix();
-	// mtx4MultMtx4(camGetPerspectiveMtxF(), &sp8c, s0);
+	s0 = gfxAllocateMatrix();
+	s1 = gfxAllocateMatrix();
+	mtx4MultMtx4(camGetPerspectiveMtxF(), &sp8c, s0);
 
-	// for (i = 0; i < 4; i++) {
-	// 	for (j = 0; j < 4; j++) {
-	// 		if (s0->m[i][j] > 32000.0f) {
-	// 			s0->m[i][j] = 32000.0f;
-	// 		} else if (s0->m[i][j] < -32000.0f) {
-	// 			s0->m[i][j] = -32000.0f;
-	// 		}
-	// 	}
-	// }
+	for (i = 0; i < 4; i++) {
+		for (j = 0; j < 4; j++) {
+			if (s0->m[i][j] > 32000.0f) {
+				s0->m[i][j] = 32000.0f;
+			} else if (s0->m[i][j] < -32000.0f) {
+				s0->m[i][j] = -32000.0f;
+			}
+		}
+	}
 
-	// camSetViewProjectionMtxF(s0);
-	// guMtxF2L(s0->m, s1);
-	// camSetViewProjectionMtxL(s1);
+	camSetViewProjectionMtxF(s0);
+	guMtxF2L(s0->m, s1);
+	camSetViewProjectionMtxL(s1);
 	// end: old implementation
 
 	// new implementation.
 	// TODO: remove use of this entirely and just replace with PerspectiveMtx
-	s1 = gfxAllocateMatrix();
-	camSetViewProjectionMtxF(camGetPerspectiveMtxF());
-	guMtxF2L(camGetPerspectiveMtxF()->m, s1);
-	camSetViewProjectionMtxL(s1);
+	// s1 = gfxAllocateMatrix();
+	// camSetViewProjectionMtxF(camGetPerspectiveMtxF());
+	// guMtxF2L(camGetPerspectiveMtxF()->m, s1);
+	// camSetViewProjectionMtxL(s1);
 	// end new implementation
 
 	mtxScaleRows(scale, &sp8c);
