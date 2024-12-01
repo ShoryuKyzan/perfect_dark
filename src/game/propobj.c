@@ -13481,7 +13481,9 @@ void objRenderProp(struct prop *prop, struct modelrenderdata *renderdata, bool x
 		}
 
 		if (orthogonal) {
-			gSPMatrix(gdl++, camGetViewProjectionMtxL(), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_PROJECTION);
+			// prior code: used to use camGetViewProjectionMtxL
+			// this used to cause transform to camera space. so any globaldrawoffset transforms applied will mess things up from here.
+			gSPMatrix(gdl++, camGetPerspectiveMtxL(), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_PROJECTION);
 		}
 
 		renderdata->gdl = gdl;
