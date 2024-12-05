@@ -3667,6 +3667,7 @@ void playerTick(bool arg0)
 						sp178 += mdy * 0.00025f;
 						sp174 -= mdx * 0.00025f;
 					}
+				}
 #endif
 
 				f20 = sqrtf(sp2ac.f[0] * sp2ac.f[0] + sp2ac.f[2] * sp2ac.f[2]);
