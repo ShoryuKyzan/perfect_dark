@@ -3,6 +3,7 @@
 #include "openvr_mingw.hpp"
 #include "system.h"
 #include "include/vr.h"
+#include "types.h"
 
 // VR
 // external
@@ -20,10 +21,22 @@ Matrix4 mat4VREyePosLeft;
 Matrix4 mat4VREyePosRight;
 Matrix4 mat4Camera;
 Vector3 vecHMDPositionLast;
+Vector3 vecHMDRotationLast;
 Vector3 vecHMDPositionDiff;
+Vector3 vecHMDRotationDiff;
 float fNearClip = 0.1f;
 float fFarClip = 9000.0f;
 
+// Add this helper function at the top of the file
+Vector3 getRotationFromMatrix(const Matrix4& mat) {
+    Vector3 rot;
+    // Extract Euler angles from rotation matrix
+    // Assuming Y-up coordinate system
+    rot.y = atan2(mat[2], mat[10]); // Yaw around Y axis
+    rot.x = atan2(-mat[6], sqrt(mat[2]*mat[2] + mat[10]*mat[10])); // Pitch around X
+    rot.z = atan2(mat[4], mat[5]); // Roll around Z
+    return rot;
+}
 
 extern "C" Matrix4 vrSteamVRMtx44ToMat4(const vr::HmdMatrix44_t &mtx)
 {
@@ -192,27 +205,41 @@ extern "C" void vrTick()
         }
     }
 
-    if (vrTrackedDevicePoses[vr::k_unTrackedDeviceIndex_Hmd].bPoseIsValid)
-    {
+    if (vrTrackedDevicePoses[vr::k_unTrackedDeviceIndex_Hmd].bPoseIsValid) {
         mat4HMDPose = mat4DevicePoseList[vr::k_unTrackedDeviceIndex_Hmd];
         mat4HMDPose.invert();
 
-        // track difference between this and last frame for HMD pose translation
-        if(firstTick){
+        Vector3 vecHMDRotNext = getRotationFromMatrix(mat4HMDPose);
+        
+        if(firstTick) {
             vecHMDPositionLast.x = 0;
             vecHMDPositionLast.y = 0;
             vecHMDPositionLast.z = 0;
-            vecHMDPositionLast = vecHMDPositionLast * mat4HMDPose;
+            vecHMDRotationLast = vecHMDRotNext;
             firstTick = false;
-        }else{
+        } else {
             vecHMDPosNext = mat4HMDPose * vecHMDPosNext;
             vecHMDPositionDiff = vecHMDPositionLast - vecHMDPosNext;
+            vecHMDRotationDiff = vecHMDRotationLast - vecHMDRotNext;
+            vecHMDRotationLast = vecHMDRotNext;
         }
     }
 }
 
-extern "C" Vector3 vrGetHMDMovementDiff(){
-    return vecHMDPositionDiff;
+extern "C" void vrGetHMDMovementDiff(float coord[3]){
+    coord[0] = vecHMDPositionDiff.x;
+    coord[1] = vecHMDPositionDiff.y;
+    coord[2] = vecHMDPositionDiff.z;
+}
+
+extern "C" void vrAddHMDTranslation(struct movedata *data, float *vv_theta) {
+    data->analogstrafe += vecHMDPositionDiff.x;
+    data->analogwalk += vecHMDPositionDiff.z;
+    
+    // Convert HMD yaw to degrees and directly set vv_theta
+    float yawDegrees = vecHMDRotationDiff.y * (360.0f / (2.0f * M_PI));
+    *vv_theta += yawDegrees;
+    // The game's movement system will add this rotation on top of our direct vv_theta changes
 }
 
 extern "C" void vrLogSubmitResult(vr::EVRCompositorError error, u8 eye)

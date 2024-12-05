@@ -70,6 +70,7 @@
 #include "lib/lib_317f0.h"
 #include "data.h"
 #include "types.h"
+#include "../../port/vr/include/vr_c.h"
 #ifndef PLATFORM_N64
 #include "video.h"
 #include "input.h"
@@ -3209,6 +3210,25 @@ void playerConfigureVi(void)
 	viSetBufSize(playerGetFbWidth(), playerGetFbHeight());
 }
 
+void playerApplyHMDHeight(struct coord *pos) {
+    struct player *player = g_Vars.currentplayer;
+    
+    if (player->cameramode == CAMERAMODE_DEFAULT 
+        && g_Vars.tickmode == TICKMODE_NORMAL) {
+        // Get HMD height from VR system
+		float coord[3];
+        vrGetHMDMovementDiff(coord);
+        f32 hmd_height = coord[1];
+        
+        // Scale HMD height by character's eye height ratio
+        // Using 159.0f as the reference height (standard Bond height)
+        f32 height_scale = player->vv_eyeheight / 159.0f;
+        
+        // Apply scaled height to camera position
+        pos->y += hmd_height * height_scale;
+    }
+}
+
 void playerTick(bool arg0)
 {
 	f32 aspectratio;
@@ -3647,7 +3667,6 @@ void playerTick(bool arg0)
 						sp178 += mdy * 0.00025f;
 						sp174 -= mdx * 0.00025f;
 					}
-				}
 #endif
 
 				f20 = sqrtf(sp2ac.f[0] * sp2ac.f[0] + sp2ac.f[2] * sp2ac.f[2]);
@@ -3791,6 +3810,10 @@ void playerTick(bool arg0)
 		spf4.y = b + spf4.y;
 		spf4.z = c + spf4.z;
 
+		// Add HMD height adjustment before camera update
+		playerApplyHMDHeight(&spf4);
+
+		// XXX CAMERA UPDATE LIKELY HAPPENING HERE
 		player0f0c1840(&spf4,
 				&g_Vars.currentplayer->bond2.unk28,
 				&g_Vars.currentplayer->bond2.unk1c,

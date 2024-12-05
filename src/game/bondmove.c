@@ -311,6 +311,7 @@ void bmoveApplyMoveData(struct movedata *data)
 	} else if (g_Vars.currentplayer->bondmovemode == MOVEMODE_GRAB) {
 		bgrabApplyMoveData(data);
 	} else if (g_Vars.currentplayer->bondmovemode == MOVEMODE_WALK) {
+		vrAddHMDTranslation(data, &g_Vars.currentplayer->vv_theta);
 		bwalkApplyMoveData(data);
 	}
 }
