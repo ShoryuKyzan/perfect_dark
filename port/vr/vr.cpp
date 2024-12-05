@@ -283,11 +283,11 @@ extern "C" void vrGetCurrentProjectionMtx(float dest[4][4], vr::Hmd_Eye nEye)
     Matrix4 matMVP;
     if (nEye == vr::Eye_Left)
     {
-        matMVP = mat4VRProjectionLeft * mat4VREyePosLeft * mat4HMDPose;
+        matMVP = mat4VRProjectionLeft * mat4VREyePosLeft;
     }
     else if (nEye == vr::Eye_Right)
     {
-        matMVP = mat4VRProjectionRight * mat4VREyePosRight * mat4HMDPose;
+        matMVP = mat4VRProjectionRight * mat4VREyePosRight;
     }
     vrMat4ToFloat44(dest, matMVP);
 }
