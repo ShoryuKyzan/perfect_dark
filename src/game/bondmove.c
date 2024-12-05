@@ -38,6 +38,7 @@
 #include "lib/anim.h"
 #include "data.h"
 #include "types.h"
+#include "../../port/vr/include/vr_c.h"
 #ifndef PLATFORM_N64
 #include <math.h>
 #include "input.h"
