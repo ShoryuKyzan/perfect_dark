@@ -29,6 +29,8 @@ Matrix4 mat4ControllerPoseLeft;
 Matrix4 mat4ControllerPoseRight;
 bool controllerConnectedLeft;
 bool controllerConnectedRight;
+vr::VRActionHandle_t leftControllerActionPose;
+vr::VRActionHandle_t rightControllerActionPose;
 
 // Add this helper function at the top of the file
 Vector3 getRotationFromMatrix(const Matrix4& mat) {
@@ -109,6 +111,12 @@ extern "C" void vrFloat44ToMat4(Matrix4 &destMat4, float srcM[4][4])
     destMat4.set(tmp);
 }
 
+void vrInitInputBindings() {
+    vr::VRInput()->SetActionManifestPath("pdvr_actions.json");
+    vr::VRInput()->GetActionHandle( "/actions/game/in/Hand_Left", &leftControllerActionPose );
+    vr::VRInput()->GetActionHandle( "/actions/game/in/Hand_Right", &rightControllerActionPose );
+}
+
 
 extern "C" bool vrInit()
 {
@@ -168,10 +176,7 @@ extern "C" bool vrInit()
     mat4VREyePosRight = vrSteamVRMtx34ToMat4(m_pHMD->GetEyeToHeadTransform(vr::Eye_Right));
     mat4VREyePosRight.invert();
 
-
-    // init input bindings
-    vr::VRInput()->SetActionManifestPath("pdvr_actions.json");
-
+    vrInitInputBindings();
 
     vrEnabled = true;
 
@@ -189,6 +194,21 @@ extern "C" void vrShutdown()
         vrEnabled = false;
         sysLogPrintf(LOG_NOTE, "vr shutdown");
     }
+}
+
+
+void vrGetControllerPose(vr::VRActionHandle_t *actionPose, bool *controllerConnected, Matrix4 *outputMatrix) {
+		vr::InputPoseActionData_t poseData;
+		if ( vr::VRInput()->GetPoseActionDataForNextFrame( *actionPose, vr::TrackingUniverseStanding, &poseData, sizeof( poseData ), vr::k_ulInvalidInputValueHandle ) != vr::VRInputError_None
+			|| !poseData.bActive || !poseData.pose.bPoseIsValid )
+		{
+			*controllerConnected = false;
+		}
+		else
+		{
+            *controllerConnected = true;
+			*outputMatrix = ConvertSteamVRMatrixToMatrix4( poseData.pose.mDeviceToAbsoluteTracking );
+		}
 }
 
 extern "C" void vrTick()
@@ -228,20 +248,8 @@ extern "C" void vrTick()
         }
     }
 
-    // Track controller poses
-    if (vrTrackedDevicePoses[vr::k_unTrackedDeviceIndex_Controller0].bPoseIsValid) {
-        mat4ControllerPoseLeft = vrSteamVRMtx34ToMat4(vrTrackedDevicePoses[vr::k_unTrackedDeviceIndex_Controller0].mDeviceToAbsoluteTracking);
-        controllerConnectedLeft = true;
-    } else {
-        controllerConnectedLeft = false;
-    }
-
-    if (vrTrackedDevicePoses[vr::k_unTrackedDeviceIndex_Controller1].bPoseIsValid) {
-        mat4ControllerPoseRight = vrSteamVRMtx34ToMat4(vrTrackedDevicePoses[vr::k_unTrackedDeviceIndex_Controller1].mDeviceToAbsoluteTracking);
-        controllerConnectedRight = true;
-    } else {
-        controllerConnectedRight = false;
-    }
+    vrGetControllerPose(&leftControllerActionPose, &controllerConnectedLeft, &mat4ControllerPoseLeft);
+    vrGetControllerPose(&rightControllerActionPose, &controllerConnectedRight, &mat4ControllerPoseRight);
 }
 
 extern "C" void vrGetHMDMovementDiff(float coord[3]){

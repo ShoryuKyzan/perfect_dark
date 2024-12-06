@@ -53,6 +53,7 @@
 #include "lib/lib_317f0.h"
 #include "data.h"
 #include "types.h"
+#include "../../port/vr/include/vr_c.h"
 #ifndef PLATFORM_N64
 #include "game/stagetable.h"
 #include "video.h"
@@ -163,6 +164,8 @@ struct fireslot g_Fireslots[20];
 u32 fill2[1];
 #endif
 
+
+extern bool vrEnabled;
 Lights1 var80070090 = gdSPDefLights1(0x96, 0x96, 0x96, 0xff, 0xff, 0xff, 0xb2, 0x4d, 0x2e);
 
 u32 g_BgunGunMemBaseSizeDefault = 150 * 1024;
@@ -7541,6 +7544,32 @@ static inline f32 bgunGetFovOffsetY(void)
 
 #endif
 
+void bgunApplyVRControllerPos(struct hand *hand, s32 handnum) {
+    if (!vrEnabled || handnum != HAND_RIGHT) {
+        return;
+    }
+
+    float controllerMatrix[4][4];
+    if (vrGetRightControllerMatrix(controllerMatrix)) {
+        // Set the weapon position and orientation directly from controller
+        mtx4Copy((Mtxf *)controllerMatrix, &hand->posrotmtx);
+        hand->useposrot = true;
+        
+        // Disable auto-aim and look-ahead behaviors
+        hand->damppos.f[0] = 0.0f;
+        hand->damppos.f[1] = 0.0f;
+        hand->damppos.f[2] = 0.0f;
+        
+        hand->damplook.x = 0.0f;
+        hand->damplook.y = 0.0f;
+        hand->damplook.z = -1.0f;
+        
+        hand->dampup.x = 0.0f;
+        hand->dampup.y = 1.0f;
+        hand->dampup.z = 0.0f;
+    }
+}
+
 void bgun0f0a5550(s32 handnum)
 {
 	u8 *mtxallocation;
@@ -13302,28 +13331,3 @@ void bgun0f0abd30(s32 handnum)
 	}
 }
 
-void bgunApplyVRControllerPos(struct hand *hand, s32 handnum) {
-    if (!vrEnabled || handnum != HAND_RIGHT) {
-        return;
-    }
-
-    float controllerMatrix[4][4];
-    if (vrGetRightControllerMatrix(controllerMatrix)) {
-        // Set the weapon position and orientation directly from controller
-        mtx4Copy((Mtxf *)controllerMatrix, &hand->posrotmtx);
-        hand->useposrot = true;
-        
-        // Disable auto-aim and look-ahead behaviors
-        hand->damppos.f[0] = 0.0f;
-        hand->damppos.f[1] = 0.0f;
-        hand->damppos.f[2] = 0.0f;
-        
-        hand->damplook.x = 0.0f;
-        hand->damplook.y = 0.0f;
-        hand->damplook.z = -1.0f;
-        
-        hand->dampup.x = 0.0f;
-        hand->dampup.y = 1.0f;
-        hand->dampup.z = 0.0f;
-    }
-}
