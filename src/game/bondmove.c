@@ -305,6 +305,20 @@ void bmoveHandleActivate(void)
 	}
 }
 
+void bmoveVRAddHMDTranslation(struct movedata *data, float *vv_theta) {
+    float movement[3];
+    float rotation[3];
+    vrGetHMDMovementDiff(movement);
+    vrGetHMDRotationDiff(rotation);
+    
+    data->analogstrafe += movement[0];
+    data->analogwalk += movement[2];
+    
+    // Convert HMD yaw to degrees and directly set vv_theta
+    float yawDegrees = rotation[1] * (360.0f / (2.0f * M_PI));
+    *vv_theta += yawDegrees;
+}
+
 void bmoveApplyMoveData(struct movedata *data)
 {
 	if (g_Vars.currentplayer->bondmovemode == MOVEMODE_BIKE) {
@@ -312,7 +326,7 @@ void bmoveApplyMoveData(struct movedata *data)
 	} else if (g_Vars.currentplayer->bondmovemode == MOVEMODE_GRAB) {
 		bgrabApplyMoveData(data);
 	} else if (g_Vars.currentplayer->bondmovemode == MOVEMODE_WALK) {
-		vrAddHMDTranslation(data, &g_Vars.currentplayer->vv_theta);
+		bmoveVRAddHMDTranslation(data, &g_Vars.currentplayer->vv_theta);
 		bwalkApplyMoveData(data);
 	}
 }

@@ -3,7 +3,6 @@
 #include "openvr_mingw.hpp"
 #include "system.h"
 #include "include/vr.h"
-#include "types.h"
 
 // VR
 // external
@@ -232,14 +231,10 @@ extern "C" void vrGetHMDMovementDiff(float coord[3]){
     coord[2] = vecHMDPositionDiff.z;
 }
 
-extern "C" void vrAddHMDTranslation(struct movedata *data, float *vv_theta) {
-    data->analogstrafe += vecHMDPositionDiff.x;
-    data->analogwalk += vecHMDPositionDiff.z;
-    
-    // Convert HMD yaw to degrees and directly set vv_theta
-    float yawDegrees = vecHMDRotationDiff.y * (360.0f / (2.0f * M_PI));
-    *vv_theta += yawDegrees;
-    // The game's movement system will add this rotation on top of our direct vv_theta changes
+extern "C" void vrGetHMDRotationDiff(float coord[3]){
+    coord[0] = vecHMDRotationDiff.x;
+    coord[1] = vecHMDRotationDiff.y;
+    coord[2] = vecHMDRotationDiff.z;
 }
 
 extern "C" void vrLogSubmitResult(vr::EVRCompositorError error, u8 eye)
