@@ -207,7 +207,7 @@ void vrGetControllerPose(vr::VRActionHandle_t *actionPose, bool *controllerConne
 		else
 		{
             *controllerConnected = true;
-			*outputMatrix = ConvertSteamVRMatrixToMatrix4( poseData.pose.mDeviceToAbsoluteTracking );
+			*outputMatrix = vrSteamVRMtx34ToMat4( poseData.pose.mDeviceToAbsoluteTracking );
 		}
 }
 
