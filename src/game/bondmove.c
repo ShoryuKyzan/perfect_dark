@@ -44,6 +44,8 @@
 #include "input.h"
 #include "video.h"
 
+extern bool vrEnabled;
+
 static void bgunProcessQuickDetonate(struct movedata *data, u32 c1buttons, u32 c1buttonsthisframe, u32 buttons1, u32 buttons2) {
 	if ((((c1buttons & (buttons1)) && (c1buttonsthisframe & (buttons2)))
 			|| ((c1buttons & (buttons2)) && (c1buttonsthisframe & (buttons1))))
@@ -941,11 +943,18 @@ void bmoveProcessInput(bool allowc1x, bool allowc1y, bool allowc1buttons, bool i
 
 					if (bgunGetWeaponNum(HAND_RIGHT) == WEAPON_HORIZONSCANNER) {
 						g_Vars.currentplayer->insightaimmode = true;
+					} else if (vrEnabled) {
+						// In VR, always use manual aim and disable auto-aim/swivel
+						g_Vars.currentplayer->insightaimmode = true; // XXX might not be correct if its using crosshair aim...
+						movedata.canswivelgun = false;
+						movedata.canmanualaim = true;
+						movedata.canautoaim = false;
+					} else {
+						movedata.canswivelgun = !g_Vars.currentplayer->insightaimmode;
+						movedata.canmanualaim = g_Vars.currentplayer->insightaimmode;
+						movedata.canautoaim = !g_Vars.currentplayer->insightaimmode;
 					}
 
-					movedata.canswivelgun = !g_Vars.currentplayer->insightaimmode;
-					movedata.canmanualaim = g_Vars.currentplayer->insightaimmode;
-					movedata.canautoaim = !g_Vars.currentplayer->insightaimmode;
 					movedata.digitalstepforward = false;
 					movedata.digitalstepback = false;
 					movedata.digitalstepleft = false;
@@ -1272,11 +1281,17 @@ void bmoveProcessInput(bool allowc1x, bool allowc1y, bool allowc1buttons, bool i
 
 					if (bgunGetWeaponNum(HAND_RIGHT) == WEAPON_HORIZONSCANNER) {
 						g_Vars.currentplayer->insightaimmode = true;
+					} else if (vrEnabled) {
+						// In VR, always use manual aim and disable auto-aim/swivel
+						g_Vars.currentplayer->insightaimmode = true; // XXX might not be correct if its using crosshair aim...
+						movedata.canswivelgun = false;
+						movedata.canmanualaim = true;
+						movedata.canautoaim = false;
+					} else {
+						movedata.canswivelgun = !g_Vars.currentplayer->insightaimmode;
+						movedata.canmanualaim = g_Vars.currentplayer->insightaimmode;
+						movedata.canautoaim = !g_Vars.currentplayer->insightaimmode;
 					}
-
-					movedata.canswivelgun = !g_Vars.currentplayer->insightaimmode;
-					movedata.canmanualaim = g_Vars.currentplayer->insightaimmode;
-					movedata.canautoaim = !g_Vars.currentplayer->insightaimmode;
 
 					// On N64 control schemes the d-pad does the same thing as the C buttons
 					u32 slmask, srmask, sumask, sdmask;
@@ -1406,6 +1421,11 @@ void bmoveProcessInput(bool allowc1x, bool allowc1y, bool allowc1buttons, bool i
 						if (movedata.speedvertaup > 1) {
 							movedata.speedvertaup = 1;
 						}
+					} else if (vrEnabled) {
+						// Reset vertical aim speeds in VR when not actively aiming up/down
+						// XXX still not entirely sure why this is needed
+						movedata.speedvertadown = 0;
+						movedata.speedvertaup = 0;
 					}
 
 					// Handle looking left/right while aiming
@@ -1421,6 +1441,9 @@ void bmoveProcessInput(bool allowc1x, bool allowc1y, bool allowc1buttons, bool i
 						if (movedata.aimturnrightspeed > 1) {
 							movedata.aimturnrightspeed = 1;
 						}
+					} else {
+						movedata.aimturnleftspeed = 0;
+						movedata.aimturnrightspeed = 0;
 					}
 
 #ifndef PLATFORM_N64

@@ -7615,6 +7615,8 @@ void bgun0f0a5550(s32 handnum)
 		}
 	}
 
+	bgunApplyVRControllerPos(hand, handnum);
+
 	if (handnum == HAND_RIGHT) {
 		sp274.x = func0f0b131c(handnum) + hand->damppos.f[0] + hand->adjustpos.f[0];
 		sp274.y = weapondef->posy + hand->damppos.f[1] + hand->adjustpos.f[1];
@@ -13298,4 +13300,30 @@ void bgun0f0abd30(s32 handnum)
 
 		gunctrl->lastmag = false;
 	}
+}
+
+void bgunApplyVRControllerPos(struct hand *hand, s32 handnum) {
+    if (!vrEnabled || handnum != HAND_RIGHT) {
+        return;
+    }
+
+    float controllerMatrix[4][4];
+    if (vrGetRightControllerMatrix(controllerMatrix)) {
+        // Set the weapon position and orientation directly from controller
+        mtx4Copy((Mtxf *)controllerMatrix, &hand->posrotmtx);
+        hand->useposrot = true;
+        
+        // Disable auto-aim and look-ahead behaviors
+        hand->damppos.f[0] = 0.0f;
+        hand->damppos.f[1] = 0.0f;
+        hand->damppos.f[2] = 0.0f;
+        
+        hand->damplook.x = 0.0f;
+        hand->damplook.y = 0.0f;
+        hand->damplook.z = -1.0f;
+        
+        hand->dampup.x = 0.0f;
+        hand->dampup.y = 1.0f;
+        hand->dampup.z = 0.0f;
+    }
 }
