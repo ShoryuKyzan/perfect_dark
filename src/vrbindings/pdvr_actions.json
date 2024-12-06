@@ -35,6 +35,14 @@
       "type": "boolean"
     },
     {
+      "name": "/actions/game/in/turnleft",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/game/in/turnright",
+      "type": "boolean"
+    },
+    {
       "name": "/actions/game/in/movement",
       "type": "vector2"
     },
