@@ -25,6 +25,10 @@ Vector3 vecHMDPositionDiff;
 Vector3 vecHMDRotationDiff;
 float fNearClip = 0.1f;
 float fFarClip = 9000.0f;
+Matrix4 mat4ControllerPoseLeft;
+Matrix4 mat4ControllerPoseRight;
+bool controllerConnectedLeft;
+bool controllerConnectedRight;
 
 // Add this helper function at the top of the file
 Vector3 getRotationFromMatrix(const Matrix4& mat) {
@@ -223,6 +227,21 @@ extern "C" void vrTick()
             vecHMDRotationLast = vecHMDRotNext;
         }
     }
+
+    // Track controller poses
+    if (vrTrackedDevicePoses[vr::k_unTrackedDeviceIndex_Controller0].bPoseIsValid) {
+        mat4ControllerPoseLeft = vrSteamVRMtx34ToMat4(vrTrackedDevicePoses[vr::k_unTrackedDeviceIndex_Controller0].mDeviceToAbsoluteTracking);
+        controllerConnectedLeft = true;
+    } else {
+        controllerConnectedLeft = false;
+    }
+
+    if (vrTrackedDevicePoses[vr::k_unTrackedDeviceIndex_Controller1].bPoseIsValid) {
+        mat4ControllerPoseRight = vrSteamVRMtx34ToMat4(vrTrackedDevicePoses[vr::k_unTrackedDeviceIndex_Controller1].mDeviceToAbsoluteTracking);
+        controllerConnectedRight = true;
+    } else {
+        controllerConnectedRight = false;
+    }
 }
 
 extern "C" void vrGetHMDMovementDiff(float coord[3]){
@@ -290,4 +309,20 @@ extern "C" void vrGetCurrentProjectionMtx(float dest[4][4], vr::Hmd_Eye nEye)
 extern "C" void vrSetCameraMtx(float matrix[4][4])
 {
     vrFloat44ToMat4(mat4Camera, matrix);
+}
+
+extern "C" bool vrGetLeftControllerMatrix(float matrix[4][4]) {
+    if (!controllerConnectedLeft) {
+        return false;
+    }
+    vrMat4ToFloat44(matrix, mat4ControllerPoseLeft);
+    return true;
+}
+
+extern "C" bool vrGetRightControllerMatrix(float matrix[4][4]) {
+    if (!controllerConnectedRight) {
+        return false;
+    }
+    vrMat4ToFloat44(matrix, mat4ControllerPoseRight);
+    return true;
 }
