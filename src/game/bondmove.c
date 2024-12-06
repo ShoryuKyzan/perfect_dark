@@ -307,7 +307,7 @@ void bmoveHandleActivate(void)
 	}
 }
 
-void bmoveVRAddHMDTranslation(struct movedata *data, float *vv_theta) {
+void bmoveVRAddHMDTranslation(struct movedata *data, float *vv_theta, float *vv_verta) {
     float movement[3];
     float rotation[3];
     vrGetHMDMovementDiff(movement);
@@ -319,6 +319,11 @@ void bmoveVRAddHMDTranslation(struct movedata *data, float *vv_theta) {
     // Convert HMD yaw to degrees and directly set vv_theta
     float yawDegrees = rotation[1] * (360.0f / (2.0f * M_PI));
     *vv_theta += yawDegrees;
+    // Convert HMD pitch to degrees and return it
+    // Note: Pitch is rotation[0], and we need to negate it because the game uses 
+    // opposite convention for pitch direction
+    float pitchDegrees = -rotation[0] * (360.0f / (2.0f * M_PI));
+    *vv_verta += pitchDegrees;
 }
 
 void bmoveApplyMoveData(struct movedata *data)
@@ -328,7 +333,7 @@ void bmoveApplyMoveData(struct movedata *data)
 	} else if (g_Vars.currentplayer->bondmovemode == MOVEMODE_GRAB) {
 		bgrabApplyMoveData(data);
 	} else if (g_Vars.currentplayer->bondmovemode == MOVEMODE_WALK) {
-		bmoveVRAddHMDTranslation(data, &g_Vars.currentplayer->vv_theta);
+		bmoveVRAddHMDTranslation(data, &g_Vars.currentplayer->vv_theta, &g_Vars.currentplayer->vv_verta);
 		bwalkApplyMoveData(data);
 	}
 }
