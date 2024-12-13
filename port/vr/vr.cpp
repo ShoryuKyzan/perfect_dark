@@ -31,6 +31,8 @@ bool controllerConnectedLeft;
 bool controllerConnectedRight;
 vr::VRActionHandle_t leftControllerActionPose;
 vr::VRActionHandle_t rightControllerActionPose;
+bool firstTick = false;
+
 
 // Add this helper function at the top of the file
 Vector3 getRotationFromMatrix(const Matrix4& mat) {
@@ -213,8 +215,7 @@ void vrGetControllerPose(vr::VRActionHandle_t *actionPose, bool *controllerConne
 
 extern "C" void vrTick()
 {
-    static bool firstTick = false;
-    Vector3 vecHMDPosNext;
+    Vector3 vecHMDPosNext(0, 0, 0);
     if (!m_pHMD)
         return;
 
@@ -233,6 +234,7 @@ extern "C" void vrTick()
         mat4HMDPose.invert();
 
         Vector3 vecHMDRotNext = getRotationFromMatrix(mat4HMDPose);
+        Vector3 vecHMDPosNext = Vector3(mat4HMDPose[12], mat4HMDPose[13], mat4HMDPose[14]);
         
         if(firstTick) {
             vecHMDPositionLast.x = 0;
@@ -241,7 +243,6 @@ extern "C" void vrTick()
             vecHMDRotationLast = vecHMDRotNext;
             firstTick = false;
         } else {
-            vecHMDPosNext = mat4HMDPose * vecHMDPosNext;
             vecHMDPositionDiff = vecHMDPositionLast - vecHMDPosNext;
             vecHMDRotationDiff = vecHMDRotationLast - vecHMDRotNext;
             vecHMDRotationLast = vecHMDRotNext;
