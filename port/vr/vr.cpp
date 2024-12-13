@@ -290,7 +290,7 @@ extern "C" void vrLogSubmitResult(vr::EVRCompositorError error, u8 eye)
     }
     else
     {
-        sysLogPrintf(LOG_NOTE, "%s Eye: successfully submitted texture", eyeName);
+        // XXX sysLogPrintf(LOG_NOTE, "%s Eye: successfully submitted texture", eyeName);
     }
 }
 
@@ -333,4 +333,16 @@ extern "C" bool vrGetRightControllerMatrix(float matrix[4][4]) {
     }
     vrMat4ToFloat44(matrix, mat4ControllerPoseRight);
     return true;
+}
+
+extern "C" void vrGetHMDPosition(float coord[3]) {
+    coord[0] = vecHMDPositionLast.x;
+    coord[1] = vecHMDPositionLast.y;
+    coord[2] = vecHMDPositionLast.z;
+}
+
+extern "C" void vrGetHMDRotation(float coord[3]) {
+    coord[0] = vecHMDRotationLast.x;
+    coord[1] = vecHMDRotationLast.y;
+    coord[2] = vecHMDRotationLast.z;
 }

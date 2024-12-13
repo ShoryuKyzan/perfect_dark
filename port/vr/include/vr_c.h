@@ -3,3 +3,5 @@ void vrGetHMDMovementDiff(float coord[3]);
 void vrGetHMDRotationDiff(float coord[3]);
 bool vrGetLeftControllerMatrix(float matrix[4][4]);
 bool vrGetRightControllerMatrix(float matrix[4][4]);
+void vrGetHMDPosition(float coord[3]);
+void vrGetHMDRotation(float coord[3]);

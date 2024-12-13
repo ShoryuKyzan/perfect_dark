@@ -70,6 +70,7 @@
 #include "lib/lib_317f0.h"
 #include "data.h"
 #include "types.h"
+#include "system.h" // XXX
 #include "../../port/vr/include/vr_c.h"
 #ifndef PLATFORM_N64
 #include "video.h"
@@ -4388,25 +4389,40 @@ void playerAllocateMatrices(struct coord *cam_pos, struct coord *cam_look, struc
 	sp80.f[1] = sp74.f[1] + cam_look->f[1];
 	sp80.f[2] = sp74.f[2] + cam_look->f[2];
 
+	// Only apply VR roll in normal gameplay modes
+	// TODO add it reasonably to other other modes too
+	struct coord new_up = {cam_up->x, cam_up->y, cam_up->z};
+	// sysLogPrintf(LOG_NOTE, "cameramode: %d", g_Vars.currentplayer->cameramode); // XXX
+	if (g_Vars.currentplayer->cameramode == CAMERAMODE_DEFAULT) {
+		// Apply roll from VR orientation to cam_up
+		float vr_rotation[3];
+		vrGetHMDRotation(vr_rotation);
+		float roll = vr_rotation[2];
+
+		Mtxf mtxroll;
+		guRotateF(mtxroll.m, roll, cam_look->x, cam_look->y, cam_look->z);
+		mtx4TransformVecInPlace(&mtxroll, &new_up);
+	}
 	mtxComputeLookAt(&sp8c,
-			sp74.x, sp74.y, sp74.z,
-			cam_look->x, cam_look->y, cam_look->z,
-			cam_up->x, cam_up->y, cam_up->z);
+		sp74.x, sp74.y, sp74.z,
+		cam_look->x, cam_look->y, cam_look->z,
+		new_up.x, new_up.y, new_up.z);
 
 	guLookAtReflect(&spd0, lookat,
-			sp74.x, sp74.y, sp74.z,
-			sp80.x, sp80.y, sp80.z,
-			cam_up->x, cam_up->y, cam_up->z);
+		sp74.x, sp74.y, sp74.z,
+		sp80.x, sp80.y, sp80.z,
+		new_up.x, new_up.y, new_up.z);
+
 
 	mtxComputeLookAt(g_Vars.currentplayer->mtxLookAt,
 			cam_pos->x, cam_pos->y, cam_pos->z,
 			cam_look->x, cam_look->y, cam_look->z,
-			cam_up->x, cam_up->y, cam_up->z);
+			new_up.x, new_up.y, new_up.z);
 
 	mtxComputeCameraToWorld(g_Vars.currentplayer->mtxCamToWorld,
 			cam_pos->x, cam_pos->y, cam_pos->z,
 			cam_look->x, cam_look->y, cam_look->z,
-			cam_up->x, cam_up->y, cam_up->z);
+			new_up.x, new_up.y, new_up.z);
 
 	// old: implementation for OrthographicMtx(camSetViewProjectionMtxL) and camGetorthomtxf (camSetViewProjectionMtxF)
 	s0 = gfxAllocateMatrix();
