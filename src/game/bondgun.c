@@ -7408,7 +7408,7 @@ void bgun0f0a4e44(struct hand *hand, struct weapon *weapondef, struct modeldef *
 
 			mtx = (Mtxf *)allocation;
 
-			mtxLoadAxisRotation(arg10->m, 0, mtx->m[3][0] - hand->aimpos.x, mtx->m[3][1] - hand->aimpos.y, mtx->m[3][2] - hand->aimpos.z);
+			mtx00016e98(arg10->m, 0, mtx->m[3][0] - hand->aimpos.x, mtx->m[3][1] - hand->aimpos.y, mtx->m[3][2] - hand->aimpos.z);
 			mtx4MultMtx4InPlace(arg10, &sp70);
 			mtx00016710(muzzlez, sp70.m);
 			mtx4MultMtx4InPlace(arg9, &sp70);

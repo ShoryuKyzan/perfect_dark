@@ -458,7 +458,7 @@ u32 mtx00016dcc(f32 arg0, f32 arg1)
 	return result;
 }
 
-void mtxLoadAxisRotation(f32 mtx[4][4], f32 angle, f32 x, f32 y, f32 z)
+void mtx00016e98(f32 mtx[4][4], f32 angle, f32 x, f32 y, f32 z)
 {
 	f32 sine;
 	f32 cosine;
