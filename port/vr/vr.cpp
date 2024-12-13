@@ -246,6 +246,7 @@ extern "C" void vrTick()
             vecHMDPositionDiff = vecHMDPositionLast - vecHMDPosNext;
             vecHMDRotationDiff = vecHMDRotationLast - vecHMDRotNext;
             vecHMDRotationLast = vecHMDRotNext;
+            vecHMDPositionLast = vecHMDPosNext;
         }
     }
 
