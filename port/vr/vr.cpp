@@ -248,6 +248,7 @@ extern "C" void vrTick()
             vecHMDRotationLast = vecHMDRotNext;
             vecHMDPositionLast = vecHMDPosNext;
         }
+        // sysLogPrintf(LOG_NOTE, "vecHMDRotationLast: %f %f %f", vecHMDRotationLast.x, vecHMDRotationLast.y, vecHMDRotationLast.z); // XXX
     }
 
     vrGetControllerPose(&leftControllerActionPose, &controllerConnectedLeft, &mat4ControllerPoseLeft);

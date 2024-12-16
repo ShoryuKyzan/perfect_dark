@@ -3093,7 +3093,7 @@ extern "C" void gfx_run(Gfx *commands)
     // -1 means 2d, 0 for left, 1 for right
     for (vrRenderEye = -1; vrRenderEye < num_passes - 1; vrRenderEye++)
     {
-        sysLogPrintf(LOG_NOTE, "frame pass %d", vrRenderEye); // XXX
+        // sysLogPrintf(LOG_NOTE, "frame pass %d", vrRenderEye); // XXX
         if (vrRenderEye == -1)
         {
             gfx_rapi->update_framebuffer_parameters(0, gfx_current_window_dimensions.width,
