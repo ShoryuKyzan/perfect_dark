@@ -38,6 +38,7 @@
 #include "lib/anim.h"
 #include "data.h"
 #include "types.h"
+#include "system.h" // XXX
 #include "../../port/vr/include/vr_c.h"
 #ifndef PLATFORM_N64
 #include <math.h>
@@ -307,21 +308,12 @@ void bmoveHandleActivate(void)
 	}
 }
 
-void bmoveVRAddHMDTranslation(struct movedata *data, float *vv_theta, float *vv_verta) {
-    float movement[3];
+void bmoveVRAddHMDRotation(float *vv_theta, float *vv_verta) {
     float rotation[3];
-    vrGetHMDMovementDiff(movement);
     vrGetHMDRotationDiff(rotation);
-    
-    data->analogstrafe += movement[0];
-    data->analogwalk += movement[2];
-    
-    // Convert HMD yaw to degrees and directly set vv_theta
+
     float yawDegrees = rotation[1] * (360.0f / (2.0f * M_PI));
     *vv_theta += yawDegrees;
-    // Convert HMD pitch to degrees and return it
-    // Note: Pitch is rotation[0], and we need to negate it because the game uses 
-    // opposite convention for pitch direction
     float pitchDegrees = -rotation[0] * (360.0f / (2.0f * M_PI));
     *vv_verta += pitchDegrees;
 }
@@ -333,7 +325,7 @@ void bmoveApplyMoveData(struct movedata *data)
 	} else if (g_Vars.currentplayer->bondmovemode == MOVEMODE_GRAB) {
 		bgrabApplyMoveData(data);
 	} else if (g_Vars.currentplayer->bondmovemode == MOVEMODE_WALK) {
-		bmoveVRAddHMDTranslation(data, &g_Vars.currentplayer->vv_theta, &g_Vars.currentplayer->vv_verta);
+		bmoveVRAddHMDRotation(&g_Vars.currentplayer->vv_theta, &g_Vars.currentplayer->vv_verta);
 		bwalkApplyMoveData(data);
 	}
 }
@@ -950,10 +942,10 @@ void bmoveProcessInput(bool allowc1x, bool allowc1y, bool allowc1buttons, bool i
 						g_Vars.currentplayer->insightaimmode = true;
 					} else if (vrEnabled) {
 						// In VR, always use manual aim and disable auto-aim/swivel
-						g_Vars.currentplayer->insightaimmode = true; // XXX might not be correct if its using crosshair aim...
-						movedata.canswivelgun = false;
-						movedata.canmanualaim = true;
-						movedata.canautoaim = false;
+						// g_Vars.currentplayer->insightaimmode = true; // XXX might not be correct if its using crosshair aim...
+						// movedata.canmanualaim = false;
+						// movedata.canswivelgun = false;
+						// movedata.canautoaim = false;
 					} else {
 						movedata.canswivelgun = !g_Vars.currentplayer->insightaimmode;
 						movedata.canmanualaim = g_Vars.currentplayer->insightaimmode;
@@ -1288,10 +1280,10 @@ void bmoveProcessInput(bool allowc1x, bool allowc1y, bool allowc1buttons, bool i
 						g_Vars.currentplayer->insightaimmode = true;
 					} else if (vrEnabled) {
 						// In VR, always use manual aim and disable auto-aim/swivel
-						g_Vars.currentplayer->insightaimmode = true; // XXX might not be correct if its using crosshair aim...
-						movedata.canswivelgun = false;
-						movedata.canmanualaim = true;
-						movedata.canautoaim = false;
+						// g_Vars.currentplayer->insightaimmode = true; // XXX might not be correct if its using crosshair aim...
+						// movedata.canswivelgun = false;
+						// movedata.canmanualaim = true;
+						// movedata.canautoaim = false;
 					} else {
 						movedata.canswivelgun = !g_Vars.currentplayer->insightaimmode;
 						movedata.canmanualaim = g_Vars.currentplayer->insightaimmode;
@@ -1429,8 +1421,8 @@ void bmoveProcessInput(bool allowc1x, bool allowc1y, bool allowc1buttons, bool i
 					} else if (vrEnabled) {
 						// Reset vertical aim speeds in VR when not actively aiming up/down
 						// XXX still not entirely sure why this is needed
-						movedata.speedvertadown = 0;
-						movedata.speedvertaup = 0;
+						// movedata.speedvertadown = 0;
+						// movedata.speedvertaup = 0;
 					}
 
 					// Handle looking left/right while aiming

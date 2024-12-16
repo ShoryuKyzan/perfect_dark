@@ -26,9 +26,12 @@
 #include "lib/collision.h"
 #include "data.h"
 #include "types.h"
+#include "../../port/vr/include/vr_c.h"
 #ifndef PLATFORM_N64
 extern f32 fabsf(f32);
 #endif
+
+extern bool vrEnabled;
 
 void bwalkInit(void)
 {
@@ -237,6 +240,15 @@ s32 bwalkTryMoveUpwards(f32 amount)
 	return result;
 }
 
+void bmoveApplyHMDDiff(struct coord *vel) {
+    float movement[3];
+    vrGetHMDMovementDiff(movement);
+    vel->x += movement[0];
+    vel->z += movement[2];
+    
+}
+
+
 bool bwalkCalculateNewPosition(struct coord *vel, f32 rotateamount, bool apply, f32 extrawidth, s32 checktypes)
 {
 	s32 result = CDRESULT_NOCOLLISION;
@@ -262,6 +274,11 @@ bool bwalkCalculateNewPosition(struct coord *vel, f32 rotateamount, bool apply, 
 	dstpos.x = g_Vars.currentplayer->prop->pos.x;
 	dstpos.y = g_Vars.currentplayer->prop->pos.y;
 	dstpos.z = g_Vars.currentplayer->prop->pos.z;
+
+	// add hmd movement to vel
+	if(vrEnabled){
+		bmoveApplyHMDDiff(vel);
+	}
 
 	if (vel->x || vel->y || vel->z) {
 		if (g_Vars.currentplayer->tank) {
