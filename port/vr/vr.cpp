@@ -357,3 +357,11 @@ extern "C" void vrGetHMDTotalPositionChange(float coord[3]) {
     coord[1] = vecHMDPositionLast.y - vecHMDPositionInitial.y;
     coord[2] = vecHMDPositionLast.z - vecHMDPositionInitial.z;
 }
+
+/**
+ * @brief scale factor that translates headset positional movements to world movements
+ * 
+ */
+extern "C" float vrGetWorldScaleFactor(){
+    return 30.0f; // TODO make this a setting or driven from steam game settings
+}

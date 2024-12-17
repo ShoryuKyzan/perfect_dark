@@ -243,8 +243,9 @@ s32 bwalkTryMoveUpwards(f32 amount)
 void bmoveApplyHMDDiff(struct coord *vel) {
     float movement[3];
     vrGetHMDMovementDiff(movement);
-    vel->x += movement[0];
-    vel->z += movement[2];
+	float scaleFactor = vrGetWorldScaleFactor();
+    vel->x += (scaleFactor * movement[0] * -1.0f);
+    vel->z += (scaleFactor * movement[2] * -1.0f);
     
 }
 

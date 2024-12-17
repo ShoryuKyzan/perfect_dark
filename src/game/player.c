@@ -77,6 +77,7 @@
 #include "input.h"
 #endif
 
+extern bool vrEnabled;
 s32 g_DefaultWeapons[2];
 f32 g_MpSwirlRotateSpeed;
 f32 g_MpSwirlAngleDegrees;
@@ -3211,25 +3212,6 @@ void playerConfigureVi(void)
 	viSetBufSize(playerGetFbWidth(), playerGetFbHeight());
 }
 
-void playerApplyHMDHeight(struct coord *pos) {
-    struct player *player = g_Vars.currentplayer;
-    
-    if (player->cameramode == CAMERAMODE_DEFAULT 
-        && g_Vars.tickmode == TICKMODE_NORMAL) {
-        // Get HMD height from VR system
-		float coord[3];
-        vrGetHMDMovementDiff(coord);
-        f32 hmd_height = coord[1];
-        
-        // Scale HMD height by character's eye height ratio
-        // Using 159.0f as the reference height (standard Bond height)
-        f32 height_scale = player->vv_eyeheight / 159.0f;
-        
-        // Apply scaled height to camera position
-        pos->y += hmd_height * height_scale;
-    }
-}
-
 void playerTick(bool arg0)
 {
 	f32 aspectratio;
@@ -3812,9 +3794,6 @@ void playerTick(bool arg0)
 		spf4.y = b + spf4.y;
 		spf4.z = c + spf4.z;
 
-		// Add HMD height adjustment before camera update
-		playerApplyHMDHeight(&spf4);
-
 		// XXX CAMERA UPDATE LIKELY HAPPENING HERE
 		player0f0c1840(&spf4,
 				&g_Vars.currentplayer->bond2.unk28,
@@ -4380,13 +4359,24 @@ void playerAllocateMatrices(struct coord *cam_pos, struct coord *cam_look, struc
 	g_Vars.currentplayer->mtxCamToWorld = gfxAllocateMatrix();
 
 	lookat = gfxAllocateLookAt(2);
-	float vr_pos_offset[3];
-	vrGetHMDTotalPositionChange(vr_pos_offset);
 	struct coord cur_cam_pos = {
 		cam_pos->x,
-		cam_pos->y + vr_pos_offset[1], 
+		cam_pos->y, 
 		cam_pos->z
 	};
+	// VR position offset
+	float vr_pos_offset[3] = {0, 0, 0};
+	if(vrEnabled) {
+		vrGetHMDTotalPositionChange(vr_pos_offset);
+		vr_pos_offset[1] *= vrGetWorldScaleFactor() * -1;
+
+		// Scale HMD height by character's eye height ratio
+        // Using 159.0f as the reference height (standard Bond height)
+        f32 height_scale = g_Vars.currentplayer->vv_eyeheight / 159.0f;
+
+		vr_pos_offset[1] *= height_scale;
+		cur_cam_pos.y += vr_pos_offset[1];
+	}
 
 	sp74.x = (cur_cam_pos.x - g_Vars.currentplayer->globaldrawworldoffset.x) * scale;
 	sp74.y = (cur_cam_pos.y - g_Vars.currentplayer->globaldrawworldoffset.y) * scale;
