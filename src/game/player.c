@@ -4380,10 +4380,17 @@ void playerAllocateMatrices(struct coord *cam_pos, struct coord *cam_look, struc
 	g_Vars.currentplayer->mtxCamToWorld = gfxAllocateMatrix();
 
 	lookat = gfxAllocateLookAt(2);
+	float vr_pos_offset[3];
+	vrGetHMDTotalPositionChange(vr_pos_offset);
+	struct coord cur_cam_pos = {
+		cam_pos->x,
+		cam_pos->y + vr_pos_offset[1], 
+		cam_pos->z
+	};
 
-	sp74.x = (cam_pos->x - g_Vars.currentplayer->globaldrawworldoffset.x) * scale;
-	sp74.y = (cam_pos->y - g_Vars.currentplayer->globaldrawworldoffset.y) * scale;
-	sp74.z = (cam_pos->z - g_Vars.currentplayer->globaldrawworldoffset.z) * scale;
+	sp74.x = (cur_cam_pos.x - g_Vars.currentplayer->globaldrawworldoffset.x) * scale;
+	sp74.y = (cur_cam_pos.y - g_Vars.currentplayer->globaldrawworldoffset.y) * scale;
+	sp74.z = (cur_cam_pos.z - g_Vars.currentplayer->globaldrawworldoffset.z) * scale;
 
 	sp80.f[0] = sp74.f[0] + cam_look->f[0];
 	sp80.f[1] = sp74.f[1] + cam_look->f[1];
@@ -4415,12 +4422,12 @@ void playerAllocateMatrices(struct coord *cam_pos, struct coord *cam_look, struc
 
 
 	mtxComputeLookAt(g_Vars.currentplayer->mtxLookAt,
-			cam_pos->x, cam_pos->y, cam_pos->z,
+			cur_cam_pos.x, cur_cam_pos.y, cur_cam_pos.z,
 			cam_look->x, cam_look->y, cam_look->z,
 			new_up.x, new_up.y, new_up.z);
 
 	mtxComputeCameraToWorld(g_Vars.currentplayer->mtxCamToWorld,
-			cam_pos->x, cam_pos->y, cam_pos->z,
+			cur_cam_pos.x, cur_cam_pos.y, cur_cam_pos.z,
 			cam_look->x, cam_look->y, cam_look->z,
 			new_up.x, new_up.y, new_up.z);
 

@@ -32,6 +32,7 @@ bool controllerConnectedRight;
 vr::VRActionHandle_t leftControllerActionPose;
 vr::VRActionHandle_t rightControllerActionPose;
 bool firstTick = false;
+Vector3 vecHMDPositionInitial;
 
 
 // Add this helper function at the top of the file
@@ -240,6 +241,7 @@ extern "C" void vrTick()
             vecHMDPositionLast.x = 0;
             vecHMDPositionLast.y = 0;
             vecHMDPositionLast.z = 0;
+            vecHMDPositionInitial = vecHMDPosNext;
             vecHMDRotationLast = vecHMDRotNext;
             firstTick = false;
         } else {
@@ -348,4 +350,10 @@ extern "C" void vrGetHMDRotation(float coord[3]) {
     coord[0] = vecHMDRotationLast.x;
     coord[1] = vecHMDRotationLast.y;
     coord[2] = vecHMDRotationLast.z;
+}
+
+extern "C" void vrGetHMDTotalPositionChange(float coord[3]) {
+    coord[0] = vecHMDPositionLast.x - vecHMDPositionInitial.x;
+    coord[1] = vecHMDPositionLast.y - vecHMDPositionInitial.y;
+    coord[2] = vecHMDPositionLast.z - vecHMDPositionInitial.z;
 }
