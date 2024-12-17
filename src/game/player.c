@@ -4397,7 +4397,7 @@ void playerAllocateMatrices(struct coord *cam_pos, struct coord *cam_look, struc
 		float roll = vr_rotation[2];
 
 		Mtxf mtxroll;
-		guRotateF(mtxroll.m, roll, cam_look->x, cam_look->y, cam_look->z);
+		guRotateF(mtxroll.m, roll/M_PI * 180.0f, cam_look->x, cam_look->y, cam_look->z);
 		mtx4TransformVecInPlace(&mtxroll, &new_up);
 	}
 	mtxComputeLookAt(&sp8c,
