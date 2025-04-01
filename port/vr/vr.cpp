@@ -232,7 +232,7 @@ extern "C" void vrTick()
 
     if (vrTrackedDevicePoses[vr::k_unTrackedDeviceIndex_Hmd].bPoseIsValid) {
         mat4HMDPose = mat4DevicePoseList[vr::k_unTrackedDeviceIndex_Hmd];
-        mat4HMDPose.invert();
+        // do not invert it, as that is appropriate for the world position being translated central to the HMD (world orbits HMD)
 
         Vector3 vecHMDRotNext = getRotationFromMatrix(mat4HMDPose);
         Vector3 vecHMDPosNext = Vector3(mat4HMDPose[12], mat4HMDPose[13], mat4HMDPose[14]);
