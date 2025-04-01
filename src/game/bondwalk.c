@@ -244,8 +244,8 @@ void bmoveApplyHMDDiff(struct coord *vel) {
     float movement[3];
     vrGetHMDMovementDiff(movement);
 	float scaleFactor = vrGetWorldScaleFactor();
-    vel->x += (scaleFactor * movement[0] * -1.0f);
-    vel->z += (scaleFactor * movement[2] * -1.0f);
+    vel->x += (scaleFactor * movement[0]);
+    vel->z += (scaleFactor * movement[2]);
     
 }
 
