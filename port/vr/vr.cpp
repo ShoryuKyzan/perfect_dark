@@ -38,7 +38,7 @@ Vector3 vecHMDPositionInitial;
 // Add this helper function at the top of the file
 Vector3 getRotationFromMatrix(const Matrix4& mat) {
     Vector3 rot;
-    // Extract Euler angles from rotation matrix
+    // Extract radians from rotation matrix
     // Assuming Y-up coordinate system
     rot.y = atan2(mat[2], mat[10]); // Yaw around Y axis
     rot.x = atan2(-mat[6], sqrt(mat[2]*mat[2] + mat[10]*mat[10])); // Pitch around X
