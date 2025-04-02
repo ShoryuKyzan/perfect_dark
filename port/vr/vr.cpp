@@ -14,6 +14,7 @@ vr::IVRSystem *m_pHMD;
 vr::TrackedDevicePose_t vrTrackedDevicePoses[vr::k_unMaxTrackedDeviceCount];
 Matrix4 mat4DevicePoseList[vr::k_unMaxTrackedDeviceCount];
 Matrix4 mat4HMDPose;
+Matrix4 mat4HMDPoseInverted;
 Matrix4 mat4VRProjectionLeft;
 Matrix4 mat4VRProjectionRight;
 Matrix4 mat4VREyePosLeft;
@@ -234,8 +235,11 @@ extern "C" void vrTick()
         mat4HMDPose = mat4DevicePoseList[vr::k_unTrackedDeviceIndex_Hmd];
         // do not invert it, as that is appropriate for the world position being translated central to the HMD (world orbits HMD)
 
-        Vector3 vecHMDRotNext = getRotationFromMatrix(mat4HMDPose);
         Vector3 vecHMDPosNext = Vector3(mat4HMDPose[12], mat4HMDPose[13], mat4HMDPose[14]);
+        // the HMD euclidean angles arent correct until the matrix is inverted
+        mat4HMDPoseInverted = mat4HMDPose;
+        mat4HMDPoseInverted.invert();
+        Vector3 vecHMDRotNext = getRotationFromMatrix(mat4HMDPoseInverted);
         
         if(firstTick) {
             vecHMDPositionLast.x = 0;
