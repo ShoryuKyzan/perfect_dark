@@ -35,6 +35,9 @@ vr::VRActionHandle_t rightControllerActionPose;
 bool firstTick = false;
 Vector3 vecHMDPositionInitial;
 
+float userHeight=0.0f;
+vr::EDeviceActivityLevel priorActivityLevel;
+
 
 // Add this helper function at the top of the file
 Vector3 getRotationFromMatrix(const Matrix4& mat) {
@@ -255,7 +258,29 @@ extern "C" void vrTick()
             vecHMDPositionLast = vecHMDPosNext;
         }
         // sysLogPrintf(LOG_NOTE, "vecHMDRotationLast: %f %f %f", vecHMDRotationLast.x, vecHMDRotationLast.y, vecHMDRotationLast.z); // XXX
+
+            
+        // capture user height when they put on the headset 
+        // TODO FIXME seated needs to be a setting or the player will be seen as very short in that mode
+        vr::EDeviceActivityLevel activityLevel = m_pHMD->GetTrackedDeviceActivityLevel(vr::k_unTrackedDeviceIndex_Hmd);
+        if (
+            // became active
+            activityLevel == vr::k_EDeviceActivityLevel_UserInteraction && 
+            priorActivityLevel != vr::k_EDeviceActivityLevel_UserInteraction ||
+            // active and invalid height
+            (activityLevel == vr::k_EDeviceActivityLevel_UserInteraction && userHeight < 0.1f)) {
+
+            // Headset is now being worn
+            userHeight = vecHMDPosNext.y;
+            if (userHeight > 0.01f) {
+                sysLogPrintf(LOG_NOTE, "vr User height recorded:  %f", userHeight);
+            }else {
+                sysLogPrintf(LOG_NOTE, "vr User height not recorded:  %f", userHeight);
+            }
+        }
+        priorActivityLevel = activityLevel;
     }
+
 
     vrGetControllerPose(&leftControllerActionPose, &controllerConnectedLeft, &mat4ControllerPoseLeft);
     vrGetControllerPose(&rightControllerActionPose, &controllerConnectedRight, &mat4ControllerPoseRight);
