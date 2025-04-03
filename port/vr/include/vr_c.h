@@ -8,3 +8,4 @@ void vrGetHMDRotation(float coord[3]);
 void vrGetHMDTotalPositionChange(float coord[3]);
 float vrGetWorldScaleFactor();
 float vrGetUserRealHeight();
+bool vrUserHeightIsValid();

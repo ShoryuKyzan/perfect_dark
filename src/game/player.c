@@ -4366,7 +4366,7 @@ void playerAllocateMatrices(struct coord *cam_pos, struct coord *cam_look, struc
 	};
 	// VR position offset
 	float vr_pos[3] = {0, 0, 0};
-	if(vrEnabled) {
+	if(vrEnabled && vrUserHeightIsValid()) {
 		vrGetHMDPosition(vr_pos);
 
 		// TODO world scale might factor in here, unsure rn. we'd def want the player to get bigger if world scale smaller.

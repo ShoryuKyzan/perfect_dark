@@ -35,6 +35,7 @@ vr::VRActionHandle_t rightControllerActionPose;
 bool firstTick = false;
 Vector3 vecHMDPositionInitial;
 
+#define VALID_MIN_USER_HEIGHT 0.01f
 float userHeight=0.0f;
 vr::EDeviceActivityLevel priorActivityLevel;
 bool seatedMode = false; // TODO implement height adjustment based on seated/standing setting. All code is for standing so far.
@@ -235,6 +236,19 @@ extern "C" void vrTick()
     }
 
     if (vrTrackedDevicePoses[vr::k_unTrackedDeviceIndex_Hmd].bPoseIsValid) {
+        
+        // capture user height when they put on the headset 
+        // TODO FIXME seated needs to be a setting or the player will be seen as very short in that mode
+        vr::EDeviceActivityLevel activityLevel = m_pHMD->GetTrackedDeviceActivityLevel(vr::k_unTrackedDeviceIndex_Hmd);
+        bool becameActive = activityLevel == vr::k_EDeviceActivityLevel_UserInteraction && priorActivityLevel != vr::k_EDeviceActivityLevel_UserInteraction;
+        priorActivityLevel = activityLevel;
+
+        if(becameActive){
+            sysLogPrintf(LOG_NOTE, "vr headset active. reset diffs"); // XXX
+            // reset height diffs as hmd position might have drastically moved
+            firstTick = true;
+        }
+
         mat4HMDPose = mat4DevicePoseList[vr::k_unTrackedDeviceIndex_Hmd];
         // do not invert it, as that is appropriate for the world position being translated central to the HMD (world orbits HMD)
 
@@ -257,28 +271,20 @@ extern "C" void vrTick()
             vecHMDRotationLast = vecHMDRotNext;
             vecHMDPositionLast = vecHMDPosNext;
         }
-        // sysLogPrintf(LOG_NOTE, "vecHMDRotationLast: %f %f %f", vecHMDRotationLast.x, vecHMDRotationLast.y, vecHMDRotationLast.z); // XXX
 
-            
-        // capture user height when they put on the headset 
-        // TODO FIXME seated needs to be a setting or the player will be seen as very short in that mode
-        vr::EDeviceActivityLevel activityLevel = m_pHMD->GetTrackedDeviceActivityLevel(vr::k_unTrackedDeviceIndex_Hmd);
-        if (
-            // became active
-            activityLevel == vr::k_EDeviceActivityLevel_UserInteraction && 
-            priorActivityLevel != vr::k_EDeviceActivityLevel_UserInteraction ||
+        if (becameActive ||
             // active and invalid height
-            (activityLevel == vr::k_EDeviceActivityLevel_UserInteraction && userHeight < 0.1f)) {
+            (activityLevel == vr::k_EDeviceActivityLevel_UserInteraction && !vrUserHeightIsValid())) {
+
 
             // Headset is now being worn
-            userHeight = vecHMDPosNext.y;
-            if (userHeight > 0.01f) {
+            if (vecHMDPosNext.y > VALID_MIN_USER_HEIGHT) {
+                userHeight = vecHMDPosNext.y;
                 sysLogPrintf(LOG_NOTE, "vr User height recorded:  %f", userHeight);
             }else {
                 sysLogPrintf(LOG_NOTE, "vr User height not recorded:  %f", userHeight);
             }
         }
-        priorActivityLevel = activityLevel;
     }
 
 
@@ -400,4 +406,11 @@ extern "C" float vrGetWorldScaleFactor(){
 
 extern "C" float vrGetUserRealHeight(){
     return userHeight;
+}
+extern "C" bool vrUserHeightIsValid(){
+    if(userHeight > VALID_MIN_USER_HEIGHT){
+        return true;
+    }else{
+        return false; // TODO FIXME raw expression seems to convert to somethin non useful (short int?)
+    }
 }
