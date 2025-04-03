@@ -37,7 +37,7 @@ Vector3 vecHMDPositionInitial;
 
 float userHeight=0.0f;
 vr::EDeviceActivityLevel priorActivityLevel;
-
+bool seatedMode = false; // TODO implement height adjustment based on seated/standing setting. All code is for standing so far.
 
 // Add this helper function at the top of the file
 Vector3 getRotationFromMatrix(const Matrix4& mat) {
