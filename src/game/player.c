@@ -4365,17 +4365,19 @@ void playerAllocateMatrices(struct coord *cam_pos, struct coord *cam_look, struc
 		cam_pos->z
 	};
 	// VR position offset
-	float vr_pos_offset[3] = {0, 0, 0};
+	float vr_pos[3] = {0, 0, 0};
 	if(vrEnabled) {
-		vrGetHMDTotalPositionChange(vr_pos_offset);
-		vr_pos_offset[1] *= vrGetWorldScaleFactor();
+		vrGetHMDPosition(vr_pos);
 
-		// Scale HMD height by character's eye height ratio
-        // Using 159.0f as the reference height (standard Bond height)
-        f32 height_scale = g_Vars.currentplayer->vv_eyeheight / 159.0f;
+		// TODO world scale might factor in here, unsure rn. we'd def want the player to get bigger if world scale smaller.
+		float userCrouchPercent = vr_pos[1] / vrGetUserRealHeight();
 
-		vr_pos_offset[1] *= height_scale;
-		cur_cam_pos.y += vr_pos_offset[1];
+        // reduce cam height by how much the user is crouching
+		// scaled to the current character model's height
+		f32 height_adjust = g_Vars.currentplayer->vv_eyeheight -
+			(userCrouchPercent * g_Vars.currentplayer->vv_eyeheight);
+
+		cur_cam_pos.y -= height_adjust;
 	}
 
 	sp74.x = (cur_cam_pos.x - g_Vars.currentplayer->globaldrawworldoffset.x) * scale;

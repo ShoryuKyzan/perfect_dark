@@ -394,3 +394,7 @@ extern "C" void vrGetHMDTotalPositionChange(float coord[3]) {
 extern "C" float vrGetWorldScaleFactor(){
     return 30.0f; // TODO make this a setting or driven from steam game settings
 }
+
+extern "C" float vrGetUserRealHeight(){
+    return userHeight;
+}
