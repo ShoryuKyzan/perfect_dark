@@ -4368,7 +4368,7 @@ void playerAllocateMatrices(struct coord *cam_pos, struct coord *cam_look, struc
 	float vr_pos_offset[3] = {0, 0, 0};
 	if(vrEnabled) {
 		vrGetHMDTotalPositionChange(vr_pos_offset);
-		vr_pos_offset[1] *= vrGetWorldScaleFactor() * -1;
+		vr_pos_offset[1] *= vrGetWorldScaleFactor();
 
 		// Scale HMD height by character's eye height ratio
         // Using 159.0f as the reference height (standard Bond height)
@@ -4390,11 +4390,11 @@ void playerAllocateMatrices(struct coord *cam_pos, struct coord *cam_look, struc
 	// TODO add it reasonably to other other modes too
 	struct coord new_up = {cam_up->x, cam_up->y, cam_up->z};
 	// sysLogPrintf(LOG_NOTE, "cameramode: %d", g_Vars.currentplayer->cameramode); // XXX
-	if (g_Vars.currentplayer->cameramode == CAMERAMODE_DEFAULT) {
+	if (vrEnabled && g_Vars.currentplayer->cameramode == CAMERAMODE_DEFAULT) {
 		// Apply roll from VR orientation to cam_up
 		float vr_rotation[3];
 		vrGetHMDRotation(vr_rotation);
-		float roll = vr_rotation[2];
+		float roll = vr_rotation[2] * -1.0f;
 
 		Mtxf mtxroll;
 		guRotateF(mtxroll.m, roll/M_PI * 180.0f, cam_look->x, cam_look->y, cam_look->z);
