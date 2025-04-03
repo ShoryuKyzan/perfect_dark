@@ -389,9 +389,12 @@ extern "C" void vrGetHMDTotalPositionChange(float coord[3]) {
 
 /**
  * @brief scale factor that translates headset positional movements to world movements
+ * except for height movement. Thats based on user real height and the character height
  * 
  */
 extern "C" float vrGetWorldScaleFactor(){
+    // TODO FIXME this really is a movement scaling to make it realistic for the default game. The actual scaling factor should be different. It should have some limits to prevent multiplayer cheating? And maybe steam already does this
+
     return 30.0f; // TODO make this a setting or driven from steam game settings
 }
 
