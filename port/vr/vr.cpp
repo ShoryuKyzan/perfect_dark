@@ -259,9 +259,7 @@ extern "C" void vrTick()
         Vector3 vecHMDRotNext = getRotationFromMatrix(mat4HMDPoseInverted);
         
         if(firstTick) {
-            vecHMDPositionLast.x = 0;
-            vecHMDPositionLast.y = 0;
-            vecHMDPositionLast.z = 0;
+            vecHMDPositionLast = vecHMDPosNext;
             vecHMDPositionInitial = vecHMDPosNext;
             vecHMDRotationLast = vecHMDRotNext;
             firstTick = false;

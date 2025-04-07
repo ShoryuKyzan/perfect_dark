@@ -2866,6 +2866,7 @@ struct player
 	/*0x19bc*/ f32 vv_height;			  // 159 when Jo, regardless of crouch state
 	/*0x19c0*/ f32 vv_headheight;		  // 172 when Jo, regardless of crouch state
 	/*0x19c4*/ f32 vv_eyeheight;		  // 159 when Jo, regardless of crouch state
+	f32 vv_current_eyeheight;  // eyeheight that is affected by crouch state (and when transitioning to different crouch heights)
 	/*0x19c8*/ bool haschrbody;
 	/*0x19cc*/ struct geocyl periminfo;
 	/*0x19e4*/ struct geocyl perimshoot;

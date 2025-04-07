@@ -679,6 +679,7 @@ void playerLoadDefaults(void)
 {
 	if (!g_Vars.mplayerisrunning || g_Vars.currentplayer->model00d4 == NULL) {
 		g_Vars.currentplayer->vv_eyeheight = 159;
+		g_Vars.currentplayer->vv_current_eyeheight = 159.0f;
 		g_Vars.currentplayer->vv_headheight = 172;
 	}
 
@@ -4366,18 +4367,19 @@ void playerAllocateMatrices(struct coord *cam_pos, struct coord *cam_look, struc
 	};
 	// VR position offset
 	float vr_pos[3] = {0, 0, 0};
-	if(vrEnabled && vrUserHeightIsValid()) {
+	// TODO support other cam modes
+	if(vrEnabled && vrUserHeightIsValid() && g_Vars.currentplayer->cameramode == CAMERAMODE_DEFAULT) {
 		vrGetHMDPosition(vr_pos);
 
-		// TODO world scale might factor in here, unsure rn. we'd def want the player to get bigger if world scale smaller.
-		float userCrouchPercent = vr_pos[1] / vrGetUserRealHeight();
+		// crouch percent = 0% if standing, 100% if prone
+		float standCrouchPercent = vr_pos[1] / vrGetUserRealHeight();
 
         // reduce cam height by how much the user is crouching
 		// scaled to the current character model's height
-		f32 height_adjust = g_Vars.currentplayer->vv_eyeheight -
-			(userCrouchPercent * g_Vars.currentplayer->vv_eyeheight);
-
-		cur_cam_pos.y -= height_adjust;
+		f32 standingHeight = standCrouchPercent * g_Vars.currentplayer->vv_current_eyeheight;
+		printf("vr_pos[1] %f vrGetUserRealHeight() %f standCrouchPercent %f standingHeight %f vv_current_eyeheight %f\n", vr_pos[1], vrGetUserRealHeight(), standCrouchPercent, standingHeight, g_Vars.currentplayer->vv_current_eyeheight);
+		// set camera to feet pos + vr-effected eye height
+		cur_cam_pos.y = g_Vars.currentplayer->vv_manground + standingHeight;
 	}
 
 	sp74.x = (cur_cam_pos.x - g_Vars.currentplayer->globaldrawworldoffset.x) * scale;

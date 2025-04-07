@@ -1128,6 +1128,7 @@ void bwalkUpdateVertical(void)
 			g_Vars.currentplayer->crouchoffsetrealsmall +
 			g_Vars.currentplayer->crouchheight *
 			g_Vars.currentplayer->vv_eyeheight * 0.0062893079593778f;
+		g_Vars.currentplayer->vv_current_eyeheight = eyeheight;
 
 		if (eyeheight < 30) {
 			eyeheight = 30;
