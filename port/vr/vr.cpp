@@ -2,6 +2,7 @@
 #include "include/Matrices.h"
 #include "openvr_mingw.hpp"
 #include "system.h"
+#include "fs.h"
 #include "include/vr.h"
 
 // VR
@@ -120,7 +121,15 @@ extern "C" void vrFloat44ToMat4(Matrix4 &destMat4, float srcM[4][4])
 }
 
 void vrInitInputBindings() {
-    vr::VRInput()->SetActionManifestPath("pdvr_actions.json");
+    const char *actionManifestPath = fsFullPath("$E/pdvr_actions.json");
+    sysLogPrintf(LOG_NOTE, "VR action manifest path: %s", actionManifestPath); // XXX
+    vr::EVRInputError eError = vr::VRInput()->SetActionManifestPath(actionManifestPath);
+
+    char buf[1024];
+    if (eError != vr::VRInputError_None) {
+        sprintf_s(buf, sizeof(buf), "Unable to set action manifest path: %d", eError);
+        sysLogPrintf(LOG_ERROR, buf);
+    }
     vr::VRInput()->GetActionHandle( "/actions/game/in/Hand_Left", &leftControllerActionPose );
     vr::VRInput()->GetActionHandle( "/actions/game/in/Hand_Right", &rightControllerActionPose );
 }
@@ -211,7 +220,8 @@ void vrGetControllerPose(vr::VRActionHandle_t *actionPose, bool *controllerConne
 			|| !poseData.bActive || !poseData.pose.bPoseIsValid )
 		{
 			*controllerConnected = false;
-		}
+            sysLogPrintf(LOG_NOTE, "vr controller not connected"); // XXX
+        }
 		else
 		{
             *controllerConnected = true;

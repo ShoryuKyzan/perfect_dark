@@ -1,6 +1,10 @@
 #ifndef _IN_FS_H
 #define _IN_FS_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdio.h>
 #include <PR/ultratypes.h>
 
@@ -22,5 +26,9 @@ FILE *fsFileOpenRead(const char *name);
 void fsFileClose(FILE *f);
 
 const char *fsGetModDir(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
