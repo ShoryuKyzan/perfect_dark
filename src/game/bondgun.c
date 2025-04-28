@@ -2150,7 +2150,7 @@ bool bgun0f09aba4(struct hand *hand, struct handweaponinfo *info, s32 handnum, s
 
 			hand->rotxend = M_BADTAU - (recoilangle * M_BADTAU) / 360.0f;
 
-			hand->posend.x = (func0f0b131c(handnum) - hand->aimpos.x) * recoildist / 1000.0f;
+			hand->posend.x = (handGetWeaponXPosition(handnum) - hand->aimpos.x) * recoildist / 1000.0f;
 			hand->posend.y = 0;
 			hand->posend.z = (weapondef->posz - hand->aimpos.z) * recoildist / 1000.0f;
 
@@ -5205,7 +5205,7 @@ void bgunSwivel(f32 screenx, f32 screeny, f32 crossdamp, f32 aimdamp)
 	player->crosspos2[0] += camGetScreenLeft();
 	player->crosspos2[1] += camGetScreenTop();
 
-	cam0f0b4c3c(player->crosspos2, &aimpos, 1000);
+	camCalculateAimDirection(player->crosspos2, &aimpos, 1000);
 
 	bgunSetAimPos(&aimpos);
 }
@@ -5256,7 +5256,7 @@ void bgun0f0a0c08(struct coord *arg0, struct coord *arg1)
 	arg0->y = 0;
 	arg0->z = 0;
 
-	cam0f0b4c3c(g_Vars.currentplayer->crosspos, arg1, 1);
+	camCalculateAimDirection(g_Vars.currentplayer->crosspos, arg1, 1);
 }
 
 void bgun0f0a0c44(s32 handnum, struct coord *arg1, struct coord *arg2)
@@ -5265,7 +5265,7 @@ void bgun0f0a0c44(s32 handnum, struct coord *arg1, struct coord *arg2)
 	arg1->y = 0;
 	arg1->z = 0;
 
-	cam0f0b4c3c(g_Vars.currentplayer->hands[handnum].crosspos, arg2, 1);
+	camCalculateAimDirection(g_Vars.currentplayer->hands[handnum].crosspos, arg2, 1);
 }
 
 void bgunCalculatePlayerShotSpread(struct coord *gunpos2d, struct coord *gundir2d, s32 handnum, bool dorandom)
@@ -5321,7 +5321,7 @@ void bgunCalculatePlayerShotSpread(struct coord *gunpos2d, struct coord *gundir2
 	gunpos2d->y = 0;
 	gunpos2d->z = 0;
 
-	cam0f0b4c3c(crosspos, gundir2d, 1);
+	camCalculateAimDirection(crosspos, gundir2d, 1);
 }
 
 void bgunCalculateBotShotSpread(struct coord *arg0, s32 weaponnum, s32 funcnum, bool arg3, s32 crouchpos, bool dual)
@@ -6904,7 +6904,7 @@ void bgunUpdateLasersight(struct hand *hand, struct modeldef *modeldef, s32 hand
 
 			mtx4TransformVecInPlace((Mtxf *)((uintptr_t)allocation + mtxindex * sizeof(Mtxf)), &beamfar);
 		} else {
-			cam0f0b4c3c(g_Vars.currentplayer->crosspos, &beamfar, 1);
+			camCalculateAimDirection(g_Vars.currentplayer->crosspos, &beamfar, 1);
 
 			beamfar.x *= 500.0f;
 			beamfar.y *= 500.0f;
@@ -7647,7 +7647,7 @@ void bgun0f0a5550(s32 handnum)
 	bgunApplyVRControllerPos(hand, handnum);
 
 	if (handnum == HAND_RIGHT) {
-		sp274.x = func0f0b131c(handnum) + hand->damppos.f[0] + hand->adjustpos.f[0];
+		sp274.x = handGetWeaponXPosition(handnum) + hand->damppos.f[0] + hand->adjustpos.f[0];
 		sp274.y = weapondef->posy + hand->damppos.f[1] + hand->adjustpos.f[1];
 		sp274.z = weapondef->posz + hand->damppos.f[2] + hand->adjustpos.f[2];
 	} else if (isdetonator) {
@@ -7655,7 +7655,7 @@ void bgun0f0a5550(s32 handnum)
 		sp274.y = -16.5f + hand->damppos.f[1] + hand->adjustpos.f[1];
 		sp274.z = -16.0f + hand->damppos.f[2] + hand->adjustpos.f[2];
 	} else {
-		sp274.x = func0f0b131c(handnum) + hand->damppos.f[0] - hand->adjustpos.f[0];
+		sp274.x = handGetWeaponXPosition(handnum) + hand->damppos.f[0] - hand->adjustpos.f[0];
 		sp274.y = weapondef->posy + hand->damppos.f[1] + hand->adjustpos.f[1];
 		sp274.z = weapondef->posz + hand->damppos.f[2] + hand->adjustpos.f[2];
 	}

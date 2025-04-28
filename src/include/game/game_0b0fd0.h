@@ -13,7 +13,7 @@ struct weaponfunc *currentPlayerGetWeaponFunction(u32 hand);
 struct invaimsettings *gsetGetAimSettings(struct gset *gset);
 struct inventory_ammo *weaponGetAmmoByFunction(u32 weaponnum, u32 funcnum);
 f32 handGetXShift(s32 handnum);
-f32 func0f0b131c(s32 handnum);
+f32 handGetWeaponXPosition(s32 handnum);
 f32 currentPlayerGetGunZoomFov(void);
 void currentPlayerZoomOut(f32 fovpersec);
 void currentPlayerZoomIn(f32 fovpersec);

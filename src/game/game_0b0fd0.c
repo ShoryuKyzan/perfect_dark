@@ -158,7 +158,7 @@ f32 handGetXShift(s32 handnum)
 	return g_Vars.currentplayer->hands[handnum].xshift;
 }
 
-f32 func0f0b131c(s32 hand)
+f32 handGetWeaponXPosition(s32 hand)
 {
 	f32 x;
 	struct weapon *weapon;

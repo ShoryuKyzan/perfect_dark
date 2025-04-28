@@ -2165,7 +2165,7 @@ Gfx *menuRenderModel(Gfx *gdl, struct menumodel *menumodel, s32 modeltype)
 			screenpos[1] = posy + viGetViewTop() + viGetViewHeight() * 0.5f;
 		}
 
-		cam0f0b4c3c(screenpos, &tmpcoord, 1.0f);
+		camCalculateAimDirection(screenpos, &tmpcoord, 1.0f);
 
 		mtx4LoadIdentity(&posmtx);
 

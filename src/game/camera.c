@@ -105,23 +105,30 @@ void camSetScale(void)
 	player->c_cameraleftnorm.y = 0;
 	player->c_cameraleftnorm.z = -fVar5 * fVar4;
 }
-
-void cam0f0b4c3c(f32 pos2d[2], struct coord *dir2d, f32 arg2)
+void camCalculateAimDirection(f32 crossPos[2], struct coord *aimDirection, f32 distance)
 {
 	struct player *player = g_Vars.currentplayer;
-	f32 sp20;
-	f32 sp1c;
-	f32 sp18 = -1.0f;
-	f32 f2;
+	f32 screenY;
+	f32 screenX;
+	f32 depth = -1.0f; // Depth is set to -1.0f to represent the forward direction in camera space.
+	f32 scale;
 
-	sp1c = (player->c_halfheight - (pos2d[1] - player->c_screentop)) * player->c_scaley;
-	sp20 = (pos2d[0] - player->c_screenleft - player->c_halfwidth) * player->c_scalex;
+	// Calculate the vertical screen position relative to the center of the screen,
+	// scaled by the vertical scaling factor.
+	screenY = (player->c_halfheight - (crossPos[1] - player->c_screentop)) * player->c_scaley;
 
-	f2 = arg2 / sqrtf(sp20 * sp20 + sp1c * sp1c + sp18 * sp18);
+	// Calculate the horizontal screen position relative to the center of the screen,
+	// scaled by the horizontal scaling factor.
+	screenX = (crossPos[0] - player->c_screenleft - player->c_halfwidth) * player->c_scalex;
 
-	dir2d->x = sp20 * f2;
-	dir2d->y = sp1c * f2;
-	dir2d->z = sp18 * f2;
+	// Compute the scaling factor to adjust the aim direction vector to the desired distance.
+	// The scale is based on the magnitude of the vector (screenX, screenY, depth).
+	scale = distance / sqrtf(screenX * screenX + screenY * screenY + depth * depth);
+
+	// Scale the screenX, screenY, and depth values to compute the aim direction vector.
+	aimDirection->x = screenX * scale;
+	aimDirection->y = screenY * scale;
+	aimDirection->z = depth * scale;
 }
 
 void camProject3DToScreen2D(struct coord *in, f32 *out)

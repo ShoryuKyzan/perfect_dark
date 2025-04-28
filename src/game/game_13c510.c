@@ -122,7 +122,7 @@ bool artifactTestLos(struct coord *spec, struct coord *roompos, s32 xi, s32 yi)
 	struct coord gundir3d;
 	struct coord gunpos3d = g_Vars.currentplayer->cam_pos;
 	f32 crosspos[2] = { (f32)xi, (f32)yi };
-	cam0f0b4c3c(crosspos, &gundir2d, 1.f);
+	camCalculateAimDirection(crosspos, &gundir2d, 1.f);
 	mtx4RotateVec(camGetProjectionMtxF(), &gundir2d, &gundir3d);
 
 	return shotTestLos(&gunpos2d, &gundir2d, &gunpos3d, &gundir3d, &endpos);
