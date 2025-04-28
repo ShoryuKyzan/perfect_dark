@@ -4377,7 +4377,6 @@ void playerAllocateMatrices(struct coord *cam_pos, struct coord *cam_look, struc
         // reduce cam height by how much the user is crouching
 		// scaled to the current character model's height
 		f32 standingHeight = standCrouchPercent * g_Vars.currentplayer->vv_current_eyeheight;
-		printf("vr_pos[1] %f vrGetUserRealHeight() %f standCrouchPercent %f standingHeight %f vv_current_eyeheight %f\n", vr_pos[1], vrGetUserRealHeight(), standCrouchPercent, standingHeight, g_Vars.currentplayer->vv_current_eyeheight);
 		// set camera to feet pos + vr-effected eye height
 		cur_cam_pos.y = g_Vars.currentplayer->vv_manground + standingHeight;
 	}
