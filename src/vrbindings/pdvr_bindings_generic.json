@@ -1,6 +1,6 @@
 {
    "bindings" : {
-      "/actions/demo" : {
+      "/actions/game" : {
          "poses" : [
             {
                "output" : "/actions/game/in/hand_left",

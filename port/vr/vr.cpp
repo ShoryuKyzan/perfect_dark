@@ -31,8 +31,12 @@ Matrix4 mat4ControllerPoseLeft;
 Matrix4 mat4ControllerPoseRight;
 bool controllerConnectedLeft;
 bool controllerConnectedRight;
+vr::VRActionSetHandle_t actionsetGame = vr::k_ulInvalidActionSetHandle;
 vr::VRActionHandle_t leftControllerActionPose;
 vr::VRActionHandle_t rightControllerActionPose;
+vr::VRInputValueHandle_t sourceLeft = vr::k_ulInvalidInputValueHandle;
+vr::VRInputValueHandle_t sourceRight = vr::k_ulInvalidInputValueHandle;
+
 bool firstTick = false;
 Vector3 vecHMDPositionInitial;
 
@@ -130,8 +134,13 @@ void vrInitInputBindings() {
         sprintf_s(buf, sizeof(buf), "Unable to set action manifest path: %d", eError);
         sysLogPrintf(LOG_ERROR, buf);
     }
+
+    vr::VRInput()->GetActionSetHandle( "/actions/game", &actionsetGame );
+
     vr::VRInput()->GetActionHandle( "/actions/game/in/Hand_Left", &leftControllerActionPose );
+    vr::VRInput()->GetInputSourceHandle( "/user/hand/left", &sourceLeft );
     vr::VRInput()->GetActionHandle( "/actions/game/in/Hand_Right", &rightControllerActionPose );
+    vr::VRInput()->GetInputSourceHandle( "/user/hand/right", &sourceRight );
 }
 
 
@@ -216,10 +225,17 @@ extern "C" void vrShutdown()
 
 void vrGetControllerPose(vr::VRActionHandle_t *actionPose, bool *controllerConnected, Matrix4 *outputMatrix) {
 		vr::InputPoseActionData_t poseData;
-		if ( vr::VRInput()->GetPoseActionDataForNextFrame( *actionPose, vr::TrackingUniverseStanding, &poseData, sizeof( poseData ), vr::k_ulInvalidInputValueHandle ) != vr::VRInputError_None
+        vr::EVRInputError pError = vr::VRInput()->GetPoseActionDataForNextFrame(
+            *actionPose,
+            vr::TrackingUniverseStanding,
+            &poseData,
+            sizeof( poseData ),
+            vr::k_ulInvalidInputValueHandle );
+        // check if the controller is connected and if the pose is valid
+		if ( pError != vr::VRInputError_None
 			|| !poseData.bActive || !poseData.pose.bPoseIsValid )
 		{
-			*controllerConnected = false;
+            *controllerConnected = false;
             sysLogPrintf(LOG_NOTE, "vr controller not connected"); // XXX
         }
 		else
@@ -231,9 +247,25 @@ void vrGetControllerPose(vr::VRActionHandle_t *actionPose, bool *controllerConne
 
 extern "C" void vrTick()
 {
+    // Process SteamVR action state
+	// UpdateActionState is called each frame to update the state of the actions themselves. The application
+	// controls which action sets are active with the provided array of VRActiveActionSet_t structs.
+	vr::VRActiveActionSet_t actionSet = { 0 };
+	actionSet.ulActionSet = actionsetGame;
+	vr::EVRInputError pError = vr::VRInput()->UpdateActionState( &actionSet, sizeof(actionSet), 1 );
+	if (pError != vr::VRInputError_None) {
+        sysLogPrintf(LOG_ERROR, "Failed to update action state: %d", pError);
+    }
+
+    vrGetControllerPose(&leftControllerActionPose, &controllerConnectedLeft, &mat4ControllerPoseLeft);
+    vrGetControllerPose(&rightControllerActionPose, &controllerConnectedRight, &mat4ControllerPoseRight);
+
+
     Vector3 vecHMDPosNext(0, 0, 0);
+
     if (!m_pHMD)
         return;
+
 
     vr::VRCompositor()->WaitGetPoses(vrTrackedDevicePoses, vr::k_unMaxTrackedDeviceCount, NULL, 0);
 
@@ -296,8 +328,6 @@ extern "C" void vrTick()
     }
 
 
-    vrGetControllerPose(&leftControllerActionPose, &controllerConnectedLeft, &mat4ControllerPoseLeft);
-    vrGetControllerPose(&rightControllerActionPose, &controllerConnectedRight, &mat4ControllerPoseRight);
 }
 
 extern "C" void vrGetHMDMovementDiff(float coord[3]){
