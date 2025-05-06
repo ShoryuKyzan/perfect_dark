@@ -7545,12 +7545,20 @@ static inline f32 bgunGetFovOffsetY(void)
 #endif
 
 void bgunApplyVRControllerPos(struct hand *hand, s32 handnum) {
-    if (!vrEnabled || handnum != HAND_RIGHT) {
+    if (!vrEnabled) {
         return;
     }
+	
 
     float controllerMatrix[4][4];
-    if (vrGetRightControllerMatrix(controllerMatrix)) {
+	bool connected = false;
+    if (handnum == HAND_RIGHT){
+		connected = vrGetRightControllerMatrix(controllerMatrix);
+	} else if(handnum == HAND_LEFT){
+		connected = vrGetLeftControllerMatrix(controllerMatrix);
+	}
+
+	if (connected) {
         // Set the weapon position and orientation directly from controller
         mtx4Copy((Mtxf *)controllerMatrix, &hand->posrotmtx);
         hand->useposrot = true;
