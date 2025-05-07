@@ -7578,6 +7578,13 @@ void bgunApplyVRControllerPos(struct hand *hand, s32 handnum) {
     }
 }
 
+/**
+ * Update the hand model position, rotation and animation for the current frame.
+ * This handles things like weapon position, recoil, aim tracking, muzzle flash,
+ * shell ejection etc.
+ * 
+ * @param handnum Which hand (0 = right, 1 = left)
+ */
 void bgunUpdateHandModel(s32 handnum)
 {
 	u8 *mtxallocation;
@@ -7588,13 +7595,13 @@ void bgunUpdateHandModel(s32 handnum)
 	Mtxf rotationMatrix;
 	Mtxf transformMatrix;
 	union modelrodata *rodata;
-	bool *toggleVisibility[3] = {NULL, NULL, NULL};
+	bool *toggleVisibility[3] = {NULL, NULL, NULL}; // For muzzle flash parts
 	s32 toggleCount = 0;
 	struct modelnode *node;
 	struct player *player = g_Vars.currentplayer;
 	struct hand *hand = player->hands + handnum;
 	struct weaponfunc *funcdef;
-	struct weaponfunc_shoot *shootfunc = NULL;
+	struct weaponfunc_shoot *shootfunc = NULL; 
 	s32 i;
 	s32 weaponnum = bgunGetWeaponNum2(handnum);
 	struct weapon *weapondef;
@@ -7610,26 +7617,32 @@ void bgunUpdateHandModel(s32 handnum)
 
 	weapondef = weaponFindById(weaponnum);
 
+	// Special case for remote mine detonator in left hand
 	if (handnum == HAND_LEFT && weaponnum == WEAPON_REMOTEMINE) {
 		isdetonator = true;
 	}
 
 	funcdef = gsetGetWeaponFunction2(&hand->gset);
 
+	// Get shoot function definition if this is a shooting weapon
 	if (funcdef && (funcdef->type & 0xff) == INVENTORYFUNCTYPE_SHOOT) {
 		shootfunc = (struct weaponfunc_shoot *)funcdef;
 	}
 
+	// Update weapon blending after changing weapons
 	bgunUpdateBlend(hand, handnum);
 
+	// Update x-position shifts when equipping/unequipping weapons
 	if (handnum == HAND_RIGHT) {
 		if (weaponHasFlag(bgunGetWeaponNum2(HAND_LEFT), WEAPONFLAG_00000040)) {
+			// Move right hand right when left weapon equipped
 			hand->xshift += 2.0f * g_Vars.lvupdate60freal / 240.0f;
 
 			if (hand->xshift > 2.0f) {
 				hand->xshift = 2.0f;
 			}
 		} else {
+			// Move right hand back to center when left weapon unequipped
 			hand->xshift -= 2.0f * g_Vars.lvupdate60freal / 240.0f;
 
 			if (hand->xshift < 0.0f) {
@@ -7638,12 +7651,14 @@ void bgunUpdateHandModel(s32 handnum)
 		}
 	} else {
 		if (weaponHasFlag(bgunGetWeaponNum2(HAND_RIGHT), WEAPONFLAG_00000040)) {
+			// Move left hand left when right weapon equipped
 			hand->xshift -= 2.0f * g_Vars.lvupdate60freal / 240.0f;
 
 			if (hand->xshift < -2.0f) {
 				hand->xshift = -2.0f;
 			}
 		} else {
+			// Move left hand back to center when right weapon unequipped 
 			hand->xshift += 2.0f * g_Vars.lvupdate60freal / 240.0f;
 
 			if (hand->xshift > 0.0f) {
@@ -7652,13 +7667,16 @@ void bgunUpdateHandModel(s32 handnum)
 		}
 	}
 
+	// Apply VR controller position if enabled
 	bgunApplyVRControllerPos(hand, handnum);
 
+	// Calculate weapon position based on hand and weapon type
 	if (handnum == HAND_RIGHT) {
 		weaponPosition.x = handGetWeaponXPosition(handnum) + hand->damppos.f[0] + hand->adjustpos.f[0];
 		weaponPosition.y = weapondef->posy + hand->damppos.f[1] + hand->adjustpos.f[1];
 		weaponPosition.z = weapondef->posz + hand->damppos.f[2] + hand->adjustpos.f[2];
 	} else if (isdetonator) {
+		// Special positioning for remote mine detonator
 		weaponPosition.x = 6.5f + hand->damppos.f[0] - hand->adjustpos.f[0];
 		weaponPosition.y = -16.5f + hand->damppos.f[1] + hand->adjustpos.f[1];
 		weaponPosition.z = -16.0f + hand->damppos.f[2] + hand->adjustpos.f[2];
@@ -7668,6 +7686,7 @@ void bgunUpdateHandModel(s32 handnum)
 		weaponPosition.z = weapondef->posz + hand->damppos.f[2] + hand->adjustpos.f[2];
 	}
 
+	// Adjust position when weapon is pulled closer to screen
 	weaponPosition.y += player->guncloseroffset * 5.0f / -90.0f * 50.0f;
 	weaponPosition.z -= player->guncloseroffset * 15.0f / -90.0f * 50.0f;
 
@@ -7677,12 +7696,14 @@ void bgunUpdateHandModel(s32 handnum)
 	weaponPosition.z += bgunGetFovOffsetZ();
 #endif
 
+	// Apply recoil
 	if (hand->firing && shootfunc && g_Vars.lvupdate240 != 0 && shootfunc->recoilsettings != NULL) {
 		weaponPosition.x += (RANDOMFRAC() - 0.5f) * shootfunc->recoilsettings->xrange * hand->finalmult[0];
 		weaponPosition.y += (RANDOMFRAC() - 0.5f) * shootfunc->recoilsettings->yrange * hand->finalmult[0];
 		weaponPosition.z += (RANDOMFRAC() - 0.5f) * shootfunc->recoilsettings->zrange * hand->finalmult[0];
 	}
 
+	// Calculate aim position based on crosshair
 	hand->fspare1 = (player->crosspos2[0] - camGetScreenLeft() - camGetScreenWidth() * 0.5f) * weapondef->aimsettings->guntransside / (camGetScreenWidth() * 0.5f);
 
 	if (player->crosspos2[1] - camGetScreenTop() > camGetScreenHeight() * 0.5f) {
@@ -7694,9 +7715,11 @@ void bgunUpdateHandModel(s32 handnum)
 	fspare1 = hand->fspare1;
 	fspare2 = hand->fspare2;
 
+	// Apply aiming offset to weapon position
 	weaponPosition.f[0] += fspare1;
 	weaponPosition.f[1] -= fspare2;
 
+	// Determine if hand should be visible
 	hand->visible = true;
 
 	if (!weaponHasFlag(weaponnum, WEAPONFLAG_00000040)
@@ -7709,6 +7732,7 @@ void bgunUpdateHandModel(s32 handnum)
 		hand->visible = false;
 	}
 
+	// If hand is visible, set up weapon model
 	if (hand->visible) {
 		weaponModelDef = player->gunctrl.gunmodeldef;
 		mtxallocation = gfxAllocate(weaponModelDef->nummatrices * sizeof(Mtxf));
@@ -7720,6 +7744,7 @@ void bgunUpdateHandModel(s32 handnum)
 			}
 		}
 
+		// Execute model command lists
 		bgunExecuteModelCmdList(hand->unk0dcc);
 
 		if (player->gunctrl.handmodeldef != NULL) {
@@ -7733,12 +7758,15 @@ void bgunUpdateHandModel(s32 handnum)
 		}
 	}
 
+	// Calculate model matrices
 	mtx4LoadIdentity(&rotationMatrix);
 
+	// Handle gangsta style rotation
 	if (PLAYERCOUNT() == 1 && IS8MB() && weaponHasFlag(weaponnum, WEAPONFLAG_GANGSTA)) {
 		bgunUpdateGangsta(hand, handnum, &weaponPosition, funcdef, &tempMatrix1, &rotationMatrix);
 	}
 
+	// Apply custom position/rotation if set
 	if (hand->useposrot) {
 		weaponPosition.f[0] += hand->posrotmtx.m[3][0];
 		weaponPosition.f[1] += hand->posrotmtx.m[3][1];
@@ -7756,12 +7784,14 @@ void bgunUpdateHandModel(s32 handnum)
 		hand->posoffset.z = 0.0f;
 	}
 
+	// Set up camera-relative matrices
 	mtx00016d58(&tempMatrix1, 0.0f, 0.0f, 0.0f,
 			hand->damplook.x, hand->damplook.y, hand->damplook.z,
 			hand->dampup.x, hand->dampup.y, hand->dampup.z);
 
 	mtxApplyTransformInPlace(&tempMatrix1, &rotationMatrix);
 
+	// Calculate aim rotation
 	aimDirection.x = 0.0f;
 	aimDirection.y = M_PI;
 	aimDirection.z = 0.0f;
@@ -7784,12 +7814,15 @@ void bgunUpdateHandModel(s32 handnum)
 	mtx4Copy(&rotationMatrix, &finalModelMatrix);
 	mtx4SetTranslation(&weaponPosition, &finalModelMatrix);
 
+	// Store matrices for next frame
 	mtx4Copy(&finalModelMatrix, &hand->cammtx);
 	mtx4Copy(&hand->posmtx, &hand->prevmtx);
 
 	mtxApplyTransform(camGetProjectionMtxF(), &hand->cammtx, &hand->posmtx);
 
+	// Handle visible weapon model
 	if (hand->visible) {
+		// Find muzzle flash toggle nodes
 		for (j = 0x5a; j < 0x5d; j++) {
 			node = modelGetPart(weaponModelDef, j);
 
@@ -7803,6 +7836,7 @@ void bgunUpdateHandModel(s32 handnum)
 		hand->gunmodel.matrices = (Mtxf *)mtxallocation;
 		hand->handmodel.matrices = (Mtxf *)mtxallocation;
 
+		// Flip model for left hand dual wield weapons
 		if (weaponHasFlag(weaponnum, WEAPONFLAG_DUALFLIP) && handnum == HAND_LEFT) {
 			mtx00015e24(-1, &finalModelMatrix);
 		}
@@ -7812,6 +7846,7 @@ void bgunUpdateHandModel(s32 handnum)
 		mtx4Copy(&finalModelMatrix, (Mtxf *)mtxallocation);
 		// XXX finalModelMatrix is the final model render matrix
 
+		// Handle ejected items (grenade pins etc)
 		if (hand->unk0cc8_04 > 0) {
 			switch (weaponnum) {
 			case WEAPON_GRENADE:
@@ -7835,6 +7870,7 @@ void bgunUpdateHandModel(s32 handnum)
 		var8009d0dc = -1;
 		var8009d0f0[0] = var8009d0f0[1] = var8009d0f0[2] = -1;
 
+		// Handle weapon-specific updates
 		switch (weaponnum) {
 		case WEAPON_LASER:
 			bgunUpdateLaser(hand);
@@ -7866,6 +7902,7 @@ void bgunUpdateHandModel(s32 handnum)
 				a0 = false;
 			}
 
+			// Determine if cached animation matrices can be used
 			switch (weaponnum) {
 			case WEAPON_REAPER:
 				a0 = false;
@@ -7906,6 +7943,7 @@ void bgunUpdateHandModel(s32 handnum)
 			}
 
 #if VERSION >= VERSION_PAL_BETA
+			// PAL specific animation handling
 			switch (modelGetAnimNum(&hand->gunmodel)) {
 			case ANIM_GUN_CROSSBOW_EQUIP:
 			case ANIM_GUN_LAPTOP_EQUIP:
@@ -7927,6 +7965,7 @@ void bgunUpdateHandModel(s32 handnum)
 			}
 #endif
 
+			// Use cached matrices if possible
 			if (a0) {
 				if (player->hands[HAND_RIGHT].unk0dd4 == -1) {
 					mtx4LoadIdentity(&sp84);
@@ -7989,6 +8028,7 @@ void bgunUpdateHandModel(s32 handnum)
 
 			g_ModelJointPositionedFunc = 0;
 
+			// Handle slide component animation
 			node = modelGetPart(weaponModelDef, MODELPART_GUN_SLIDE);
 
 			if (node) {
@@ -8010,6 +8050,7 @@ void bgunUpdateHandModel(s32 handnum)
 				mtx->m[3][2] += sp74.f[2];
 			}
 
+			// Disable muzzle flash nodes initially
 			if (toggleVisibility[0] != NULL) {
 				*toggleVisibility[0] = false;
 			}
@@ -8022,6 +8063,7 @@ void bgunUpdateHandModel(s32 handnum)
 				*toggleVisibility[2] = false;
 			}
 
+			// Handle weapon-specific updates
 			switch (weaponnum) {
 			case WEAPON_SNIPERRIFLE:
 				bgunUpdateSniperRifle(weaponModelDef, mtxallocation);
@@ -8034,6 +8076,7 @@ void bgunUpdateHandModel(s32 handnum)
 				break;
 			}
 
+			// Find muzzle node
 			node = modelGetPart(weaponModelDef, MODELPART_GUN_MUZZLEPOS);
 
 			if (weaponnum == WEAPON_REAPER) {
@@ -8044,6 +8087,7 @@ void bgunUpdateHandModel(s32 handnum)
 				}
 			}
 
+			// Update muzzle position
 			if (node) {
 				sp6c = modelFindNodeMtxIndex(node, 0);
 
@@ -8059,6 +8103,7 @@ void bgunUpdateHandModel(s32 handnum)
 
 				hand->muzzlez = -((Mtxf *)((uintptr_t)mtxallocation + sp6c * sizeof(Mtxf)))->m[3][2];
 
+				// Handle muzzle flash
 				if (hand->flashon && toggleCount > 0 && weaponnum != WEAPON_SHOTGUN && g_Vars.lvupdate240 != 0) {
 					bgun0f0a4e44(hand, weapondef, weaponModelDef, funcdef, toggleCount, mtxallocation, weaponnum, toggleVisibility, sp6c, &rotationMatrix, &transformMatrix);
 				}
@@ -8067,6 +8112,7 @@ void bgunUpdateHandModel(s32 handnum)
 					|| weaponnum == WEAPON_REMOTEMINE
 					|| weaponnum == WEAPON_PROXIMITYMINE
 					|| weaponnum == WEAPON_NBOMB) {
+				// For throwables, use hold position instead of muzzle
 				sp6c = modelFindNodeMtxIndex(modelGetPart(weaponModelDef, MODELPART_GUN_HOLDPOS), 0);
 
 				mtx = (Mtxf *)mtxallocation;
@@ -8081,6 +8127,7 @@ void bgunUpdateHandModel(s32 handnum)
 
 				hand->muzzlez = -((Mtxf *)((uintptr_t)mtxallocation + sp6c * sizeof(Mtxf)))->m[3][2];
 			} else {
+				// No muzzle node - use hand position
 				hand->muzzlepos.x = hand->posmtx.m[3][0];
 				hand->muzzlepos.y = hand->posmtx.m[3][1];
 				hand->muzzlepos.z = hand->posmtx.m[3][2];
@@ -8091,6 +8138,7 @@ void bgunUpdateHandModel(s32 handnum)
 			}
 		}
 	} else {
+		// Not visible - use hand position for muzzle
 		hand->muzzlepos.x = hand->posmtx.m[3][0];
 		hand->muzzlepos.y = hand->posmtx.m[3][1];
 		hand->muzzlepos.z = hand->posmtx.m[3][2];
@@ -8100,6 +8148,7 @@ void bgunUpdateHandModel(s32 handnum)
 		hand->muzzlez = -hand->cammtx.m[3][2];
 	}
 
+	// Handle weapon-specific updates
 	switch (weaponnum) {
 	case WEAPON_ROCKETLAUNCHER:
 		bgunUpdateRocketLauncher(hand, handnum, (struct weaponfunc_shootprojectile *)funcdef);
@@ -8112,18 +8161,22 @@ void bgunUpdateHandModel(s32 handnum)
 		break;
 	}
 
+	// Create firing effects
 	if (hand->firing && g_Vars.lvupdate240 != 0) {
 		bgunCreateFx(hand, handnum, funcdef, weaponnum, weaponModelDef, mtxallocation);
 	}
 
+	// Update gun smoke
 	if (PLAYERCOUNT() == 1 && IS8MB() && g_Vars.lvupdate240 != 0) {
 		bgunUpdateSmoke(hand, handnum, weaponnum, funcdef);
 	}
 
+	// Update ejected items
 	if (hand->ejectstate > EJECTSTATE_INACTIVE) {
 		bgunTickEject(hand, weaponModelDef, isdetonator);
 	}
 
+	// Update laser sight (Falcon 2)
 	if (PLAYERCOUNT() == 1 && IS8MB() && hand->visible
 			&& weaponnum >= WEAPON_FALCON2 && weaponnum <= WEAPON_FALCON2_SCOPE) {
 		bgunUpdateLasersight(hand, weaponModelDef, handnum, mtxallocation);
@@ -8131,6 +8184,7 @@ void bgunUpdateHandModel(s32 handnum)
 		lasersightFree(handnum);
 	}
 
+	// Reset animation increments
 	hand->animframeinc = 0;
 
 #if VERSION >= VERSION_PAL_BETA
