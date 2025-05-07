@@ -7578,18 +7578,18 @@ void bgunApplyVRControllerPos(struct hand *hand, s32 handnum) {
     }
 }
 
-void bgun0f0a5550(s32 handnum)
+void bgunUpdateHandModel(s32 handnum)
 {
 	u8 *mtxallocation;
-	Mtxf sp2c4;
-	Mtxf sp284;
-	struct modeldef *modeldef = NULL;
-	struct coord sp274 = {0, 0, 0};
-	Mtxf sp234;
-	Mtxf sp1f4;
+	Mtxf finalModelMatrix;
+	Mtxf tempMatrix1;
+	struct modeldef *weaponModelDef = NULL;
+	struct coord weaponPosition = {0, 0, 0};
+	Mtxf rotationMatrix;
+	Mtxf transformMatrix;
 	union modelrodata *rodata;
-	bool *sp1e4[3] = {NULL, NULL, NULL};
-	s32 sp1e0 = 0;
+	bool *toggleVisibility[3] = {NULL, NULL, NULL};
+	s32 toggleCount = 0;
 	struct modelnode *node;
 	struct player *player = g_Vars.currentplayer;
 	struct hand *hand = player->hands + handnum;
@@ -7602,10 +7602,10 @@ void bgun0f0a5550(s32 handnum)
 	bool isdetonator = false;
 	f32 fspare1;
 	f32 fspare2;
-	struct coord sp1a4;
-	Mtxf sp164;
-	Mtxf sp124;
-	struct coord sp118;
+	struct coord aimDirection;
+	Mtxf rotationMatrixX;
+	Mtxf rotationMatrixY;
+	struct coord muzzlePosition;
 	s32 j;
 
 	weapondef = weaponFindById(weaponnum);
@@ -7655,32 +7655,32 @@ void bgun0f0a5550(s32 handnum)
 	bgunApplyVRControllerPos(hand, handnum);
 
 	if (handnum == HAND_RIGHT) {
-		sp274.x = handGetWeaponXPosition(handnum) + hand->damppos.f[0] + hand->adjustpos.f[0];
-		sp274.y = weapondef->posy + hand->damppos.f[1] + hand->adjustpos.f[1];
-		sp274.z = weapondef->posz + hand->damppos.f[2] + hand->adjustpos.f[2];
+		weaponPosition.x = handGetWeaponXPosition(handnum) + hand->damppos.f[0] + hand->adjustpos.f[0];
+		weaponPosition.y = weapondef->posy + hand->damppos.f[1] + hand->adjustpos.f[1];
+		weaponPosition.z = weapondef->posz + hand->damppos.f[2] + hand->adjustpos.f[2];
 	} else if (isdetonator) {
-		sp274.x = 6.5f + hand->damppos.f[0] - hand->adjustpos.f[0];
-		sp274.y = -16.5f + hand->damppos.f[1] + hand->adjustpos.f[1];
-		sp274.z = -16.0f + hand->damppos.f[2] + hand->adjustpos.f[2];
+		weaponPosition.x = 6.5f + hand->damppos.f[0] - hand->adjustpos.f[0];
+		weaponPosition.y = -16.5f + hand->damppos.f[1] + hand->adjustpos.f[1];
+		weaponPosition.z = -16.0f + hand->damppos.f[2] + hand->adjustpos.f[2];
 	} else {
-		sp274.x = handGetWeaponXPosition(handnum) + hand->damppos.f[0] - hand->adjustpos.f[0];
-		sp274.y = weapondef->posy + hand->damppos.f[1] + hand->adjustpos.f[1];
-		sp274.z = weapondef->posz + hand->damppos.f[2] + hand->adjustpos.f[2];
+		weaponPosition.x = handGetWeaponXPosition(handnum) + hand->damppos.f[0] - hand->adjustpos.f[0];
+		weaponPosition.y = weapondef->posy + hand->damppos.f[1] + hand->adjustpos.f[1];
+		weaponPosition.z = weapondef->posz + hand->damppos.f[2] + hand->adjustpos.f[2];
 	}
 
-	sp274.y += player->guncloseroffset * 5.0f / -90.0f * 50.0f;
-	sp274.z -= player->guncloseroffset * 15.0f / -90.0f * 50.0f;
+	weaponPosition.y += player->guncloseroffset * 5.0f / -90.0f * 50.0f;
+	weaponPosition.z -= player->guncloseroffset * 15.0f / -90.0f * 50.0f;
 
 #ifndef PLATFORM_N64
 	// adjust viewmodel position for different FOVs
-	sp274.y -= bgunGetFovOffsetY();
-	sp274.z += bgunGetFovOffsetZ();
+	weaponPosition.y -= bgunGetFovOffsetY();
+	weaponPosition.z += bgunGetFovOffsetZ();
 #endif
 
 	if (hand->firing && shootfunc && g_Vars.lvupdate240 != 0 && shootfunc->recoilsettings != NULL) {
-		sp274.x += (RANDOMFRAC() - 0.5f) * shootfunc->recoilsettings->xrange * hand->finalmult[0];
-		sp274.y += (RANDOMFRAC() - 0.5f) * shootfunc->recoilsettings->yrange * hand->finalmult[0];
-		sp274.z += (RANDOMFRAC() - 0.5f) * shootfunc->recoilsettings->zrange * hand->finalmult[0];
+		weaponPosition.x += (RANDOMFRAC() - 0.5f) * shootfunc->recoilsettings->xrange * hand->finalmult[0];
+		weaponPosition.y += (RANDOMFRAC() - 0.5f) * shootfunc->recoilsettings->yrange * hand->finalmult[0];
+		weaponPosition.z += (RANDOMFRAC() - 0.5f) * shootfunc->recoilsettings->zrange * hand->finalmult[0];
 	}
 
 	hand->fspare1 = (player->crosspos2[0] - camGetScreenLeft() - camGetScreenWidth() * 0.5f) * weapondef->aimsettings->guntransside / (camGetScreenWidth() * 0.5f);
@@ -7694,8 +7694,8 @@ void bgun0f0a5550(s32 handnum)
 	fspare1 = hand->fspare1;
 	fspare2 = hand->fspare2;
 
-	sp274.f[0] += fspare1;
-	sp274.f[1] -= fspare2;
+	weaponPosition.f[0] += fspare1;
+	weaponPosition.f[1] -= fspare2;
 
 	hand->visible = true;
 
@@ -7710,11 +7710,11 @@ void bgun0f0a5550(s32 handnum)
 	}
 
 	if (hand->visible) {
-		modeldef = player->gunctrl.gunmodeldef;
-		mtxallocation = gfxAllocate(modeldef->nummatrices * sizeof(Mtxf));
+		weaponModelDef = player->gunctrl.gunmodeldef;
+		mtxallocation = gfxAllocate(weaponModelDef->nummatrices * sizeof(Mtxf));
 
 		if (weaponHasFlag(weaponnum, WEAPONFLAG_02000000)) {
-			for (i = 0; i < modeldef->nummatrices; i++) {
+			for (i = 0; i < weaponModelDef->nummatrices; i++) {
 				mtx = (Mtxf *)(mtxallocation + i * sizeof(Mtxf));
 				mtx4LoadIdentity(mtx);
 			}
@@ -7726,29 +7726,29 @@ void bgun0f0a5550(s32 handnum)
 			bgunExecuteModelCmdList(hand->unk0dd0);
 		}
 
-		bgun0f098030(hand, modeldef);
+		bgun0f098030(hand, weaponModelDef);
 
 		if (weaponHasFlag(weaponnum, WEAPONFLAG_00002000)) {
-			bgun0f0981e8(hand, modeldef);
+			bgun0f0981e8(hand, weaponModelDef);
 		}
 	}
 
-	mtx4LoadIdentity(&sp234);
+	mtx4LoadIdentity(&rotationMatrix);
 
 	if (PLAYERCOUNT() == 1 && IS8MB() && weaponHasFlag(weaponnum, WEAPONFLAG_GANGSTA)) {
-		bgunUpdateGangsta(hand, handnum, &sp274, funcdef, &sp284, &sp234);
+		bgunUpdateGangsta(hand, handnum, &weaponPosition, funcdef, &tempMatrix1, &rotationMatrix);
 	}
 
 	if (hand->useposrot) {
-		sp274.f[0] += hand->posrotmtx.m[3][0];
-		sp274.f[1] += hand->posrotmtx.m[3][1];
-		sp274.f[2] += hand->posrotmtx.m[3][2];
+		weaponPosition.f[0] += hand->posrotmtx.m[3][0];
+		weaponPosition.f[1] += hand->posrotmtx.m[3][1];
+		weaponPosition.f[2] += hand->posrotmtx.m[3][2];
 
-		mtxApplyTransformInPlace(&hand->posrotmtx, &sp234);
+		mtxApplyTransformInPlace(&hand->posrotmtx, &rotationMatrix);
 
-		sp234.m[3][0] = 0.0f;
-		sp234.m[3][1] = 0.0f;
-		sp234.m[3][2] = 0.0f;
+		rotationMatrix.m[3][0] = 0.0f;
+		rotationMatrix.m[3][1] = 0.0f;
+		rotationMatrix.m[3][2] = 0.0f;
 	} else {
 		hand->rotxoffset = 0.0f;
 		hand->posoffset.x = 0.0f;
@@ -7756,47 +7756,47 @@ void bgun0f0a5550(s32 handnum)
 		hand->posoffset.z = 0.0f;
 	}
 
-	mtx00016d58(&sp284, 0.0f, 0.0f, 0.0f,
+	mtx00016d58(&tempMatrix1, 0.0f, 0.0f, 0.0f,
 			hand->damplook.x, hand->damplook.y, hand->damplook.z,
 			hand->dampup.x, hand->dampup.y, hand->dampup.z);
 
-	mtxApplyTransformInPlace(&sp284, &sp234);
+	mtxApplyTransformInPlace(&tempMatrix1, &rotationMatrix);
 
-	sp1a4.x = 0.0f;
-	sp1a4.y = M_PI;
-	sp1a4.z = 0.0f;
+	aimDirection.x = 0.0f;
+	aimDirection.y = M_PI;
+	aimDirection.z = 0.0f;
 
-	mtx4LoadRotation(&sp1a4, &sp164);
+	mtx4LoadRotation(&aimDirection, &rotationMatrixX);
 
-	sp1a4.y = 0.0f;
+	aimDirection.y = 0.0f;
 
-	bgun0f0a24f0(&sp118, handnum);
+	bgun0f0a24f0(&muzzlePosition, handnum);
 
-	sp1a4.y = -bgun0f0a2498(sp118.x, sp118.z, sp274.f[0], sp274.f[2]);
-	sp1a4.x = bgun0f0a2498(sp118.y, sp118.z, sp274.f[1], sp274.f[2]);
+	aimDirection.y = -bgun0f0a2498(muzzlePosition.x, muzzlePosition.z, weaponPosition.f[0], weaponPosition.f[2]);
+	aimDirection.x = bgun0f0a2498(muzzlePosition.y, muzzlePosition.z, weaponPosition.f[1], weaponPosition.f[2]);
 
-	hand->lastrotangx = sp1a4.f[0];
-	hand->lastrotangy = sp1a4.f[1];
+	hand->lastrotangx = aimDirection.f[0];
+	hand->lastrotangy = aimDirection.f[1];
 
-	mtx4LoadRotation(&sp1a4, &sp124);
-	mtx4MultMtx4(&sp124, &sp164, &sp284);
-	mtx4MultMtx4InPlace(&sp284, &sp234);
-	mtx4Copy(&sp234, &sp2c4);
-	mtx4SetTranslation(&sp274, &sp2c4);
+	mtx4LoadRotation(&aimDirection, &rotationMatrixY);
+	mtx4MultMtx4(&rotationMatrixY, &rotationMatrixX, &tempMatrix1);
+	mtx4MultMtx4InPlace(&tempMatrix1, &rotationMatrix);
+	mtx4Copy(&rotationMatrix, &finalModelMatrix);
+	mtx4SetTranslation(&weaponPosition, &finalModelMatrix);
 
-	mtx4Copy(&sp2c4, &hand->cammtx);
+	mtx4Copy(&finalModelMatrix, &hand->cammtx);
 	mtx4Copy(&hand->posmtx, &hand->prevmtx);
 
 	mtxApplyTransform(camGetProjectionMtxF(), &hand->cammtx, &hand->posmtx);
 
 	if (hand->visible) {
 		for (j = 0x5a; j < 0x5d; j++) {
-			node = modelGetPart(modeldef, j);
+			node = modelGetPart(weaponModelDef, j);
 
 			if (node) {
 				rodata = node->rodata;
-				sp1e4[sp1e0] = (bool *)&hand->unk0a6c[rodata->toggle.rwdataindex];
-				sp1e0++;
+				toggleVisibility[toggleCount] = (bool *)&hand->unk0a6c[rodata->toggle.rwdataindex];
+				toggleCount++;
 			}
 		}
 
@@ -7804,12 +7804,13 @@ void bgun0f0a5550(s32 handnum)
 		hand->handmodel.matrices = (Mtxf *)mtxallocation;
 
 		if (weaponHasFlag(weaponnum, WEAPONFLAG_DUALFLIP) && handnum == HAND_LEFT) {
-			mtx00015e24(-1, &sp2c4);
+			mtx00015e24(-1, &finalModelMatrix);
 		}
 
-		mtxScaleRows(0.10000001f, &sp2c4);
+		mtxScaleRows(0.10000001f, &finalModelMatrix);
 
-		mtx4Copy(&sp2c4, (Mtxf *)mtxallocation);
+		mtx4Copy(&finalModelMatrix, (Mtxf *)mtxallocation);
+		// XXX finalModelMatrix is the final model render matrix
 
 		if (hand->unk0cc8_04 > 0) {
 			switch (weaponnum) {
@@ -7828,7 +7829,7 @@ void bgun0f0a5550(s32 handnum)
 		var8009d144 = hand;
 
 		if (hand->ejectstate > EJECTSTATE_INACTIVE) {
-			bgun0f0a45d0(hand, modeldef, isdetonator);
+			bgun0f0a45d0(hand, weaponModelDef, isdetonator);
 		}
 
 		var8009d0dc = -1;
@@ -7839,7 +7840,7 @@ void bgun0f0a5550(s32 handnum)
 			bgunUpdateLaser(hand);
 			break;
 		case WEAPON_REAPER:
-			bgunUpdateReaper(hand, modeldef);
+			bgunUpdateReaper(hand, weaponModelDef);
 			break;
 		}
 
@@ -7858,7 +7859,7 @@ void bgun0f0a5550(s32 handnum)
 			s32 stack;
 			s32 sp6c;
 
-			renderdata.unk00 = &sp2c4;
+			renderdata.unk00 = &finalModelMatrix;
 			renderdata.unk10 = hand->gunmodel.matrices;
 
 			if (hand->animmode != HANDANIMMODE_IDLE) {
@@ -7962,7 +7963,7 @@ void bgun0f0a5550(s32 handnum)
 				spc4 = hand->gunmodel.matrices;
 
 				for (spcc = 0; spcc < hand->gunmodel.definition->nummatrices; spcc++) {
-					mtxApplyTransform(&sp2c4, spc8, spc4);
+					mtxApplyTransform(&finalModelMatrix, spc8, spc4);
 					spc8++;
 					spc4++;
 				}
@@ -7988,7 +7989,7 @@ void bgun0f0a5550(s32 handnum)
 
 			g_ModelJointPositionedFunc = 0;
 
-			node = modelGetPart(modeldef, MODELPART_GUN_SLIDE);
+			node = modelGetPart(weaponModelDef, MODELPART_GUN_SLIDE);
 
 			if (node) {
 				sp80 = modelFindNodeMtxIndex(node, 0);
@@ -8009,37 +8010,37 @@ void bgun0f0a5550(s32 handnum)
 				mtx->m[3][2] += sp74.f[2];
 			}
 
-			if (sp1e4[0] != NULL) {
-				*sp1e4[0] = false;
+			if (toggleVisibility[0] != NULL) {
+				*toggleVisibility[0] = false;
 			}
 
-			if (sp1e4[1] != NULL) {
-				*sp1e4[1] = false;
+			if (toggleVisibility[1] != NULL) {
+				*toggleVisibility[1] = false;
 			}
 
-			if (sp1e4[2] != NULL) {
-				*sp1e4[2] = false;
+			if (toggleVisibility[2] != NULL) {
+				*toggleVisibility[2] = false;
 			}
 
 			switch (weaponnum) {
 			case WEAPON_SNIPERRIFLE:
-				bgunUpdateSniperRifle(modeldef, mtxallocation);
+				bgunUpdateSniperRifle(weaponModelDef, mtxallocation);
 				break;
 			case WEAPON_DEVASTATOR:
-				bgunUpdateDevastator(hand, mtxallocation, modeldef);
+				bgunUpdateDevastator(hand, mtxallocation, weaponModelDef);
 				break;
 			case WEAPON_SHOTGUN:
-				bgunUpdateShotgun(hand, mtxallocation, sp1e4[0], modeldef);
+				bgunUpdateShotgun(hand, mtxallocation, toggleVisibility[0], weaponModelDef);
 				break;
 			}
 
-			node = modelGetPart(modeldef, MODELPART_GUN_MUZZLEPOS);
+			node = modelGetPart(weaponModelDef, MODELPART_GUN_MUZZLEPOS);
 
 			if (weaponnum == WEAPON_REAPER) {
 				if (hand->flashon || hand->firing) {
-					node = modelGetPart(modeldef, MODELPART_REAPER_001E + (hand->burstbullets % 3));
+					node = modelGetPart(weaponModelDef, MODELPART_REAPER_001E + (hand->burstbullets % 3));
 				} else {
-					node = modelGetPart(modeldef, MODELPART_REAPER_001E + (g_Vars.lvframenum % 3));
+					node = modelGetPart(weaponModelDef, MODELPART_REAPER_001E + (g_Vars.lvframenum % 3));
 				}
 			}
 
@@ -8058,15 +8059,15 @@ void bgun0f0a5550(s32 handnum)
 
 				hand->muzzlez = -((Mtxf *)((uintptr_t)mtxallocation + sp6c * sizeof(Mtxf)))->m[3][2];
 
-				if (hand->flashon && sp1e0 > 0 && weaponnum != WEAPON_SHOTGUN && g_Vars.lvupdate240 != 0) {
-					bgun0f0a4e44(hand, weapondef, modeldef, funcdef, sp1e0, mtxallocation, weaponnum, sp1e4, sp6c, &sp234, &sp1f4);
+				if (hand->flashon && toggleCount > 0 && weaponnum != WEAPON_SHOTGUN && g_Vars.lvupdate240 != 0) {
+					bgun0f0a4e44(hand, weapondef, weaponModelDef, funcdef, toggleCount, mtxallocation, weaponnum, toggleVisibility, sp6c, &rotationMatrix, &transformMatrix);
 				}
 			} else if (weaponnum == WEAPON_GRENADE
 					|| weaponnum == WEAPON_TIMEDMINE
 					|| weaponnum == WEAPON_REMOTEMINE
 					|| weaponnum == WEAPON_PROXIMITYMINE
 					|| weaponnum == WEAPON_NBOMB) {
-				sp6c = modelFindNodeMtxIndex(modelGetPart(modeldef, MODELPART_GUN_HOLDPOS), 0);
+				sp6c = modelFindNodeMtxIndex(modelGetPart(weaponModelDef, MODELPART_GUN_HOLDPOS), 0);
 
 				mtx = (Mtxf *)mtxallocation;
 				mtx += sp6c;
@@ -8106,13 +8107,13 @@ void bgun0f0a5550(s32 handnum)
 	case WEAPON_DY357MAGNUM:
 	case WEAPON_DY357LX:
 		if (hand->unk0cc8_04 > 0) {
-			bgunUpdateMagnum(hand, handnum, modeldef, (Mtxf *)mtxallocation);
+			bgunUpdateMagnum(hand, handnum, weaponModelDef, (Mtxf *)mtxallocation);
 		}
 		break;
 	}
 
 	if (hand->firing && g_Vars.lvupdate240 != 0) {
-		bgunCreateFx(hand, handnum, funcdef, weaponnum, modeldef, mtxallocation);
+		bgunCreateFx(hand, handnum, funcdef, weaponnum, weaponModelDef, mtxallocation);
 	}
 
 	if (PLAYERCOUNT() == 1 && IS8MB() && g_Vars.lvupdate240 != 0) {
@@ -8120,12 +8121,12 @@ void bgun0f0a5550(s32 handnum)
 	}
 
 	if (hand->ejectstate > EJECTSTATE_INACTIVE) {
-		bgunTickEject(hand, modeldef, isdetonator);
+		bgunTickEject(hand, weaponModelDef, isdetonator);
 	}
 
 	if (PLAYERCOUNT() == 1 && IS8MB() && hand->visible
 			&& weaponnum >= WEAPON_FALCON2 && weaponnum <= WEAPON_FALCON2_SCOPE) {
-		bgunUpdateLasersight(hand, modeldef, handnum, mtxallocation);
+		bgunUpdateLasersight(hand, weaponModelDef, handnum, mtxallocation);
 	} else {
 		lasersightFree(handnum);
 	}
@@ -8364,10 +8365,10 @@ void bgunTickGameplay2(void)
 	}
 
 	bgunTickUnequippedReload();
-	bgun0f0a5550(HAND_RIGHT);
+	bgunUpdateHandModel(HAND_RIGHT);
 
 	if (player->hands[HAND_LEFT].inuse) {
-		bgun0f0a5550(HAND_LEFT);
+		bgunUpdateHandModel(HAND_LEFT);
 	} else {
 		player->hands[HAND_LEFT].ejectstate = EJECTSTATE_INACTIVE;
 	}

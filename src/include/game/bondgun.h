@@ -135,7 +135,7 @@ void bgun0f0a45d0(struct hand *hand, struct modeldef *modeldef, bool isdetonator
 void bgunTickEject(struct hand *hand, struct modeldef *modeldef, bool isdetonator);
 void bgun0f0a4e44(struct hand *hand, struct weapon *weapondef, struct modeldef *modeldef, struct weaponfunc *funcdef, s32 maxburst, u8 *allocation, s32 weaponnum, bool **arg7, s32 mtxindex, Mtxf *arg9, Mtxf *arg10);
 void bgunCreateFx(struct hand *hand, s32 handnum, struct weaponfunc *funcdef, s32 weaponnum, struct modeldef *modeldef, u8 *allocation);
-void bgun0f0a5550(s32 handnum);
+void bgunUpdateHandModel(s32 handnum);
 void bgunTickMaulerCharge(void);
 void bgunTickGameplay2(void);
 s32 bgunAllocateFireslot(void);
