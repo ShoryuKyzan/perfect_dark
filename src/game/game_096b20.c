@@ -12,7 +12,7 @@ void func0f096b20(struct coord *arg0, struct coord *arg1, f32 standfrac, struct 
 	vel->z = (arg1->z - arg0->z) * standfrac + arg0->z;
 }
 
-void func0f096b70(struct coord *arg0, struct coord *arg1, struct coord *arg2, struct coord *arg3, f32 arg4, struct coord *arg5)
+void interpolate_cubic_spline(struct coord *arg0, struct coord *arg1, struct coord *arg2, struct coord *arg3, f32 arg4, struct coord *arg5)
 {
 	f32 stack;
 	f32 mult0;
