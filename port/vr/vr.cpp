@@ -424,6 +424,13 @@ extern "C" void vrGetHMDRotation(float coord[3]) {
     coord[1] = vecHMDRotationLast.y;
     coord[2] = vecHMDRotationLast.z;
 }
+extern "C" void vrGetHMDMatrix(float matrix[4][4]) {
+    vrFloat44ToMat4(mat4HMDPose, matrix);
+}
+extern "C" void vrGetHMDMatrixInverted(float matrix[4][4]) {
+    vrFloat44ToMat4(mat4HMDPoseInverted, matrix);
+}
+
 
 extern "C" void vrGetHMDTotalPositionChange(float coord[3]) {
     coord[0] = vecHMDPositionLast.x - vecHMDPositionInitial.x;
@@ -440,6 +447,12 @@ extern "C" float vrGetWorldScaleFactor(){
     // TODO FIXME this really is a movement scaling to make it realistic for the default game. The actual scaling factor should be different. It should have some limits to prevent multiplayer cheating? And maybe steam already does this
 
     return 30.0f; // TODO make this a setting or driven from steam game settings
+}
+
+extern "C" float vrGetControllerWorldScaleFactor(){
+    // TODO FIXME this really is a movement scaling to make it realistic for the default game. The actual scaling factor should be different. It should have some limits to prevent multiplayer cheating? And maybe steam already does this
+
+    return 250.0f; // TODO make this a setting or driven from steam game settings
 }
 
 extern "C" float vrGetUserRealHeight(){

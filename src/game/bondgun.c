@@ -7544,24 +7544,66 @@ static inline f32 bgunGetFovOffsetY(void)
 
 #endif
 
-void bgunApplyVRControllerPos(struct hand *hand, s32 handnum) {
+void bgunApplyVRControllerPos(struct hand *hand, s32 handnum, Mtxf *dest) {
     if (!vrEnabled) {
         return;
     }
 	
 
-    float controllerMatrix[4][4];
+    Mtxf controllerMatrix;
+    Mtxf mtxRotationFix, mtxRotateZ;
 	bool connected = false;
     if (handnum == HAND_RIGHT){
-		connected = vrGetRightControllerMatrix(controllerMatrix);
+		connected = vrGetRightControllerMatrix(controllerMatrix.m);
 	} else if(handnum == HAND_LEFT){
-		connected = vrGetLeftControllerMatrix(controllerMatrix);
+		connected = vrGetLeftControllerMatrix(controllerMatrix.m);
 	}
 
 	if (connected) {
+		// apply inverted hmd rotation to the controller, since the game will add this back in
+		// vrGetHMDMatrixInverted(hmdMatrixInverted.m);
+		// mtx4MultMtx4InPlace(&hmdMatrixInverted, &controllerMatrix);
         // Set the weapon position and orientation directly from controller
-        mtx4Copy((Mtxf *)controllerMatrix, &hand->posrotmtx);
-        hand->useposrot = true;
+        // mtx4Copy(&controllerMatrix, &hand->posrotmtx);
+		
+		// make controller position always relative to HMD since player is located at the HMD
+		float hmd_pos[3];
+		float controller_pos[3];
+		vrGetHMDPosition(hmd_pos);
+		controller_pos[0] = (hmd_pos[0] - controllerMatrix.m[3][0]);
+		controller_pos[1] = (hmd_pos[1] - controllerMatrix.m[3][1]);
+		controller_pos[2] = (hmd_pos[2] - controllerMatrix.m[3][2]);
+		// scale
+		controller_pos[0] *= vrGetControllerWorldScaleFactor();
+		controller_pos[1] *= vrGetControllerWorldScaleFactor();
+		controller_pos[2] *= vrGetControllerWorldScaleFactor();
+		
+		// trying to fix rotation of model
+		// mtx4LoadZRotation(M_BADPI, &mtxRotateZ);
+		// mtx4LoadXRotation(M_BADPI/2.0f, &mtxRotationFix);
+		// mtx4MultMtx4InPlace(&mtxRotateZ, &mtxRotationFix);
+		// // zero out to prevent movement
+		// controllerMatrix.m[3][0] = 0.0f;
+		// controllerMatrix.m[3][1] = 0.0f;
+		// controllerMatrix.m[3][2] = 0.0f;
+		// mtx4MultMtx4InPlace(&mtxRotationFix, &controllerMatrix);
+
+		// overwrite translation in matrix
+		controllerMatrix.m[3][0] = controller_pos[0];
+		controllerMatrix.m[3][1] = controller_pos[1];
+		controllerMatrix.m[3][2] = controller_pos[2];
+
+		mtx4Copy(&controllerMatrix, dest);
+		// Translate the controller matrix by the player's ground position
+		dest->m[3][0] += g_Vars.currentplayer->prop->pos.x;
+		dest->m[3][1] += g_Vars.currentplayer->vv_manground;
+		dest->m[3][2] += g_Vars.currentplayer->prop->pos.z;
+
+		// Apply the world-to-screen transformation
+		mtx4MultMtx4InPlace(camGetWorldToScreenMtxf(), dest);
+
+		
+		// hand->useposrot = true;
         
         // Disable auto-aim and look-ahead behaviors
         hand->damppos.f[0] = 0.0f;
@@ -7667,8 +7709,8 @@ void bgunUpdateHandModel(s32 handnum)
 		}
 	}
 
-	// Apply VR controller position if enabled
-	bgunApplyVRControllerPos(hand, handnum);
+	// // Apply VR controller position if enabled
+	// bgunApplyVRControllerPos(hand, handnum);
 
 	// Calculate weapon position based on hand and weapon type
 	if (handnum == HAND_RIGHT) {
@@ -7843,6 +7885,8 @@ void bgunUpdateHandModel(s32 handnum)
 
 		mtxScaleRows(0.10000001f, &finalModelMatrix);
 
+		// Apply VR controller position if enabled
+		bgunApplyVRControllerPos(hand, handnum, &finalModelMatrix);
 		mtx4Copy(&finalModelMatrix, (Mtxf *)mtxallocation);
 		// XXX finalModelMatrix is the final model render matrix
 
