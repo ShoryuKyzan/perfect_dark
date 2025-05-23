@@ -7551,7 +7551,7 @@ void bgunApplyVRControllerPos(struct hand *hand, s32 handnum, Mtxf *dest) {
 	
 
     Mtxf controllerMatrix;
-    Mtxf mtxRotationFix, mtxRotateZ;
+    Mtxf mtxRotationFix, mtxRotateY;
 	bool connected = false;
     if (handnum == HAND_RIGHT){
 		connected = vrGetRightControllerMatrix(controllerMatrix.m);
@@ -7579,14 +7579,14 @@ void bgunApplyVRControllerPos(struct hand *hand, s32 handnum, Mtxf *dest) {
 		controller_pos[2] *= vrGetControllerWorldScaleFactor();
 		
 		// trying to fix rotation of model
-		// mtx4LoadZRotation(M_BADPI, &mtxRotateZ);
-		// mtx4LoadXRotation(M_BADPI/2.0f, &mtxRotationFix);
-		// mtx4MultMtx4InPlace(&mtxRotateZ, &mtxRotationFix);
+		mtx4LoadXRotation(M_BADPI, &mtxRotationFix);
+		mtx4LoadYRotation(M_BADPI/2.0f, &mtxRotateY);
+		mtx4MultMtx4InPlace(&mtxRotateY, &mtxRotationFix);
 		// // zero out to prevent movement
-		// controllerMatrix.m[3][0] = 0.0f;
-		// controllerMatrix.m[3][1] = 0.0f;
-		// controllerMatrix.m[3][2] = 0.0f;
-		// mtx4MultMtx4InPlace(&mtxRotationFix, &controllerMatrix);
+		controllerMatrix.m[3][0] = 0.0f;
+		controllerMatrix.m[3][1] = 0.0f;
+		controllerMatrix.m[3][2] = 0.0f;
+		mtx4MultMtx4InPlace(&mtxRotationFix, &controllerMatrix);
 
 		// overwrite translation in matrix
 		controllerMatrix.m[3][0] = controller_pos[0];
