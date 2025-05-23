@@ -7709,9 +7709,6 @@ void bgunUpdateHandModel(s32 handnum)
 		}
 	}
 
-	// // Apply VR controller position if enabled
-	// bgunApplyVRControllerPos(hand, handnum);
-
 	// Calculate weapon position based on hand and weapon type
 	if (handnum == HAND_RIGHT) {
 		weaponPosition.x = handGetWeaponXPosition(handnum) + hand->damppos.f[0] + hand->adjustpos.f[0];
