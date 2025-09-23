@@ -2,6 +2,7 @@
 #define VR_H
 #include "Matrices.h"
 #include "openvr_mingw.hpp"
+#include "../vrMatrixUtils.h"
 #include <PR/ultratypes.h>
 
 #ifdef __cplusplus
@@ -12,7 +13,6 @@ extern bool vrEnabled;
 extern uint32_t vrRenderWidth;
 extern uint32_t vrRenderHeight;
 Matrix4 vrSteamVRMtx44ToMat4(const struct vr::HmdMatrix44_t &mtx);
-Matrix4 vrSteamVRMtx34ToMat4(const struct vr::HmdMatrix34_t &matPose);
 bool vrInit();
 void vrShutdown();
 void vrTick();

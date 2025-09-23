@@ -4,6 +4,7 @@
 #include "system.h"
 #include "fs.h"
 #include "include/vr.h"
+#include "debug/controller.h"
 
 // VR
 // external
@@ -63,18 +64,6 @@ extern "C" Matrix4 vrSteamVRMtx44ToMat4(const vr::HmdMatrix44_t &mtx)
         mtx.m[0][1], mtx.m[1][1], mtx.m[2][1], mtx.m[3][1],
         mtx.m[0][2], mtx.m[1][2], mtx.m[2][2], mtx.m[3][2],
         mtx.m[0][3], mtx.m[1][3], mtx.m[2][3], mtx.m[3][3]);
-    return matrixObj;
-}
-//-----------------------------------------------------------------------------
-// Purpose: Converts a SteamVR matrix to our local matrix class
-//-----------------------------------------------------------------------------
-extern "C" Matrix4 vrSteamVRMtx34ToMat4(const vr::HmdMatrix34_t &matPose)
-{
-    Matrix4 matrixObj(
-        matPose.m[0][0], matPose.m[1][0], matPose.m[2][0], 0.0,
-        matPose.m[0][1], matPose.m[1][1], matPose.m[2][1], 0.0,
-        matPose.m[0][2], matPose.m[1][2], matPose.m[2][2], 0.0,
-        matPose.m[0][3], matPose.m[1][3], matPose.m[2][3], 1.0f);
     return matrixObj;
 }
 
@@ -203,6 +192,12 @@ extern "C" bool vrInit()
     mat4VREyePosRight.invert();
 
     vrInitInputBindings();
+
+    // DEBUG controller positions
+    // #ifdef DEBUG
+    sysLogPrintf(LOG_NOTE, "vr debug controller positions enabled");
+    // XXX controllerDebugInit(m_pHMD);
+    // #endif
 
     vrEnabled = true;
 

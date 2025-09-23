@@ -31,6 +31,7 @@
 #include "gfx_rendering_api.h"
 #include "gfx_screen_config.h"
 #include "../../port/vr/include/vr.h"
+#include "../../port/vr/debug/controller.h"
 
 
 uintptr_t gfxFramebuffer;
@@ -1181,6 +1182,7 @@ static void gfx_sp_matrix(uint8_t parameters, const int32_t *addr)
     float P_mat[4][4];
     gfx_get_render_p_mtx(P_mat);
     gfx_matrix_mul(rsp.MP_matrix, rsp.modelview_matrix_stack[rsp.modelview_matrix_stack_size - 1], P_mat);
+
 }
 
 static void gfx_sp_pop_matrix(uint32_t count)
@@ -3120,6 +3122,17 @@ extern "C" void gfx_run(Gfx *commands)
         rendering_state.viewport = {};
         rendering_state.scissor = {};
         gfx_run_dl(commands);
+
+        // render controllers
+        if (vrEnabled && vrRenderEye >= 0)
+        {
+            // TODO might need to use the world matrix here too
+            float P_mat2[4][4];
+            gfx_get_render_p_mtx(P_mat2);
+            controllerDebugRender(P_mat2); // DEBUG rendering of controller positions
+        }
+
+
         gfx_flush();
         gfxFramebuffer = 0;
 
