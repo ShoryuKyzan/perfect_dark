@@ -132,7 +132,6 @@ public:
     // constructors
     Matrix4(); // init with identity
     Matrix4(const float src[16]);
-    Matrix4(const float src[4][4]);
     Matrix4(float m00, float m01, float m02, float m03,  // 1st column
             float m04, float m05, float m06, float m07,  // 2nd column
             float m08, float m09, float m10, float m11,  // 3rd column
@@ -577,14 +576,6 @@ inline Matrix4::Matrix4()
 inline Matrix4::Matrix4(const float src[16])
 {
     set(src);
-}
-
-inline Matrix4::Matrix4(const float mat[4][4])
-{
-    set(mat[0][0], mat[0][1], mat[0][2], mat[0][3],
-        mat[1][0], mat[1][1], mat[1][2], mat[1][3],
-        mat[2][0], mat[2][1], mat[2][2], mat[2][3],
-        mat[3][0], mat[3][1], mat[3][2], mat[3][3]);
 }
 
 inline Matrix4::Matrix4(float m00, float m01, float m02, float m03,
