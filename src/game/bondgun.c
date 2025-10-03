@@ -7568,39 +7568,70 @@ void bgunApplyVRControllerPos(struct hand *hand, s32 handnum, Mtxf *dest) {
 		
 		// make controller position always relative to HMD since player is located at the HMD
 		float hmd_pos[3];
-		float controller_pos[3];
+		// float controller_pos[3];
 		vrGetHMDPosition(hmd_pos);
-		controller_pos[0] = (hmd_pos[0] - controllerMatrix.m[3][0]);
-		controller_pos[1] = (controllerMatrix.m[3][1] - hmd_pos[1]); // for some reason its wrong unless i flip this
-		controller_pos[2] = (hmd_pos[2] - controllerMatrix.m[3][2]);
-		// scale
-		controller_pos[0] *= vrGetControllerWorldScaleFactor();
-		controller_pos[1] *= vrGetControllerWorldScaleFactor();
-		controller_pos[2] *= vrGetControllerWorldScaleFactor();
-		
-		// trying to fix rotation of model
-		mtx4LoadXRotation(M_BADPI, &mtxRotationFix);
-		mtx4LoadYRotation(M_BADPI/2.0f, &mtxRotateY);
-		mtx4MultMtx4InPlace(&mtxRotateY, &mtxRotationFix);
-		// // zero out to prevent movement
-		controllerMatrix.m[3][0] = 0.0f;
-		controllerMatrix.m[3][1] = 0.0f;
-		controllerMatrix.m[3][2] = 0.0f;
-		mtx4MultMtx4InPlace(&mtxRotationFix, &controllerMatrix);
 
-		// overwrite translation in matrix
-		controllerMatrix.m[3][0] = controller_pos[0];
-		controllerMatrix.m[3][1] = controller_pos[1];
-		controllerMatrix.m[3][2] = controller_pos[2];
+		printf("controller\n\1t%.3f %f %f %f\n2\t%.3f %f %f %f\n3\t%.3f %f %f %f\n4\t%.3f %f %f %f\n",
+			controllerMatrix.m[0][0], controllerMatrix.m[0][1], controllerMatrix.m[0][2], controllerMatrix.m[0][3],
+			controllerMatrix.m[1][0], controllerMatrix.m[1][1], controllerMatrix.m[1][2], controllerMatrix.m[1][3],
+			controllerMatrix.m[2][0], controllerMatrix.m[2][1], controllerMatrix.m[2][2], controllerMatrix.m[2][3],
+			controllerMatrix.m[3][0], controllerMatrix.m[3][1], controllerMatrix.m[3][2], controllerMatrix.m[3][3]); // XXX
+
+		// controller_pos[0] = (controllerMatrix.m[3][0] - hmd_pos[0]);
+		// controller_pos[1] = (controllerMatrix.m[3][1] - hmd_pos[1]); // for some reason its wrong unless i flip this
+		// controller_pos[2] = (controllerMatrix.m[3][2] - hmd_pos[2]);
+		
+		// // swap x/z axes
+		// float tmp = controller_pos[0];
+		// controller_pos[0] = controller_pos[2];
+		// controller_pos[2] = tmp;
+
+		// // scale
+		// controller_pos[0] *= vrGetControllerWorldScaleFactor();
+		// controller_pos[1] *= vrGetControllerWorldScaleFactor();
+		// controller_pos[2] *= vrGetControllerWorldScaleFactor();
+		
+		// // trying to fix rotation of model
+		// // mtx4LoadXRotation(M_BADPI, &mtxRotationFix);
+		// mtx4LoadYRotation(M_BADPI/2.0f, &mtxRotationFix);
+		// // mtx4MultMtx4InPlace(&mtxRotateY, &mtxRotationFix);
+		// // // // zero out to prevent movement
+		// controllerMatrix.m[3][0] = 0.0f;
+		// controllerMatrix.m[3][1] = 0.0f;
+		// controllerMatrix.m[3][2] = 0.0f;
+		// mtx4MultMtx4InPlace(&mtxRotationFix, &controllerMatrix);
+
+		// // overwrite translation in matrix
+		// controllerMatrix.m[3][0] = controller_pos[0];
+		// controllerMatrix.m[3][1] = controller_pos[1];
+		// controllerMatrix.m[3][2] = controller_pos[2];
+		
+		controllerMatrix.m[3][0] *= vrGetControllerWorldScaleFactor();
+		controllerMatrix.m[3][1] *= vrGetControllerWorldScaleFactor();
+		controllerMatrix.m[3][2] *= vrGetControllerWorldScaleFactor();
+
+		hmd_pos[0] *= vrGetWorldScaleFactor();
+		hmd_pos[1] *= vrGetWorldScaleFactor();
+		hmd_pos[2] *= vrGetWorldScaleFactor();
+
+		controllerMatrix.m[3][0] = controllerMatrix.m[3][0] - hmd_pos[0];
+		controllerMatrix.m[3][1] = hmd_pos[1] - controllerMatrix.m[3][1];
+		controllerMatrix.m[3][2] = controllerMatrix.m[3][2] - hmd_pos[2];
+
+
+		// controller_pos[0] = (controllerMatrix.m[3][0] - hmd_pos[0]);
+		// controller_pos[1] = (controllerMatrix.m[3][1] - hmd_pos[1]); // for some reason its wrong unless i flip this
+		// controller_pos[2] = (controllerMatrix.m[3][2] - hmd_pos[2]);
+
 
 		mtx4Copy(&controllerMatrix, dest);
-		// Translate the controller matrix by the player's ground position
-		dest->m[3][0] += g_Vars.currentplayer->prop->pos.x;
-		dest->m[3][1] += g_Vars.currentplayer->vv_manground;
-		dest->m[3][2] += g_Vars.currentplayer->prop->pos.z;
+		// // Translate the controller matrix by the player's ground position
+		// dest->m[3][0] += g_Vars.currentplayer->prop->pos.x;
+		// dest->m[3][1] += g_Vars.currentplayer->vv_manground;
+		// dest->m[3][2] += g_Vars.currentplayer->prop->pos.z;
 
-		// Apply the world-to-screen transformation
-		mtx4MultMtx4InPlace(camGetWorldToScreenMtxf(), dest);
+		// // Apply the world-to-screen transformation
+		// mtx4MultMtx4InPlace(camGetWorldToScreenMtxf(), dest);
 
 		
 		// hand->useposrot = true;
