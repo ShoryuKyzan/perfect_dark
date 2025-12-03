@@ -102,7 +102,8 @@ Controls can be rebound in `pd.ini`. Default control scheme is as follows:
 2. Open the `MINGW32` prompt. (**NOTE:** _not_ the `MSYS` prompt or the `MINGW64` prompt)
 3. Install dependencies:  
    `pacman -S mingw-w64-i686-toolchain mingw-w64-i686-SDL2 mingw-w64-i686-zlib make git`
-4. Manually install cv2pdb to generate debugging symbols and add it to the PATH.
+4. Manually install cv2pdb and add it to the PATH. This helps generate debugging symbol pdb files.
+   https://github.com/rainers/cv2pdb/releases
 5. Get the source code:  
    `git clone --recursive https://github.com/fgsfdsfgs/perfect_dark.git && cd perfect_dark`
 6. Run `make -f Makefile.port`.
