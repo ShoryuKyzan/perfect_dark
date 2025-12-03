@@ -253,8 +253,9 @@ endif
 
 $(O_FILES): OPT_LVL := $(GCC_OPT_LVL)
 
-COMMON_CFLAGS := $(C_DEFINES) -DAVOID_UB=1 $(INCLUDES) $(TARGET_CFLAGS) -g \
+COMMON_CFLAGS := $(C_DEFINES) -DAVOID_UB=1 $(INCLUDES) $(TARGET_CFLAGS) -g3 \
   -fno-inline-functions \
+  -fno-omit-frame-pointer \
   -fno-strict-aliasing \
   -funsigned-char \
   -fwrapv \
@@ -319,8 +320,8 @@ copy_vrbindings_json: $(PDVR_JSONS)
 
 $(BIN): $(O_FILES) | copy_vrbindings_json
 	$(LD) $(COMMON_CFLAGS) $(OPT_LVL) -o $(BIN) $^ $(LDFLAGS)
-ifneq ($(CV2PDB),)
-	$(CV2PDB) $(BIN)
+ifneq (,$(findstring windows,$(TARGET_PLATFORM)))
+	cv2pdb $(BIN)
 endif
 
 $(B_DIR)/%.o: %.c $(JSON_HEADERS)

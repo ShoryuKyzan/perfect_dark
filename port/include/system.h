@@ -42,6 +42,7 @@ void sysCpuRelax(void);
 
 void crashInit(void);
 void crashShutdown(void);
+void crashLogStackTrace(void);
 
 #ifdef __cplusplus
 }

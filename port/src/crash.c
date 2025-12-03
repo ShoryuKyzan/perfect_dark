@@ -359,3 +359,88 @@ void crashAppendChar(char c)
 {
 
 }
+
+/** only implemented for win32 at this time */
+void crashLogStackTrace() {
+#ifdef PLATFORM_WIN32
+	HANDLE hProcess = GetCurrentProcess();
+	HANDLE hThread = GetCurrentThread();
+
+	// Initialize symbol handler
+	if (!SymInitialize(hProcess, NULL, TRUE)) {
+		sysLogPrintf(LOG_ERROR, "SymInitialize failed: %lu", GetLastError());
+		return;
+	}
+
+	CONTEXT context;
+	RtlCaptureContext(&context); // Capture current thread's context
+
+	STACKFRAME64 stackFrame;
+	memset(&stackFrame, 0, sizeof(STACKFRAME64));
+
+	DWORD machineType;
+#ifdef PLATFORM_X86
+	machineType = IMAGE_FILE_MACHINE_I386;
+	stackFrame.AddrPC.Offset = context.Eip;
+	stackFrame.AddrPC.Mode = AddrModeFlat;
+	stackFrame.AddrFrame.Offset = context.Ebp;
+	stackFrame.AddrFrame.Mode = AddrModeFlat;
+	stackFrame.AddrStack.Offset = context.Esp;
+	stackFrame.AddrStack.Mode = AddrModeFlat;
+#elif defined(PLATFORM_X86_64)
+	machineType = IMAGE_FILE_MACHINE_AMD64;
+	stackFrame.AddrPC.Offset = context.Rip;
+	stackFrame.AddrPC.Mode = AddrModeFlat;
+	stackFrame.AddrFrame.Offset = context.Rsp;
+	stackFrame.AddrFrame.Mode = AddrModeFlat;
+	stackFrame.AddrStack.Offset = context.Rsp;
+	stackFrame.AddrStack.Mode = AddrModeFlat;
+#else
+	sysLogPrintf(LOG_ERROR, "no stack trace available on this arch");
+	return;
+#endif
+	sysLogPrintf(LOG_NOTE, "Stack Trace:");
+	for (int i = 0; i < 20; ++i) { // Limit stack depth for demonstration
+		if (!StackWalk64(
+				machineType,
+				hProcess,
+				hThread,
+				&stackFrame,
+				&context,
+				NULL,
+				SymFunctionTableAccess64,
+				SymGetModuleBase64,
+				NULL
+			)) {
+			break; // No more frames or error
+		}
+
+		if (stackFrame.AddrPC.Offset == 0) {
+			break; // Reached the end of the stack
+		}
+
+		// Resolve symbol name
+		char lineBuf[512] = { 0 };
+		int lineLen = snprintf(lineBuf, sizeof(lineBuf), "[%d] 0x%llX", i, stackFrame.AddrPC.Offset);
+		
+		char buffer[sizeof(SYMBOL_INFO) + MAX_SYM_NAME * sizeof(TCHAR)];
+		PSYMBOL_INFO pSymbol = (PSYMBOL_INFO)buffer;
+		pSymbol->SizeOfStruct = sizeof(SYMBOL_INFO);
+		pSymbol->MaxNameLen = MAX_SYM_NAME;
+
+		DWORD64 displacement = 0;
+		if (SymFromAddr(hProcess, stackFrame.AddrPC.Offset, &displacement, pSymbol)) {
+			lineLen += snprintf(lineBuf + lineLen, sizeof(lineBuf) - lineLen, ": %s+%llu", pSymbol->Name, displacement);
+		} else {
+			lineLen += snprintf(lineBuf + lineLen, sizeof(lineBuf) - lineLen, " (Symbol not found)");
+		}
+		
+		sysLogPrintf(LOG_NOTE, "%s", lineBuf);
+	}
+
+	// Clean up symbol handler
+	SymCleanup(hProcess);
+#else
+	sysLogPrintf(LOG_WARNING, "crashLogStackTrace not implemented on this platform");
+#endif
+}

@@ -102,12 +102,13 @@ Controls can be rebound in `pd.ini`. Default control scheme is as follows:
 2. Open the `MINGW32` prompt. (**NOTE:** _not_ the `MSYS` prompt or the `MINGW64` prompt)
 3. Install dependencies:  
    `pacman -S mingw-w64-i686-toolchain mingw-w64-i686-SDL2 mingw-w64-i686-zlib make git`
-4. Get the source code:  
+4. Manually install cv2pdb to generate debugging symbols and add it to the PATH.
+5. Get the source code:  
    `git clone --recursive https://github.com/fgsfdsfgs/perfect_dark.git && cd perfect_dark`
-5. Run `make -f Makefile.port`.
+6. Run `make -f Makefile.port`.
    * Add ` ROMID=pal-final` or ` ROMID=jpn-final` at the end of the command if you want to build a PAL or JPN executable respectively.
-6. The resulting executable will be at `build/ntsc-final-port/pd.exe`.
-7. If you don't know where you downloaded the source to, you can run `explorer .` to open the current directory.
+7. The resulting executable will be at `build/ntsc-final-port/pd.exe`.
+8. If you don't know where you downloaded the source to, you can run `explorer .` to open the current directory.
 
 ### Linux
 
