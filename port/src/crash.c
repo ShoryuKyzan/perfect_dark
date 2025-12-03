@@ -26,9 +26,11 @@
 
 // NOTE: game builds with gcc, which means we have no PDBs for the windows version
 // this means that you generally won't get any symbol names in the main executable
+// However, with -g3 and -fno-omit-frame-pointer flags, addr2line can resolve them
 
 static LPTOP_LEVEL_EXCEPTION_FILTER prevExFilter;
 
+// Note: We don't use addr2line subprocess as it's too slow and creates console windows.
 static void *crashGetModuleBase(const void *addr)
 {
 	HMODULE h = NULL;
@@ -366,7 +368,8 @@ void crashLogStackTrace() {
 	HANDLE hProcess = GetCurrentProcess();
 	HANDLE hThread = GetCurrentThread();
 
-	// Initialize symbol handler
+	// Initialize symbol handler (request line loading and undecorated names)
+	SymSetOptions(SymGetOptions() | SYMOPT_DEBUG | SYMOPT_LOAD_LINES | SYMOPT_UNDNAME | SYMOPT_DEFERRED_LOADS);
 	if (!SymInitialize(hProcess, NULL, TRUE)) {
 		sysLogPrintf(LOG_ERROR, "SymInitialize failed: %lu", GetLastError());
 		return;
@@ -377,6 +380,9 @@ void crashLogStackTrace() {
 
 	STACKFRAME64 stackFrame;
 	memset(&stackFrame, 0, sizeof(STACKFRAME64));
+
+	IMAGEHLP_LINE64 lineInfo;
+	DWORD lineDisp = 0;
 
 	DWORD machineType;
 #ifdef PLATFORM_X86
@@ -431,6 +437,9 @@ void crashLogStackTrace() {
 		DWORD64 displacement = 0;
 		if (SymFromAddr(hProcess, stackFrame.AddrPC.Offset, &displacement, pSymbol)) {
 			lineLen += snprintf(lineBuf + lineLen, sizeof(lineBuf) - lineLen, ": %s+%llu", pSymbol->Name, displacement);
+			if (SymGetLineFromAddr64(hProcess, stackFrame.AddrPC.Offset, &lineDisp, &lineInfo)) {
+				lineLen += snprintf(lineBuf + lineLen, sizeof(lineBuf) - lineLen, " (%s:%lu+%lu)", lineInfo.FileName, lineInfo.LineNumber, lineDisp);
+			}
 		} else {
 			lineLen += snprintf(lineBuf + lineLen, sizeof(lineBuf) - lineLen, " (Symbol not found)");
 		}
