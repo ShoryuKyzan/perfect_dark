@@ -310,12 +310,15 @@ void bmoveHandleActivate(void)
 
 void bmoveVRAddHMDRotation(float *vv_theta, float *vv_verta) {
     float rotation[3];
+    float rotationAbs[3];
     vrGetHMDRotationDiff(rotation);
+    vrGetHMDRotation(rotationAbs); 
 
     float yawDegrees = -rotation[1] * (360.0f / (2.0f * M_PI));
     *vv_theta += yawDegrees;
-    float pitchDegrees = rotation[0] * (360.0f / (2.0f * M_PI));
-    *vv_verta += pitchDegrees;
+    // pitch is intentionally locked to HMD 
+    float pitchDegrees = rotationAbs[0] * (360.0f / (2.0f * M_PI));
+    *vv_verta = pitchDegrees;
 }
 
 void bmoveApplyMoveData(struct movedata *data)
