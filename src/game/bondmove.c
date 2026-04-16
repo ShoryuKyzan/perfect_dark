@@ -312,9 +312,9 @@ void bmoveVRAddHMDRotation(float *vv_theta, float *vv_verta) {
     float rotation[3];
     vrGetHMDRotationDiff(rotation);
 
-    float yawDegrees = rotation[1] * (360.0f / (2.0f * M_PI));
+    float yawDegrees = -rotation[1] * (360.0f / (2.0f * M_PI));
     *vv_theta += yawDegrees;
-    float pitchDegrees = -rotation[0] * (360.0f / (2.0f * M_PI));
+    float pitchDegrees = rotation[0] * (360.0f / (2.0f * M_PI));
     *vv_verta += pitchDegrees;
 }
 

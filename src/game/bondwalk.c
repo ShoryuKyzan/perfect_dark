@@ -242,11 +242,25 @@ s32 bwalkTryMoveUpwards(f32 amount)
 
 void bmoveApplyHMDDiff(struct coord *vel) {
     float movement[3];
-    vrGetHMDMovementDiff(movement);
+    vrGetHMDRelativeMovementDiff(movement);
 	float scaleFactor = vrGetWorldScaleFactor();
-    vel->x += (scaleFactor * movement[0]);
-    vel->z += (scaleFactor * movement[2]);
-    
+	
+    // Rotate HMD movement to match player's orientation
+	float fx = 0.0f;
+	float fz = 1.0f;
+	float rx = 1.0f;
+	float rz = 0.0f;
+    if (g_Vars.currentplayer) {
+        // forward = bond2.unk00 (fx,fz)
+        fx = g_Vars.currentplayer->bond2.unk00.f[0];
+        fz = g_Vars.currentplayer->bond2.unk00.f[2];
+        // right = forward rotated 90° CW = (-fz, 0, fx)  (inverted from original)
+        rx = -fz;
+        rz = fx;
+	}
+	// apply rotation
+	vel->x += scaleFactor * (movement[0] * rx + movement[2] * fx);
+	vel->z += scaleFactor * (movement[0] * rz + movement[2] * fz);
 }
 
 
@@ -359,6 +373,7 @@ bool bwalkCalculateNewPosition(struct coord *vel, f32 rotateamount, bool apply, 
 			angle -= 360;
 		}
 
+		sysLogPrintf(LOG_NOTE, "before %f after %f", g_Vars.currentplayer->vv_theta, angle) ; // XXX
 		g_Vars.currentplayer->vv_theta = angle;
 
 		g_Vars.currentplayer->prop->pos.x = dstpos.x;

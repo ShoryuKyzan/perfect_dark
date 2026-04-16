@@ -21,6 +21,7 @@ Matrix4 mat4VRProjectionRight;
 Matrix4 mat4VREyePosLeft;
 Matrix4 mat4VREyePosRight;
 Matrix4 mat4Camera;
+Matrix4 mat4HMDPoseLast;
 Vector3 vecHMDPositionLast;
 Vector3 vecHMDRotationLast;
 Vector3 vecHMDPositionDiff;
@@ -300,16 +301,37 @@ extern "C" void vrTick()
         mat4HMDPoseInverted.invert();
         Vector3 vecHMDRotNext = getRotationFromMatrix(mat4HMDPoseInverted);
         
-        if(firstTick) {
+        if (firstTick) {
+            mat4HMDPoseLast = mat4HMDPose;
             vecHMDPositionLast = vecHMDPosNext;
             vecHMDPositionInitial = vecHMDPosNext;
             vecHMDRotationLast = vecHMDRotNext;
             firstTick = false;
         } else {
-            vecHMDPositionDiff = vecHMDPositionLast - vecHMDPosNext;
-            vecHMDRotationDiff = vecHMDRotationLast - vecHMDRotNext;
+            // generate inverse rotation of last known matrix position
+            Matrix3 rotLastInv(
+                mat4HMDPoseLast[0], mat4HMDPoseLast[1], mat4HMDPoseLast[2],
+                mat4HMDPoseLast[4], mat4HMDPoseLast[5], mat4HMDPoseLast[6],
+                mat4HMDPoseLast[8], mat4HMDPoseLast[9], mat4HMDPoseLast[10]);
+            rotLastInv.transpose();
+
+            // rotation change: world-space Euler subtraction
+            // Next - Last provides correct sign and prevents "bumpy" rotation when tilted.
+            vecHMDRotationDiff = vecHMDRotNext - vecHMDRotationLast;
+            
+            
+            
+
+            // get position change (Last - Next) to ensure correct movement direction
+            Vector3 vDiffWorld = vecHMDPositionLast - vecHMDPosNext;
+            // rotate that vector by the inverse rotation to convert to natural axes
+            vecHMDPositionDiff = rotLastInv * vDiffWorld;
+            vecHMDPositionDiff.x = -vecHMDPositionDiff.x;
+
+            // update last known state
             vecHMDRotationLast = vecHMDRotNext;
             vecHMDPositionLast = vecHMDPosNext;
+            mat4HMDPoseLast = mat4HMDPose;
         }
 
         if (becameActive ||
@@ -330,7 +352,10 @@ extern "C" void vrTick()
 
 }
 
-extern "C" void vrGetHMDMovementDiff(float coord[3]){
+/**
+ * Get HMD movement difference relative to its own orientation (not world)
+ */
+extern "C" void vrGetHMDRelativeMovementDiff(float coord[3]){
     coord[0] = vecHMDPositionDiff.x;
     coord[1] = vecHMDPositionDiff.y;
     coord[2] = vecHMDPositionDiff.z;
