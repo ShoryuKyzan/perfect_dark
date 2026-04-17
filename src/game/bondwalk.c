@@ -242,6 +242,7 @@ s32 bwalkTryMoveUpwards(f32 amount)
 
 void bmoveApplyHMDDiff(struct coord *vel) {
     float movement[3];
+    float hmdPlayerCameraRelativeMovement[3];
     vrGetHMDRelativeMovementDiff(movement);
 	float scaleFactor = vrGetWorldScaleFactor();
 	
@@ -257,10 +258,15 @@ void bmoveApplyHMDDiff(struct coord *vel) {
         // right = forward rotated 90° CW = (-fz, 0, fx)  (inverted from original)
         rx = -fz;
         rz = fx;
+        hmdPlayerCameraRelativeMovement[0] = (movement[0] * rx + movement[2] * fx); // x
+        hmdPlayerCameraRelativeMovement[1] = 0.0f; // on purpose. camera Y is locked to HMD Y and its always returned from the vr getter for this var
+        hmdPlayerCameraRelativeMovement[2] = (movement[0] * rz + movement[2] * fz); // z
 	}
 	// apply rotation
-	vel->x += scaleFactor * (movement[0] * rx + movement[2] * fx);
-	vel->z += scaleFactor * (movement[0] * rz + movement[2] * fz);
+	vel->x += scaleFactor * hmdPlayerCameraRelativeMovement[0];
+	vel->z += scaleFactor * hmdPlayerCameraRelativeMovement[2];
+
+    vrAddHMDPlayerCameraRelativeMovement(hmdPlayerCameraRelativeMovement);
 }
 
 

@@ -1,5 +1,7 @@
 void vrSetCameraMtx(float matrix[4][4]);
 void vrGetHMDRelativeMovementDiff(float coord[3]);
+void vrAddHMDPlayerCameraRelativeMovement(float coord[3]);
+void vrGetHMDPlayerCameraRelativePos(float coord[3]);
 void vrGetHMDRotationDiff(float coord[3]);
 bool vrGetLeftControllerMatrix(float matrix[4][4]);
 bool vrGetRightControllerMatrix(float matrix[4][4]);

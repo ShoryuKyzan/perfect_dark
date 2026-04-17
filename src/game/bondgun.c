@@ -7569,10 +7569,10 @@ void bgunApplyVRControllerPos(struct hand *hand, s32 handnum, Mtxf *dest) {
 		// make controller position always relative to HMD since player is located at the HMD
 		float hmd_pos[3];
 		float controller_pos[3];
-		vrGetHMDPosition(hmd_pos);
-		controller_pos[0] = (hmd_pos[0] - controllerMatrix.m[3][0]);
-		controller_pos[1] = (controllerMatrix.m[3][1] - hmd_pos[1]); // for some reason its wrong unless i flip this
-		controller_pos[2] = (hmd_pos[2] - controllerMatrix.m[3][2]);
+        vrGetHMDPlayerCameraRelativePos(hmd_pos);
+		controller_pos[0] = (controllerMatrix.m[3][0] - hmd_pos[0]);
+		controller_pos[1] = (controllerMatrix.m[3][1] - hmd_pos[1]);
+		controller_pos[2] = (controllerMatrix.m[3][2] - hmd_pos[2]);
 		// scale
 		controller_pos[0] *= vrGetControllerWorldScaleFactor();
 		controller_pos[1] *= vrGetControllerWorldScaleFactor();

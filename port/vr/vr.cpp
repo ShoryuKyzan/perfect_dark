@@ -26,6 +26,7 @@ Vector3 vecHMDPositionLast;
 Vector3 vecHMDRotationLast;
 Vector3 vecHMDPositionDiff;
 Vector3 vecHMDRotationDiff;
+Vector3 vecHMDPlayerCameraRelativePos;
 float fNearClip = 0.1f;
 float fFarClip = 9000.0f;
 Matrix4 mat4ControllerPoseLeft;
@@ -359,6 +360,30 @@ extern "C" void vrGetHMDRelativeMovementDiff(float coord[3]){
     coord[0] = vecHMDPositionDiff.x;
     coord[1] = vecHMDPositionDiff.y;
     coord[2] = vecHMDPositionDiff.z;
+}
+
+/**
+ * Add HMD movement difference relative to the player camera's orientation (not world)
+ * 
+ * Note: currently y is ignored and set to hmd_pos[1] because camera Y is locked to HMD
+ */
+extern "C" void vrAddHMDPlayerCameraRelativeMovement(float coord[3]){
+    float hmd_pos[3];
+    vrGetHMDPosition(hmd_pos);
+    vecHMDPlayerCameraRelativePos.x += coord[0];
+    vecHMDPlayerCameraRelativePos.y = hmd_pos[1]; // camera Y is locked to HMD Y elsewhere already, so this is accurate
+    vecHMDPlayerCameraRelativePos.z += coord[2];
+}
+
+/**
+ * Get HMD movement difference relative to the player camera's orientation (not world)
+ * 
+ * Note: currently y will always be 0 since camera Y is locked to HMD
+ */
+extern "C" void vrGetHMDPlayerCameraRelativePos(float coord[3]){
+    coord[0] = vecHMDPlayerCameraRelativePos.x;
+    coord[1] = vecHMDPlayerCameraRelativePos.y;
+    coord[2] = vecHMDPlayerCameraRelativePos.z;
 }
 
 extern "C" void vrGetHMDRotationDiff(float coord[3]){
