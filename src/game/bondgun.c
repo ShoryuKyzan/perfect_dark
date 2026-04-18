@@ -7560,44 +7560,29 @@ void bgunApplyVRControllerPos(struct hand *hand, s32 handnum, Mtxf *dest) {
 	}
 
 	if (connected) {
-		// apply inverted hmd rotation to the controller, since the game will add this back in
-        // this entirely breaks it.
-        // Mtxf hmdMatrixInverted;
-		// vrGetHMDMatrixInverted(hmdMatrixInverted.m);
-		// mtx4MultMtx4InPlace(&hmdMatrixInverted, &controllerMatrix);
-        // Set the weapon position and orientation directly from controller
-        // mtx4Copy(&controllerMatrix, &hand->posrotmtx);
-		
-		// make controller position always relative to HMD since player is located at the HMD
 		float hmd_pos[3];
 		float controller_pos[3];
-        vrGetHMDPlayerCameraRelativePos(hmd_pos);
-		controller_pos[0] = (controllerMatrix.m[3][0] - hmd_pos[0]);
-		controller_pos[1] = (controllerMatrix.m[3][1] - hmd_pos[1]);
-		controller_pos[2] = (controllerMatrix.m[3][2] - hmd_pos[2]);
-		// scale
-		controller_pos[0] *= vrGetControllerWorldScaleFactor();
-		controller_pos[1] *= vrGetControllerWorldScaleFactor();
-		controller_pos[2] *= vrGetControllerWorldScaleFactor();
-		
-		// trying to fix rotation of model
-        // XXX this isnt the issue
-        // XXX new fix
-		// mtx4LoadYRotation(M_BADPI/2.0f, &mtxRotationFix);
-		// // zero out to prevent movement
-		// controllerMatrix.m[3][0] = 0.0f;
-		// controllerMatrix.m[3][1] = 0.0f;
-		// controllerMatrix.m[3][2] = 0.0f;
-		// mtx4MultMtx4InPlace(&mtxRotationFix, &controllerMatrix);
-        // XXX maybe entirely wrong
-		// mtx4LoadXRotation(M_BADPI, &mtxRotationFix);
-		// mtx4LoadYRotation(M_BADPI/2.0f, &mtxRotateY);
-		// mtx4MultMtx4InPlace(&mtxRotateY, &mtxRotationFix);
-		// // // zero out to prevent movement
-		// controllerMatrix.m[3][0] = 0.0f;
-		// controllerMatrix.m[3][1] = 0.0f;
-		// controllerMatrix.m[3][2] = 0.0f;
-		// mtx4MultMtx4InPlace(&mtxRotationFix, &controllerMatrix);
+		Mtxf mtxRotate180Y;
+
+		vrGetHMDPlayerCameraRelativePos(hmd_pos);
+
+		// Make controller position relative to HMD
+		controllerMatrix.m[3][0] -= hmd_pos[0];
+		controllerMatrix.m[3][1] -= hmd_pos[1];
+		controllerMatrix.m[3][2] -= hmd_pos[2];
+
+		// Invert X and Z rotation/movement by rotating 180 degrees around Y relative to HMD
+		mtx4LoadYRotation(M_PI, &mtxRotate180Y);
+		mtx4MultMtx4InPlace(&mtxRotate180Y, &controllerMatrix);
+
+		// Correct the model orientation by rotating 180 degrees around Y locally
+		mtx4MultMtx4(&controllerMatrix, &mtxRotate180Y, &mtxRotationFix);
+		mtx4Copy(&mtxRotationFix, &controllerMatrix);
+
+		// Scale the relative position
+		controller_pos[0] = controllerMatrix.m[3][0] * vrGetControllerWorldScaleFactor();
+		controller_pos[1] = controllerMatrix.m[3][1] * vrGetControllerWorldScaleFactor();
+		controller_pos[2] = controllerMatrix.m[3][2] * vrGetControllerWorldScaleFactor();
 
 		// overwrite translation in matrix
 		controllerMatrix.m[3][0] = controller_pos[0];
