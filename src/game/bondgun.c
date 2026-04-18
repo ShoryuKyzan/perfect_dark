@@ -7561,6 +7561,8 @@ void bgunApplyVRControllerPos(struct hand *hand, s32 handnum, Mtxf *dest) {
 
 	if (connected) {
 		// apply inverted hmd rotation to the controller, since the game will add this back in
+        // this entirely breaks it.
+        // Mtxf hmdMatrixInverted;
 		// vrGetHMDMatrixInverted(hmdMatrixInverted.m);
 		// mtx4MultMtx4InPlace(&hmdMatrixInverted, &controllerMatrix);
         // Set the weapon position and orientation directly from controller
@@ -7579,14 +7581,23 @@ void bgunApplyVRControllerPos(struct hand *hand, s32 handnum, Mtxf *dest) {
 		controller_pos[2] *= vrGetControllerWorldScaleFactor();
 		
 		// trying to fix rotation of model
-		mtx4LoadXRotation(M_BADPI, &mtxRotationFix);
-		mtx4LoadYRotation(M_BADPI/2.0f, &mtxRotateY);
-		mtx4MultMtx4InPlace(&mtxRotateY, &mtxRotationFix);
+        // XXX this isnt the issue
+        // XXX new fix
+		// mtx4LoadYRotation(M_BADPI/2.0f, &mtxRotationFix);
 		// // zero out to prevent movement
-		controllerMatrix.m[3][0] = 0.0f;
-		controllerMatrix.m[3][1] = 0.0f;
-		controllerMatrix.m[3][2] = 0.0f;
-		mtx4MultMtx4InPlace(&mtxRotationFix, &controllerMatrix);
+		// controllerMatrix.m[3][0] = 0.0f;
+		// controllerMatrix.m[3][1] = 0.0f;
+		// controllerMatrix.m[3][2] = 0.0f;
+		// mtx4MultMtx4InPlace(&mtxRotationFix, &controllerMatrix);
+        // XXX maybe entirely wrong
+		// mtx4LoadXRotation(M_BADPI, &mtxRotationFix);
+		// mtx4LoadYRotation(M_BADPI/2.0f, &mtxRotateY);
+		// mtx4MultMtx4InPlace(&mtxRotateY, &mtxRotationFix);
+		// // // zero out to prevent movement
+		// controllerMatrix.m[3][0] = 0.0f;
+		// controllerMatrix.m[3][1] = 0.0f;
+		// controllerMatrix.m[3][2] = 0.0f;
+		// mtx4MultMtx4InPlace(&mtxRotationFix, &controllerMatrix);
 
 		// overwrite translation in matrix
 		controllerMatrix.m[3][0] = controller_pos[0];
