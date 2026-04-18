@@ -14,3 +14,4 @@ float vrGetWorldScaleFactor();
 float vrGetControllerWorldScaleFactor();
 float vrGetUserRealHeight();
 bool vrUserHeightIsValid();
+void vrGetControllerOffset(float coord[3]);

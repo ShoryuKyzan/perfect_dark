@@ -38,6 +38,7 @@ vr::VRActionHandle_t leftControllerActionPose;
 vr::VRActionHandle_t rightControllerActionPose;
 vr::VRInputValueHandle_t sourceLeft = vr::k_ulInvalidInputValueHandle;
 vr::VRInputValueHandle_t sourceRight = vr::k_ulInvalidInputValueHandle;
+Vector3 vecControllerOffset(-50.0f, 50.0f, 40.0f);
 
 bool firstTick = false;
 Vector3 vecHMDPositionInitial;
@@ -514,4 +515,10 @@ extern "C" bool vrUserHeightIsValid(){
     }else{
         return false; // TODO FIXME raw expression seems to convert to somethin non useful (short int?)
     }
+}
+
+extern "C" void vrGetControllerOffset(float coord[3]) {
+    coord[0] = vecControllerOffset.x;
+    coord[1] = vecControllerOffset.y;
+    coord[2] = vecControllerOffset.z;
 }

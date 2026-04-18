@@ -7563,13 +7563,15 @@ void bgunApplyVRControllerPos(struct hand *hand, s32 handnum, Mtxf *dest) {
 		float hmd_pos[3];
 		float controller_pos[3];
 		Mtxf mtxRotate180Y;
+		float offset[3];
+		vrGetControllerOffset(offset);
 
 		vrGetHMDPlayerCameraRelativePos(hmd_pos);
 
 		// Make controller position relative to HMD
-		controllerMatrix.m[3][0] -= hmd_pos[0];
+		controllerMatrix.m[3][0] += hmd_pos[0];
 		controllerMatrix.m[3][1] -= hmd_pos[1];
-		controllerMatrix.m[3][2] -= hmd_pos[2];
+		controllerMatrix.m[3][2] += hmd_pos[2];
 
 		// Invert X and Z rotation/movement by rotating 180 degrees around Y relative to HMD
 		mtx4LoadYRotation(M_PI, &mtxRotate180Y);
@@ -7580,9 +7582,9 @@ void bgunApplyVRControllerPos(struct hand *hand, s32 handnum, Mtxf *dest) {
 		mtx4Copy(&mtxRotationFix, &controllerMatrix);
 
 		// Scale the relative position
-		controller_pos[0] = controllerMatrix.m[3][0] * vrGetControllerWorldScaleFactor();
-		controller_pos[1] = controllerMatrix.m[3][1] * vrGetControllerWorldScaleFactor();
-		controller_pos[2] = controllerMatrix.m[3][2] * vrGetControllerWorldScaleFactor();
+		controller_pos[0] = controllerMatrix.m[3][0] * vrGetControllerWorldScaleFactor() + offset[0];
+		controller_pos[1] = controllerMatrix.m[3][1] * vrGetControllerWorldScaleFactor() + offset[1];
+		controller_pos[2] = controllerMatrix.m[3][2] * vrGetControllerWorldScaleFactor() + offset[2];
 
 		// overwrite translation in matrix
 		controllerMatrix.m[3][0] = controller_pos[0];
