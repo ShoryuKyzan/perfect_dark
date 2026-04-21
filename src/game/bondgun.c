@@ -7554,16 +7554,20 @@ void bgunApplyVRControllerPos(struct hand *hand, s32 handnum, Mtxf *dest) {
     Mtxf hmdToControllerMatrix;
     Mtxf mtxRotationCameraYaw;
     Mtxf mtxRotationCameraPitch;
+    Mtxf mtxRotationCameraRoll;
     Mtxf mtxRotationCamera;
     Mtxf mtxRotationFix, mtxRotateY;
 	bool connected = vrGetHMDToControllerTransform(hmdToControllerMatrix.m, handnum);
 
 	if (connected) {
 		float hmd_pos[3];
+		float hmd_rot[3];
 		float controller_pos[3];
 		Mtxf mtxRotate180Y;
         float offset[3];
         vrGetControllerOffset(offset);
+        vrGetHMDRotation(hmd_rot);
+        float roll = hmd_rot[2];
 
         // Convert degrees to radians (vv_theta and vv_verta are in degrees)
         float theta = g_Vars.currentplayer->vv_theta * (M_PI / 180.0f);
@@ -7571,7 +7575,13 @@ void bgunApplyVRControllerPos(struct hand *hand, s32 handnum, Mtxf *dest) {
 
         mtx4LoadYRotation(-theta, &mtxRotationCameraYaw);
         mtx4LoadXRotation(verta, &mtxRotationCameraPitch);
-        mtx4MultMtx4(&mtxRotationCameraYaw, &mtxRotationCameraPitch, &mtxRotationCamera);
+        mtx4LoadZRotation(roll, &mtxRotationCameraRoll);
+
+        // Combine Yaw, Pitch, and Roll in the correct order: (Yaw * Pitch) * Roll
+        Mtxf mtxRotationCameraYawPitch;
+        mtx4MultMtx4(&mtxRotationCameraYaw, &mtxRotationCameraPitch, &mtxRotationCameraYawPitch);
+        mtx4MultMtx4(&mtxRotationCameraYawPitch, &mtxRotationCameraRoll, &mtxRotationCamera);
+
         mtx4MultMtx4(&mtxRotationCamera, &hmdToControllerMatrix, &controllerMatrix);
 
 		
