@@ -380,6 +380,7 @@ extern "C" void vrAddHMDPlayerCameraRelativeMovement(float coord[3]){
  * Get HMD movement difference relative to the player camera's orientation (not world)
  * 
  * Note: currently y will always be 0 since camera Y is locked to HMD
+ * @deprecated no longer used/needed
  */
 extern "C" void vrGetHMDPlayerCameraRelativePos(float coord[3]){
     coord[0] = vecHMDPlayerCameraRelativePos.x;
@@ -461,6 +462,28 @@ extern "C" bool vrGetRightControllerMatrix(float matrix[4][4]) {
         return false;
     }
     vrMat4ToFloat44(matrix, mat4ControllerPoseRight);
+    return true;
+}
+
+/**
+ * Transform from the HMD to the controller
+ */
+extern "C" bool vrGetHMDToControllerTransform(float matrix[4][4], int handnum) {
+    Matrix4 mat4ControllerPose;
+    if (handnum == 0) {
+        if (!controllerConnectedRight) {
+            return false;
+        }
+        mat4ControllerPose = mat4ControllerPoseRight;
+    } else {
+        if (!controllerConnectedLeft) {
+            return false;
+        }
+        mat4ControllerPose = mat4ControllerPoseLeft;
+    }
+    // multiply hmdposinverted by controller matrix
+    mat4ControllerPose = mat4HMDPoseInverted * mat4ControllerPose;
+    vrMat4ToFloat44(matrix, mat4ControllerPose);
     return true;
 }
 
