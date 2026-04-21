@@ -7296,7 +7296,7 @@ void bgunTickEject(struct hand *hand, struct modeldef *modeldef, bool isdetonato
 			sp84.f[1] = (hand->posmtx.m[3][1] - hand->prevmtx.m[3][1]) / g_Vars.lvupdate60freal;
 			sp84.f[2] = (hand->posmtx.m[3][2] - hand->prevmtx.m[3][2]) / g_Vars.lvupdate60freal;
 
-			mtx00017588(hand->posmtx.m, sp44.m);
+			mtx4Inverse(hand->posmtx.m, sp44.m);
 			mtx4RotateVecInPlace(&sp44, &sp84);
 
 			hand->unk0d20.f[0] += sp84.f[0] * 0.3f;

@@ -631,7 +631,7 @@ void mtx000172f0(f32 arg0[4][4], f32 arg1[4][4])
 	arg1[3][3] = 1.0f;
 }
 
-void mtx00017588(f32 arg0[4][4], f32 arg1[4][4])
+void mtx4Inverse(f32 arg0[4][4], f32 arg1[4][4])
 {
 	s32 i;
 	s32 j;
